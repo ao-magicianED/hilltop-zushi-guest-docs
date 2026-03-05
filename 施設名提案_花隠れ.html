@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>施設名提案 — 花隠れ（Hanakakure）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap');
+
+  :root {
+    --green-dark: #2D5016;
+    --green-mid: #4A7C28;
+    --green-light: #E8F0E0;
+    --gold: #C7A951;
+    --gold-light: #F5EDD4;
+    --bg: #F5F0E8;
+    --text: #2C2C2C;
+    --white: #FFFFFF;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+  }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, var(--green-dark) 0%, #1a3a0a 100%);
+    color: var(--white);
+    text-align: center;
+    padding: 80px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+  }
+  .hero h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2.8rem;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .hero .subtitle {
+    font-size: 1.1rem;
+    opacity: 0.85;
+    position: relative;
+  }
+  .hero .icon { font-size: 3.5rem; margin-bottom: 16px; position: relative; }
+
+  /* Container */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  /* Section */
+  .section {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 40px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow);
+  }
+  .section h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.6rem;
+    color: var(--green-dark);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--gold);
+    display: inline-block;
+  }
+
+  /* Criteria */
+  .criteria-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .criteria-item {
+    background: var(--green-light);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  .criteria-item .label {
+    font-weight: 700;
+    color: var(--green-dark);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* Proposal Card */
+  .proposal-card {
+    border: 2px solid #E0E0E0;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 28px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .proposal-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  }
+  .proposal-card.recommended {
+    border-color: var(--gold);
+    box-shadow: 0 4px 20px rgba(199,169,81,0.2);
+  }
+  .proposal-header {
+    padding: 24px 32px;
+    background: #F8F8F8;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .proposal-card.recommended .proposal-header {
+    background: linear-gradient(135deg, var(--gold-light), #FFF9E8);
+  }
+  .proposal-number {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    background: var(--green-dark);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .proposal-card.recommended .proposal-number {
+    background: var(--gold);
+    color: var(--green-dark);
+  }
+  .proposal-title {
+    flex: 1;
+  }
+  .proposal-title h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.5rem;
+    color: var(--green-dark);
+  }
+  .proposal-title .romaji {
+    font-size: 1rem;
+    color: #666;
+  }
+  .badge {
+    background: var(--gold);
+    color: var(--green-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .proposal-body {
+    padding: 28px 32px;
+  }
+  .proposal-body table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .proposal-body th {
+    text-align: left;
+    vertical-align: top;
+    padding: 8px 16px 8px 0;
+    color: var(--green-dark);
+    font-weight: 600;
+    width: 160px;
+    white-space: nowrap;
+    font-size: 0.9rem;
+  }
+  .proposal-body td {
+    padding: 8px 0;
+    font-size: 0.95rem;
+  }
+  .ota-example {
+    background: #F4F7F0;
+    border-left: 4px solid var(--green-mid);
+    padding: 10px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 4px 0;
+    font-size: 0.9rem;
+    font-family: monospace;
+  }
+  .strength { color: var(--green-dark); }
+  .weakness { color: #996633; }
+
+  /* Comparison Table */
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin-top: 16px;
+  }
+  .comparison-table th {
+    background: var(--green-dark);
+    color: var(--white);
+    padding: 12px 10px;
+    text-align: center;
+    font-weight: 600;
+  }
+  .comparison-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #EEE;
+  }
+  .comparison-table tbody tr:hover {
+    background: var(--green-light);
+  }
+  .comparison-table .name-col {
+    text-align: left;
+    font-weight: 600;
+    color: var(--green-dark);
+  }
+  .star { color: var(--gold); }
+
+  /* Recommendation */
+  .recommendation {
+    background: linear-gradient(135deg, var(--green-dark), #1a3a0a);
+    color: var(--white);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+  }
+  .recommendation h2 {
+    color: var(--gold) !important;
+    border-bottom-color: rgba(255,255,255,0.3) !important;
+  }
+  .recommendation .big-name {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2.5rem;
+    margin: 20px 0 8px;
+    color: var(--gold);
+  }
+  .recommendation .big-romaji {
+    font-size: 1.3rem;
+    opacity: 0.8;
+  }
+  .recommendation .listing {
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 16px 24px;
+    margin: 24px auto;
+    max-width: 600px;
+    font-family: monospace;
+    font-size: 1rem;
+  }
+  .recommendation p { margin: 8px 0; opacity: 0.9; }
+
+  @media print {
+    body { background: white; }
+    .section { box-shadow: none; border: 1px solid #ddd; }
+  }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 2rem; }
+    .section { padding: 24px 20px; }
+    .proposal-header { flex-direction: column; text-align: center; }
+    .proposal-body th { display: block; width: 100%; padding-bottom: 2px; }
+    .proposal-body td { display: block; padding-bottom: 12px; }
+    .criteria-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="icon">🏡</div>
+  <h1>施設名提案</h1>
+  <div class="subtitle">Property Name Proposals — 神武寺民泊プロジェクト</div>
+</div>
+
+<div class="container">
+
+  <!-- 物件概要 -->
+  <div class="section">
+    <h2>物件概要</h2>
+    <table style="width:100%; border-collapse:collapse;">
+      <tr><td style="padding:8px 0; font-weight:600; width:140px;">所在地</td><td>逗子市池子2-10-9（JR東逗子駅 徒歩約90秒）</td></tr>
+      <tr><td style="padding:8px 0; font-weight:600;">物件タイプ</td><td>一軒家（最大12名）</td></tr>
+      <tr><td style="padding:8px 0; font-weight:600;">コンセプト</td><td>森の隠れ家・自然に囲まれた一軒家リトリート</td></tr>
+    </table>
+  </div>
+
+  <!-- 選定基準 -->
+  <div class="section">
+    <h2>選定基準</h2>
+    <div class="criteria-grid">
+      <div class="criteria-item"><span class="label">英語での響き</span>発音しやすく覚えやすいか</div>
+      <div class="criteria-item"><span class="label">検索性（SEO）</span>OTA内検索でユニークか</div>
+      <div class="criteria-item"><span class="label">ブランディング</span>コンセプトとの一致度</div>
+      <div class="criteria-item"><span class="label">文化的魅力</span>日本文化への憧れを刺激</div>
+      <div class="criteria-item"><span class="label">OTA表示映え</span>リスティングタイトル適性</div>
+    </div>
+  </div>
+
+  <!-- 案1: 花隠れ -->
+  <div class="section" style="padding:0; overflow:hidden;">
+    <div class="proposal-card recommended" style="border:none; margin:0; box-shadow:none;">
+      <div class="proposal-header">
+        <div class="proposal-number">1</div>
+        <div class="proposal-title">
+          <h3>花隠れ</h3>
+          <div class="romaji">Hanakakure — "Hidden among flowers"</div>
+        </div>
+        <span class="badge">★ 推奨</span>
+      </div>
+      <div class="proposal-body">
+        <table>
+          <tr><th>コンセプト</th><td>四季折々の花と緑に囲まれ、都市の喧騒から「隠れる」ように佇む一軒家。日本庭園や里山の情緒を連想させる。</td></tr>
+          <tr><th>英語での印象</th><td>"Hana"（花＝日本語として広く認知）+"kakure"（隠れ）。『NARUTO』の木ノ葉隠れ（Konohagakure）との語感的な親和性があり、日本文化ファンに響く。</td></tr>
+          <tr>
+            <th>Airbnb表示例</th>
+            <td><div class="ota-example">Hanakakure — Hidden Forest Retreat near Kamakura</div></td>
+          </tr>
+          <tr>
+            <th>Booking.com表示例</th>
+            <td><div class="ota-example">花隠れ Hanakakure - Zushi Forest House</div></td>
+          </tr>
+          <tr><th>強み</th><td class="strength">唯一無二のネーミング。検索競合なし。覚えやすい4音節。</td></tr>
+          <tr><th>弱み</th><td class="weakness">初見では意味が伝わりにくいため、サブタイトルでの補足が必要。</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 案2: 森の庵 -->
+  <div class="section" style="padding:0; overflow:hidden;">
+    <div class="proposal-card" style="border:none; margin:0; box-shadow:none;">
+      <div class="proposal-header">
+        <div class="proposal-number">2</div>
+        <div class="proposal-title">
+          <h3>森の庵</h3>
+          <div class="romaji">Mori no Iori — "Forest hermitage"</div>
+        </div>
+      </div>
+      <div class="proposal-body">
+        <table>
+          <tr><th>コンセプト</th><td>鎌倉時代の草庵・茶室文化を連想させる、質素ながら趣のある隠れ処。禅的な世界観。</td></tr>
+          <tr><th>英語での印象</th><td>"Mori"（森）は直感的。"Iori"は女性名としても通用し柔らかい響き。</td></tr>
+          <tr><th>Airbnb表示例</th><td><div class="ota-example">Mori no Iori — Forest Hermitage, Zushi</div></td></tr>
+          <tr><th>Booking.com表示例</th><td><div class="ota-example">森の庵 Mori no Iori - Traditional House in Zushi</div></td></tr>
+          <tr><th>強み</th><td class="strength">「森」のイメージが物件の立地と直結。和の趣が強い。</td></tr>
+          <tr><th>弱み</th><td class="weakness">"Iori"の発音が英語話者にやや難。「庵」の本来の意味（質素な小屋）が12名規模と若干ギャップ。</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 案3: 木漏れ日 -->
+  <div class="section" style="padding:0; overflow:hidden;">
+    <div class="proposal-card" style="border:none; margin:0; box-shadow:none;">
+      <div class="proposal-header">
+        <div class="proposal-number">3</div>
+        <div class="proposal-title">
+          <h3>木漏れ日</h3>
+          <div class="romaji">Komorebi — "Sunlight filtering through leaves"</div>
+        </div>
+      </div>
+      <div class="proposal-body">
+        <table>
+          <tr><th>コンセプト</th><td>森に囲まれた物件に朝の光が差し込む情景そのもの。海外で「翻訳できない美しい日本語」として広く知られる単語。</td></tr>
+          <tr><th>英語での印象</th><td>BBC、NYT等で「世界で最も美しい日本語」として紹介実績あり。認知度が高く、憧れを刺激する。</td></tr>
+          <tr><th>Airbnb表示例</th><td><div class="ota-example">Komorebi — Forest Light House near Kamakura</div></td></tr>
+          <tr><th>Booking.com表示例</th><td><div class="ota-example">木漏れ日 Komorebi - Sunlit Forest Home, Zushi</div></td></tr>
+          <tr><th>強み</th><td class="strength">海外認知度No.1の日本語ワード。BBQと森の組み合わせにぴったり。</td></tr>
+          <tr><th>弱み</th><td class="weakness">同名の宿泊施設が既に複数存在（京都・箱根等）。差別化が必要。</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 案4: 逗子庵 -->
+  <div class="section" style="padding:0; overflow:hidden;">
+    <div class="proposal-card" style="border:none; margin:0; box-shadow:none;">
+      <div class="proposal-header">
+        <div class="proposal-number">4</div>
+        <div class="proposal-title">
+          <h3>逗子庵</h3>
+          <div class="romaji">Zushi-an — "Zushi retreat"</div>
+        </div>
+      </div>
+      <div class="proposal-body">
+        <table>
+          <tr><th>コンセプト</th><td>地名を冠することでロケーションを即座に伝える実用的なネーミング。「庵」が和のテイストを加える。</td></tr>
+          <tr><th>英語での印象</th><td>地名＋日本語の組み合わせは分かりやすい。"an"は短く発音しやすい。</td></tr>
+          <tr><th>Airbnb表示例</th><td><div class="ota-example">Zushi-an — Traditional House with BBQ Garden</div></td></tr>
+          <tr><th>Booking.com表示例</th><td><div class="ota-example">逗子庵 Zushi-an - Japanese House near Kamakura</div></td></tr>
+          <tr><th>強み</th><td class="strength">SEO最強。「Zushi」で検索するゲストにダイレクトに刺さる。覚えやすい。</td></tr>
+          <tr><th>弱み</th><td class="weakness">ポエティックさに欠ける。「逗子」の知名度は鎌倉と比べ低い。</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 案5: 翠隠 -->
+  <div class="section" style="padding:0; overflow:hidden;">
+    <div class="proposal-card" style="border:none; margin:0; box-shadow:none;">
+      <div class="proposal-header">
+        <div class="proposal-number">5</div>
+        <div class="proposal-title">
+          <h3>翠隠</h3>
+          <div class="romaji">Suiin — "Hidden in green"</div>
+        </div>
+      </div>
+      <div class="proposal-body">
+        <table>
+          <tr><th>コンセプト</th><td>「翠」（翡翠の翠、深い緑）＋「隠」（隠れる）。花隠れの姉妹候補として、より静謐で高級感のある響き。</td></tr>
+          <tr><th>英語での印象</th><td>短く、ミステリアスな響き。日本の旅館名のような格調。</td></tr>
+          <tr><th>Airbnb表示例</th><td><div class="ota-example">Suiin — Hidden Green Retreat, Zushi</div></td></tr>
+          <tr><th>Booking.com表示例</th><td><div class="ota-example">翠隠 Suiin - Forest Villa near Kamakura & Hayama</div></td></tr>
+          <tr><th>強み</th><td class="strength">完全にユニークで検索競合ゼロ。漢字2文字の簡潔さ。高級路線にも対応可能。</td></tr>
+          <tr><th>弱み</th><td class="weakness">読めない漢字（翠）。意味の伝達にサブタイトル必須。</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 総合比較 -->
+  <div class="section">
+    <h2>総合比較</h2>
+    <div style="overflow-x:auto;">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th style="text-align:left;">案</th>
+            <th>英語の響き</th>
+            <th>検索性</th>
+            <th>ブランド力</th>
+            <th>文化的魅力</th>
+            <th>OTA映え</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:var(--gold-light);">
+            <td class="name-col">花隠れ Hanakakure</td>
+            <td><span class="star">★★★★</span></td>
+            <td><span class="star">★★★★★</span></td>
+            <td><span class="star">★★★★★</span></td>
+            <td><span class="star">★★★★★</span></td>
+            <td><span class="star">★★★★</span></td>
+          </tr>
+          <tr>
+            <td class="name-col">森の庵 Mori no Iori</td>
+            <td><span class="star">★★★</span></td>
+            <td><span class="star">★★★★</span></td>
+            <td><span class="star">★★★★</span></td>
+            <td><span class="star">★★★★★</span></td>
+            <td><span class="star">★★★</span></td>
+          </tr>
+          <tr>
+            <td class="name-col">木漏れ日 Komorebi</td>
+            <td><span class="star">★★★★★</span></td>
+            <td><span class="star">★★★</span></td>
+            <td><span class="star">★★★★</span></td>
+            <td><span class="star">★★★★★</span></td>
+            <td><span class="star">★★★★</span></td>
+          </tr>
+          <tr>
+            <td class="name-col">逗子庵 Zushi-an</td>
+            <td><span class="star">★★★★</span></td>
+            <td><span class="star">★★★★★</span></td>
+            <td><span class="star">★★★</span></td>
+            <td><span class="star">★★★</span></td>
+            <td><span class="star">★★★★</span></td>
+          </tr>
+          <tr>
+            <td class="name-col">翠隠 Suiin</td>
+            <td><span class="star">★★★</span></td>
+            <td><span class="star">★★★★★</span></td>
+            <td><span class="star">★★★★★</span></td>
+            <td><span class="star">★★★★</span></td>
+            <td><span class="star">★★★★</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 推奨 -->
+  <div class="recommendation">
+    <h2>推奨</h2>
+    <div class="big-name">花隠れ</div>
+    <div class="big-romaji">Hanakakure</div>
+    <div class="listing">Hanakakure — Hidden Forest Retreat near Kamakura</div>
+    <p>ユニーク性・ブランド力・文化的魅力のバランスが最も優れている</p>
+    <p>サブタイトルで「森の隠れ家」「BBQ付き一軒家」等を補足可能</p>
+    <p style="margin-top:20px; opacity:0.6; font-size:0.85rem;">次点: 木漏れ日（Komorebi）— 海外認知度の高さは突出しているが、既存競合との差別化が課題</p>
+  </div>
+
+</div>
+
+</body>
+</html>

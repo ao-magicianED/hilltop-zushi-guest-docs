@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ハウスルール — 花隠れ（Hanakakure）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap');
+
+  :root {
+    --green-dark: #2D5016;
+    --green-mid: #4A7C28;
+    --green-light: #E8F0E0;
+    --gold: #C7A951;
+    --gold-light: #F5EDD4;
+    --bg: #F5F0E8;
+    --text: #2C2C2C;
+    --white: #FFFFFF;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --red: #C0392B;
+    --red-light: #FDEDEC;
+    --red-border: #E74C3C;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+  }
+
+  /* ===== PAGE: Cover ===== */
+  .page-cover {
+    background: linear-gradient(135deg, var(--green-dark) 0%, #1a3a0a 100%);
+    color: var(--white);
+    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 60px 20px;
+  }
+  .page-cover::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M40 0L20 20 0 0h40zm0 80L20 60 0 80h40zm40-40L60 20 80 0v40zm0 40L60 60 80 80V40zM20 40L0 20v40l20-20zm40 0L80 20v40L60 40zM40 20L20 0h40L40 20zm0 40L20 80h40L40 60z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.6;
+  }
+  .page-cover .icon { font-size: 4rem; position: relative; margin-bottom: 20px; }
+  .page-cover h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 3.5rem;
+    position: relative;
+    letter-spacing: 0.15em;
+  }
+  .page-cover .subtitle-en {
+    font-size: 1.3rem;
+    opacity: 0.8;
+    position: relative;
+    margin-bottom: 40px;
+    letter-spacing: 0.1em;
+  }
+  .page-cover .doc-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2.2rem;
+    color: var(--gold);
+    position: relative;
+    letter-spacing: 0.2em;
+    margin-bottom: 8px;
+  }
+  .page-cover .doc-title-jp {
+    font-size: 1.1rem;
+    opacity: 0.7;
+    position: relative;
+    margin-bottom: 48px;
+    letter-spacing: 0.15em;
+  }
+  .page-cover .location {
+    position: relative;
+    font-size: 1rem;
+    opacity: 0.7;
+  }
+  .page-cover .location-en {
+    position: relative;
+    font-size: 0.9rem;
+    font-style: italic;
+    opacity: 0.5;
+  }
+  .page-cover .corner-deco {
+    position: absolute;
+    width: 80px; height: 80px;
+    border: 2px solid rgba(199,169,81,0.3);
+  }
+  .page-cover .corner-deco.tl { top: 30px; left: 30px; border-right: none; border-bottom: none; }
+  .page-cover .corner-deco.tr { top: 30px; right: 30px; border-left: none; border-bottom: none; }
+  .page-cover .corner-deco.bl { bottom: 30px; left: 30px; border-right: none; border-top: none; }
+  .page-cover .corner-deco.br { bottom: 30px; right: 30px; border-left: none; border-top: none; }
+
+  /* ===== Container ===== */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  /* ===== Page Section ===== */
+  .page {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 48px 40px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow);
+    page-break-inside: avoid;
+  }
+  .page-number {
+    display: inline-block;
+    background: var(--green-dark);
+    color: var(--white);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+  }
+  .page h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.6rem;
+    color: var(--green-dark);
+    margin-bottom: 6px;
+  }
+  .page h2 + .subtitle {
+    font-size: 0.95rem;
+    color: #888;
+    margin-bottom: 24px;
+  }
+  .page h3 {
+    font-size: 1.15rem;
+    color: var(--green-dark);
+    margin-top: 28px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .page h3 .icon { font-size: 1.3rem; }
+  .page h4 {
+    font-size: 1rem;
+    color: var(--green-mid);
+    margin-top: 20px;
+    margin-bottom: 8px;
+  }
+  .page p, .page li {
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+  .page .bilingual {
+    margin-bottom: 20px;
+  }
+  .page .bilingual .jp { margin-bottom: 8px; }
+  .page .bilingual .en { color: #666; font-size: 0.9rem; }
+
+  /* Divider */
+  .divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 28px 0;
+  }
+
+  /* ===== Welcome ===== */
+  .welcome-text {
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto 32px;
+  }
+  .welcome-text h2 {
+    display: block;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .welcome-text .subtitle {
+    text-align: center;
+  }
+  .welcome-text p {
+    text-align: left;
+    font-size: 0.95rem;
+    line-height: 2;
+  }
+
+  /* ===== Contact Card ===== */
+  .contact-card {
+    background: var(--green-light);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 24px;
+  }
+  .contact-card h3 {
+    margin-top: 0;
+    border-bottom-color: var(--green-mid);
+  }
+  .contact-card table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .contact-card th {
+    text-align: left;
+    padding: 6px 12px 6px 0;
+    font-weight: 600;
+    color: var(--green-dark);
+    width: 140px;
+    vertical-align: top;
+    font-size: 0.9rem;
+  }
+  .contact-card td {
+    padding: 6px 0;
+    font-size: 0.9rem;
+  }
+
+  /* ===== Alert Box ===== */
+  .alert {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 0.9rem;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .alert .alert-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .alert-warning {
+    background: #FFF8E1;
+    border-left: 4px solid #F9A825;
+  }
+  .alert-danger {
+    background: var(--red-light);
+    border-left: 4px solid var(--red-border);
+  }
+  .alert-info {
+    background: #E3F2FD;
+    border-left: 4px solid #1976D2;
+  }
+
+  /* ===== No Smoking Page ===== */
+  .no-smoking-page {
+    text-align: center;
+    padding: 60px 40px;
+  }
+  .no-smoking-page .big-icon {
+    font-size: 6rem;
+    margin-bottom: 16px;
+  }
+  .no-smoking-page .big-text {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2.4rem;
+    color: var(--red);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .no-smoking-page .big-text-en {
+    font-size: 1.4rem;
+    color: var(--red);
+    font-weight: 700;
+    margin-bottom: 28px;
+  }
+  .no-smoking-page .sub-text {
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+  }
+  .garden-note {
+    background: var(--green-light);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 32px;
+    text-align: left;
+  }
+  .garden-note h4 {
+    text-align: center;
+    color: var(--green-dark);
+    margin-bottom: 12px;
+  }
+
+  /* ===== Rule Card ===== */
+  .rule-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .rule-card {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #E8E8E8;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .rule-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  .rule-card .rule-icon {
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    background: var(--green-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+  .rule-card .rule-content { flex: 1; }
+  .rule-card .rule-title {
+    font-weight: 700;
+    color: var(--green-dark);
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+  .rule-card .rule-desc {
+    font-size: 0.88rem;
+    margin-bottom: 2px;
+  }
+  .rule-card .rule-desc-en {
+    font-size: 0.85rem;
+    color: #888;
+  }
+
+  /* ===== Data Table ===== */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin: 16px 0;
+  }
+  .data-table th {
+    background: var(--green-dark);
+    color: var(--white);
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .data-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #EEE;
+    vertical-align: top;
+  }
+  .data-table tbody tr:hover {
+    background: var(--green-light);
+  }
+
+  /* ===== Highlight Amount ===== */
+  .highlight-amount {
+    display: inline-block;
+    background: var(--red-light);
+    color: var(--red);
+    font-weight: 700;
+    font-size: 1.3rem;
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: 2px solid var(--red-border);
+  }
+
+  /* ===== Checkout Time ===== */
+  .checkout-time {
+    display: inline-block;
+    background: var(--gold-light);
+    color: var(--green-dark);
+    font-family: 'Noto Serif JP', serif;
+    font-weight: 700;
+    font-size: 2rem;
+    padding: 12px 32px;
+    border-radius: 12px;
+    border: 2px solid var(--gold);
+  }
+
+  /* ===== Checklist ===== */
+  .checklist {
+    list-style: none;
+    padding: 0;
+  }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #F0F0F0;
+    font-size: 0.9rem;
+  }
+  .checklist li::before {
+    content: '☐';
+    font-size: 1.1rem;
+    color: var(--green-mid);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ===== Timeline Bar ===== */
+  .timeline-bar {
+    display: flex;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .timeline-bar .time-ok {
+    background: var(--green-light);
+    color: var(--green-dark);
+    padding: 12px 20px;
+    flex: 12;
+    text-align: center;
+  }
+  .timeline-bar .time-quiet {
+    background: #E8E0F0;
+    color: #5B3A8C;
+    padding: 12px 20px;
+    flex: 12;
+    text-align: center;
+  }
+
+  /* ===== BBQ Card ===== */
+  .bbq-header {
+    background: linear-gradient(135deg, #F9E4B7, #FFF3D6);
+    border-radius: 12px;
+    padding: 20px 24px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .bbq-header .title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.2rem;
+    color: var(--green-dark);
+  }
+
+  /* ===== Trash Category ===== */
+  .trash-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .trash-item {
+    border-radius: 12px;
+    padding: 16px;
+    border: 2px solid;
+  }
+  .trash-item.red { background: #FFF5F5; border-color: #E74C3C; }
+  .trash-item.yellow { background: #FFFEF5; border-color: #F1C40F; }
+  .trash-item.blue { background: #F5F9FF; border-color: #3498DB; }
+  .trash-item.green { background: #F5FFF5; border-color: #27AE60; }
+  .trash-item .trash-icon { font-size: 1.5rem; margin-bottom: 6px; }
+  .trash-item .trash-title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+  }
+  .trash-item .trash-title-en {
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 6px;
+  }
+  .trash-item .trash-desc {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  /* ===== Emergency Page ===== */
+  .emergency-header {
+    background: linear-gradient(135deg, var(--red), #922B21);
+    color: var(--white);
+    text-align: center;
+    padding: 32px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+  }
+  .emergency-header .icon { font-size: 2.5rem; margin-bottom: 8px; }
+  .emergency-header h2 {
+    color: var(--white);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.6rem;
+  }
+  .emergency-header .sub { font-size: 1rem; opacity: 0.9; }
+
+  .emergency-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #EEE;
+    margin-bottom: 12px;
+  }
+  .emergency-card .em-icon { font-size: 2rem; }
+  .emergency-card .em-label {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--green-dark);
+  }
+  .emergency-card .em-label-en {
+    font-size: 0.85rem;
+    color: #888;
+  }
+  .emergency-card .em-number {
+    margin-left: auto;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--red);
+  }
+
+  /* ===== 119 Sheet ===== */
+  .address-box {
+    background: var(--red-light);
+    border: 3px solid var(--red-border);
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    margin: 24px 0;
+  }
+  .address-box .postal { font-size: 1.2rem; color: #666; margin-bottom: 8px; }
+  .address-box .address-jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--red);
+    margin-bottom: 12px;
+  }
+  .address-box .address-en {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #444;
+  }
+
+  .speech-box {
+    background: #F8F9FA;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 12px 0;
+    border-left: 4px solid var(--green-mid);
+  }
+  .speech-box .label {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--green-dark);
+    margin-bottom: 6px;
+  }
+  .speech-box .text {
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+
+  /* ===== Wi-Fi Card ===== */
+  .wifi-card {
+    background: linear-gradient(135deg, var(--green-dark), #1a3a0a);
+    color: var(--white);
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .wifi-card .wifi-icon { font-size: 3rem; margin-bottom: 8px; }
+  .wifi-card h3 {
+    color: var(--gold);
+    border-bottom: none;
+    justify-content: center;
+    margin-top: 0;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.3rem;
+  }
+  .wifi-card .wifi-field {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 12px 0;
+    font-size: 1rem;
+  }
+  .wifi-card .wifi-label {
+    font-weight: 600;
+    opacity: 0.8;
+    min-width: 100px;
+    text-align: right;
+  }
+  .wifi-card .wifi-value {
+    background: rgba(255,255,255,0.15);
+    padding: 8px 24px;
+    border-radius: 8px;
+    font-family: monospace;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    min-width: 200px;
+  }
+  .wifi-card .wifi-note {
+    font-size: 0.8rem;
+    opacity: 0.5;
+    margin-top: 12px;
+  }
+
+  /* ===== Rules Summary ===== */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+  }
+  .summary-table th {
+    background: var(--green-dark);
+    color: var(--white);
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  .summary-table td {
+    padding: 10px 8px;
+    border-bottom: 1px solid #EEE;
+    text-align: center;
+  }
+  .summary-table .icon-col { font-size: 1.2rem; }
+  .summary-table .rule-col { text-align: left; font-weight: 600; color: var(--green-dark); }
+
+  /* ===== Footer ===== */
+  .page-footer {
+    text-align: center;
+    padding: 48px 20px;
+  }
+  .page-footer .closing {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.3rem;
+    color: var(--green-dark);
+    margin-bottom: 4px;
+  }
+  .page-footer .closing-en {
+    font-size: 1rem;
+    color: #888;
+    margin-bottom: 16px;
+  }
+  .page-footer .brand {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.1rem;
+    color: var(--green-dark);
+    font-weight: 700;
+  }
+  .page-footer .brand-en {
+    font-size: 0.85rem;
+    color: #999;
+    font-style: italic;
+  }
+
+  /* ===== Print ===== */
+  @media print {
+    body { background: white; }
+    .page-cover { min-height: auto; padding: 120px 40px; }
+    .page { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+    .page-cover, .page { page-break-after: always; }
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 640px) {
+    .page-cover h1 { font-size: 2.4rem; }
+    .page-cover .doc-title { font-size: 1.6rem; }
+    .page { padding: 28px 20px; }
+    .trash-grid { grid-template-columns: 1fr; }
+    .timeline-bar { flex-direction: column; }
+    .emergency-card { flex-direction: column; text-align: center; }
+    .emergency-card .em-number { margin-left: 0; }
+    .wifi-card .wifi-field { flex-direction: column; gap: 4px; }
+    .address-box { padding: 24px 16px; }
+    .address-box .address-jp { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== PAGE 1: 表紙 ==================== -->
+<div class="page-cover">
+  <div class="corner-deco tl"></div>
+  <div class="corner-deco tr"></div>
+  <div class="corner-deco bl"></div>
+  <div class="corner-deco br"></div>
+  <div class="icon">🏡</div>
+  <h1>花隠れ</h1>
+  <div class="subtitle-en">Hanakakure</div>
+  <div class="doc-title">HOUSE RULES</div>
+  <div class="doc-title-jp">ハウスルール</div>
+  <div class="location">逗子市池子 — 森の隠れ家</div>
+  <div class="location-en">Hidden Forest Retreat — Zushi, Kanagawa</div>
+</div>
+
+<div class="container">
+
+  <!-- ==================== PAGE 2: ウェルカム ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 2</span>
+    <div class="welcome-text">
+      <h2>ようこそ、花隠れへ</h2>
+      <div class="subtitle">Welcome to Hanakakure</div>
+    </div>
+
+    <div class="bilingual">
+      <p class="jp">
+        この度は花隠れをお選びいただき、誠にありがとうございます。<br>
+        当施設は逗子の豊かな自然に囲まれた一軒家です。<br>
+        鎌倉・葉山・逗子海岸へのアクセスも良好で、<br>
+        森の静けさと海辺のリゾート感を同時にお楽しみいただけます。
+      </p>
+      <p class="en" style="color:#888;">
+        Thank you for choosing Hanakakure.<br>
+        Our property is a private house nestled in the lush nature of Zushi.<br>
+        With easy access to Kamakura, Hayama, and Zushi Beach,<br>
+        you can enjoy both the tranquility of the forest and the charm of the coast.
+      </p>
+    </div>
+
+    <div class="bilingual">
+      <p class="jp">皆さまに快適にお過ごしいただくため、こちらのハウスルールをお読みください。</p>
+      <p class="en" style="color:#888;">Please take a moment to read these House Rules to ensure a comfortable stay for everyone.</p>
+    </div>
+
+    <div class="contact-card">
+      <h3><span class="icon">📩</span> ご連絡方法 / How to Contact Us</h3>
+      <table>
+        <tr><th>連絡手段</th><td>Airbnb / Booking.com のメッセージ機能をご利用ください</td></tr>
+        <tr><th>Contact</th><td style="color:#888;">Please message us through your booking platform (Airbnb / Booking.com)</td></tr>
+        <tr><th>Email</th><td>※予約確認メールに記載のアドレスをご利用ください<br><span style="color:#888;">See your booking confirmation</span></td></tr>
+        <tr><th>対応時間</th><td>9:00〜21:00（緊急時は時間外もご連絡ください）<br><span style="color:#888;">9:00–21:00 (Contact us anytime in case of emergency)</span></td></tr>
+      </table>
+      <div class="alert alert-warning" style="margin-top:16px;">
+        <span class="alert-icon">⚠️</span>
+        <div>
+          <strong>お電話でのご連絡は受け付けておりません。</strong><br>
+          <span style="color:#888;">We do not accept phone calls. Please use the messaging function.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 3: 禁煙 ==================== -->
+  <div class="page no-smoking-page">
+    <span class="page-number">PAGE 3</span>
+    <div class="big-icon">🚭</div>
+    <div class="big-text">全館禁煙</div>
+    <div class="big-text-en">NO SMOKING INDOORS</div>
+    <hr class="divider">
+    <p class="sub-text">室内での喫煙は固くお断りいたします。</p>
+    <p class="sub-text" style="color:#888;">Smoking is strictly prohibited inside the house.</p>
+
+    <div class="garden-note">
+      <h4>🌿 庭での喫煙について / Smoking in the Garden</h4>
+      <div class="bilingual">
+        <p class="jp"><strong>庭での喫煙は可能です。必ず備え付けの灰皿をご使用ください。</strong></p>
+        <p class="en" style="color:#888;">You may smoke in the garden. Please use the ashtray provided.</p>
+      </div>
+    </div>
+
+    <div class="alert alert-danger" style="margin-top:24px;">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        室内で喫煙が確認された場合、クリーニング費用（<strong>¥50,000〜</strong>）を請求させていただきます。<br>
+        <span style="color:#888;">A cleaning fee of ¥50,000 or more will be charged if indoor smoking is detected.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 4: HOUSE RULE 1 ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 4 — HOUSE RULE 1</span>
+    <h2>基本ルール</h2>
+    <div class="subtitle">Basic House Rules</div>
+
+    <div class="rule-grid">
+      <div class="rule-card">
+        <div class="rule-icon">🚭</div>
+        <div class="rule-content">
+          <div class="rule-title">禁煙 / No Smoking</div>
+          <div class="rule-desc">室内は全面禁煙です。庭での喫煙は灰皿をご利用ください。</div>
+          <div class="rule-desc-en">No smoking indoors. Use the ashtray in the garden if you smoke.</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-icon">👟</div>
+        <div class="rule-content">
+          <div class="rule-title">土足厳禁 / No Shoes Inside</div>
+          <div class="rule-desc">玄関で靴を脱ぎ、スリッパに履き替えてください。</div>
+          <div class="rule-desc-en">Please remove your shoes at the entrance and use the slippers provided.</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-icon">🔐</div>
+        <div class="rule-content">
+          <div class="rule-title">施錠のお願い / Lock the Door</div>
+          <div class="rule-desc">外出時・就寝時は必ずすべてのドアを施錠してください。<br>SwitchBotスマートロックの操作方法はゲストガイドをご確認ください。</div>
+          <div class="rule-desc-en">Please lock all doors when you go out or go to sleep. See the Guest Guide for SwitchBot smart lock instructions.</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-icon">💡</div>
+        <div class="rule-content">
+          <div class="rule-title">節電のお願い / Save Energy</div>
+          <div class="rule-desc">外出時はエアコン・照明・暖房をお切りください。</div>
+          <div class="rule-desc-en">Please turn off the air conditioning, lights, and heaters when you go out.</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-icon">🧹</div>
+        <div class="rule-content">
+          <div class="rule-title">清潔に保つ / Keep the House Clean</div>
+          <div class="rule-desc">ご使用後のキッチン・バスルームは簡単に清掃をお願いいたします。<br>ゴミは分別のうえ、所定の場所にお出しください（→ PAGE 7参照）。</div>
+          <div class="rule-desc-en">Please keep the kitchen and bathroom tidy after use. Separate your trash as instructed (→ see PAGE 7).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 5: HOUSE RULE 2 ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 5 — HOUSE RULE 2</span>
+    <h2>設備の取り扱い</h2>
+    <div class="subtitle">Take Good Care of the Property</div>
+
+    <h3><span class="icon">🏠</span> 破損・紛失について / Damage &amp; Loss</h3>
+    <div class="bilingual">
+      <p class="jp">設備や備品を破損・紛失された場合、修理・交換費用を請求させていただく場合がございます。故意でない場合でも、発見次第すぐにご連絡ください。</p>
+      <p class="en">If any equipment or furnishings are damaged or lost, repair/replacement costs may be charged. Even if accidental, please notify us immediately.</p>
+    </div>
+
+    <hr class="divider">
+
+    <h3><span class="icon">🔑</span> 鍵の紛失 / Lost Keys</h3>
+    <div style="text-align:center; margin:20px 0;">
+      <div class="highlight-amount">¥25,000</div>
+      <p style="margin-top:8px; font-size:0.9rem; color:#888;">スマートロック交換費用 / Smart lock replacement cost</p>
+    </div>
+    <div class="alert alert-warning">
+      <span class="alert-icon">🔒</span>
+      <div>
+        鍵の紛失が発生した場合、セキュリティのためスマートロック一式を交換します。<br>
+        <span style="color:#888;">In case of a lost key, the entire smart lock system will be replaced for security.</span>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <h3><span class="icon">⏰</span> チェックアウト時間 / Check-out Time</h3>
+    <div style="text-align:center; margin:20px 0;">
+      <div class="checkout-time">10:00 AM</div>
+    </div>
+    <div class="bilingual" style="text-align:center;">
+      <p class="jp" style="font-size:0.9rem;">チェックアウト時間を過ぎた場合、追加料金が発生する場合があります。</p>
+      <p class="en">Late check-out may incur additional charges.</p>
+    </div>
+
+    <hr class="divider">
+
+    <h3><span class="icon">✅</span> チェックアウト時のお願い / Before You Leave</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+      <div>
+        <h4 style="color:var(--green-dark);">日本語</h4>
+        <ul class="checklist">
+          <li>ゴミは分別して所定の場所にまとめる</li>
+          <li>使用した食器は洗って元の場所に戻す</li>
+          <li>エアコン・照明をすべて消す</li>
+          <li>窓をすべて閉める</li>
+          <li>玄関の施錠を確認する</li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="color:#888;">English</h4>
+        <ul class="checklist">
+          <li>Separate and gather trash in the designated area</li>
+          <li>Wash dishes and return them to their original place</li>
+          <li>Turn off all air conditioning and lights</li>
+          <li>Close all windows</li>
+          <li>Make sure the front door is locked</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 6: HOUSE RULE 3 ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 6 — HOUSE RULE 3</span>
+    <h2>騒音・BBQ</h2>
+    <div class="subtitle">Noise &amp; BBQ Rules</div>
+
+    <h3><span class="icon">🔇</span> 騒音ルール / Noise Rules</h3>
+
+    <div class="timeline-bar">
+      <div class="time-ok">〜20:00<br>通常の生活音OK<br><span style="font-size:0.75rem;">Normal sounds OK</span></div>
+      <div class="time-quiet">20:00〜翌8:00<br>🔇 静粛時間<br><span style="font-size:0.75rem;">Quiet Hours</span></div>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">🏘️</span>
+      <div>
+        当施設は閑静な住宅街に位置しています。近隣住民へのご配慮をお願いいたします。<br>
+        <span style="color:#888;">This property is located in a quiet residential area. Please be considerate of our neighbors.</span>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <h3><span class="icon">🔥</span> BBQルール / BBQ Rules</h3>
+
+    <div class="bbq-header">
+      <div class="title">庭でのBBQは歓迎です！🍖<br><span style="font-size:0.9rem; color:#888;">BBQ in the garden is welcome!</span></div>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr><th style="width:40px;"></th><th>ルール / Rule</th><th>詳細 / Details</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>⏰</td><td><strong>利用時間</strong></td><td><strong>20:00まで</strong> / Until 8:00 PM</td></tr>
+        <tr><td>🧹</td><td><strong>後片付け</strong></td><td>使用後は必ず清掃 / Clean up after use</td></tr>
+        <tr><td>🔥</td><td><strong>炭の処理</strong></td><td>完全に消火し指定の容器へ / Fully extinguish, place in designated container</td></tr>
+        <tr><td>🗑️</td><td><strong>ゴミ</strong></td><td>燃えるゴミ・ビン・カンに分別 / Separate into burnable, bottles, and cans</td></tr>
+        <tr><td>🔇</td><td><strong>騒音</strong></td><td>20:00以降は静粛に / Keep quiet after 8:00 PM</td></tr>
+        <tr><td>📍</td><td><strong>場所</strong></td><td>庭の指定エリアでのみ / Use only in the designated garden area</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-warning">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        BBQ機材の汚損・破損があった場合、修理・交換費用を請求する場合があります。<br>
+        <span style="color:#888;">Damage to BBQ equipment may result in repair/replacement charges.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 7: HOUSE RULE 4 — ゴミ分別 ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 7 — HOUSE RULE 4</span>
+    <h2>ゴミ分別ガイド</h2>
+    <div class="subtitle">Trash Sorting Guide (for short-term guests)</div>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">📋</span>
+      <div>
+        <strong>短期滞在のお客さまへ：</strong>ゴミはお部屋の中で分別し、所定の場所にまとめてください。ゴミ回収はチェックアウト後にホストが行います。<br>
+        <span style="color:#888;"><strong>For short-stay guests:</strong> Please sort your trash and leave it in the designated area inside the house. Trash collection will be handled by the host after check-out.</span>
+      </div>
+    </div>
+
+    <h3><span class="icon">🗑️</span> 分別カテゴリ / Sorting Categories</h3>
+
+    <div class="trash-grid">
+      <div class="trash-item red">
+        <div class="trash-icon">🔴</div>
+        <div class="trash-title">燃やすごみ</div>
+        <div class="trash-title-en">Burnable Trash</div>
+        <div class="trash-desc">生ゴミ、紙くず、布、革、木製品<br><span style="color:#999;">Food waste, paper, cloth, leather, wood</span></div>
+        <div style="margin-top:6px; font-size:0.75rem; color:#888;">半透明袋 / Semi-transparent bag</div>
+      </div>
+      <div class="trash-item yellow">
+        <div class="trash-icon">🟡</div>
+        <div class="trash-title">容器包装プラスチック</div>
+        <div class="trash-title-en">Plastic Packaging</div>
+        <div class="trash-desc">ラベル・キャップ、食品トレー、ビニール袋<br><span style="color:#999;">Labels, caps, food trays, plastic bags</span></div>
+        <div style="margin-top:6px; font-size:0.75rem; color:#888;">半透明袋 / Semi-transparent bag</div>
+      </div>
+      <div class="trash-item blue">
+        <div class="trash-icon">🔵</div>
+        <div class="trash-title">ビン・カン</div>
+        <div class="trash-title-en">Bottles &amp; Cans</div>
+        <div class="trash-desc">ガラス瓶、アルミ缶、スチール缶<br><span style="color:#999;">Glass bottles, aluminum cans, steel cans</span></div>
+        <div style="margin-top:6px; font-size:0.75rem; color:#888;">中身を洗って / Rinse before disposal</div>
+      </div>
+      <div class="trash-item green">
+        <div class="trash-icon">🟢</div>
+        <div class="trash-title">ペットボトル</div>
+        <div class="trash-title-en">PET Bottles</div>
+        <div class="trash-desc">ボトル本体（ラベル・キャップは外す）<br><span style="color:#999;">Body only (remove label &amp; cap)</span></div>
+        <div style="margin-top:6px; font-size:0.75rem; color:#888;">中身を洗って / Rinse before disposal</div>
+      </div>
+    </div>
+
+    <h3><span class="icon">⚠️</span> ご注意 / Important Notes</h3>
+    <ul style="list-style:none; padding:0;">
+      <li style="padding:6px 0; font-size:0.9rem;">🥬 <strong>生ゴミ</strong>は水気をよく切ってください / <span style="color:#888;">Drain food waste well</span></li>
+      <li style="padding:6px 0; font-size:0.9rem;">🧴 <strong>ペットボトル</strong>はラベルとキャップを外してください / <span style="color:#888;">Remove labels and caps from PET bottles</span></li>
+      <li style="padding:6px 0; font-size:0.9rem;">🧯 <strong>スプレー缶</strong>は中身を使い切ってください / <span style="color:#888;">Empty spray cans completely</span></li>
+      <li style="padding:6px 0; font-size:0.9rem;">❓ 分別に迷ったら「燃やすごみ」に入れてください / <span style="color:#888;">If unsure, put it in burnable trash</span></li>
+    </ul>
+  </div>
+
+  <!-- ==================== PAGE 8: 緊急連絡先 ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 8</span>
+
+    <div class="emergency-header">
+      <div class="icon">🆘</div>
+      <h2>緊急連絡先</h2>
+      <div class="sub">EMERGENCY CONTACTS</div>
+    </div>
+
+    <div class="emergency-card">
+      <div class="em-icon">🚔</div>
+      <div>
+        <div class="em-label">警察</div>
+        <div class="em-label-en">Police — Crime, accidents</div>
+      </div>
+      <div class="em-number">110</div>
+    </div>
+
+    <div class="emergency-card">
+      <div class="em-icon">🚒</div>
+      <div>
+        <div class="em-label">消防</div>
+        <div class="em-label-en">Fire Department</div>
+      </div>
+      <div class="em-number">119</div>
+    </div>
+
+    <div class="emergency-card">
+      <div class="em-icon">🚑</div>
+      <div>
+        <div class="em-label">救急車</div>
+        <div class="em-label-en">Ambulance — Medical emergency</div>
+      </div>
+      <div class="em-number">119</div>
+    </div>
+
+    <hr class="divider">
+
+    <h3><span class="icon">🌐</span> 外国語対応 / Multilingual Support</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>サービス / Service</th><th>番号 / Number</th><th>対応 / Languages</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Japan Visitor Hotline</strong></td><td><strong>050-3816-2787</strong></td><td>EN / CN / KR / JP（24時間）</td></tr>
+        <tr><td><strong>TELL Lifeline</strong></td><td><strong>03-5774-0992</strong></td><td>English counseling</td></tr>
+      </tbody>
+    </table>
+
+    <h3><span class="icon">🏥</span> 最寄り病院 / Nearest Hospital</h3>
+    <table class="data-table">
+      <thead>
+        <tr><th>病院名</th><th>住所</th><th>備考</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>逗子中央医院</td><td>逗子市逗子1-1-3</td><td>外来受付時間は要確認</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-info" style="margin-top:16px;">
+      <span class="alert-icon">📩</span>
+      <div>
+        <strong>ホストへの連絡は、OTA（Airbnb/Booking.com）のメッセージでお願いします。</strong><br>
+        <span style="color:#888;">To contact the host, please use the OTA messaging function.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 9: 119番通報シート ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 9</span>
+    <div style="text-align:center;">
+      <h2 style="display:block; text-align:center; color:var(--red);">🚨 119番通報シート</h2>
+      <div class="subtitle" style="text-align:center; color:var(--red);">119 Emergency Call Sheet</div>
+      <p style="font-size:1rem; margin:16px 0;">119番に電話したら、このページを読んでください<br><span style="color:#888;">When calling 119, please read this page</span></p>
+    </div>
+
+    <h3><span class="icon">📍</span> この家の住所 / Address of this house</h3>
+
+    <div class="address-box">
+      <div class="postal">〒249-0003</div>
+      <div class="address-jp">神奈川県逗子市池子2丁目10番9号</div>
+      <div class="address-en">2-10-9 Ikego, Zushi City, Kanagawa Prefecture<br>Postal Code: 249-0003</div>
+    </div>
+
+    <h3><span class="icon">🗣️</span> 電話での伝え方 / What to say on the phone</h3>
+
+    <div class="speech-box">
+      <div class="label">日本語（読み上げ用）— 救急</div>
+      <div class="text">「救急です。場所は、逗子市池子2丁目10番9号です。」</div>
+    </div>
+    <div class="speech-box">
+      <div class="label">日本語（読み上げ用）— 火事</div>
+      <div class="text">「火事です。場所は、逗子市池子2丁目10番9号です。」</div>
+    </div>
+    <div class="speech-box" style="border-left-color:#3498DB;">
+      <div class="label" style="color:#2980B9;">English — Ambulance</div>
+      <div class="text">"I need an ambulance. The address is 2-10-9 Ikego, Zushi City, Kanagawa."</div>
+    </div>
+    <div class="speech-box" style="border-left-color:#3498DB;">
+      <div class="label" style="color:#2980B9;">English — Fire</div>
+      <div class="text">"There is a fire. The address is 2-10-9 Ikego, Zushi City, Kanagawa."</div>
+    </div>
+
+    <h3><span class="icon">🏠</span> 目印 / Landmarks</h3>
+    <div class="bilingual">
+      <p class="jp">JR東逗子駅（Higashi-Zushi Station）から徒歩約90秒</p>
+      <p class="en">Near JR Higashi-Zushi Station, approximately 90 seconds on foot</p>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 10: Wi-Fi & ルールまとめ ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 10</span>
+    <h2>Wi-Fi &amp; ルールまとめ</h2>
+    <div class="subtitle">Wi-Fi &amp; Rules Summary</div>
+
+    <div class="wifi-card">
+      <div class="wifi-icon">📶</div>
+      <h3>Wi-Fi</h3>
+      <div class="wifi-field">
+        <span class="wifi-label">SSID</span>
+        <span class="wifi-value">__________________</span>
+      </div>
+      <div class="wifi-field">
+        <span class="wifi-label">Password</span>
+        <span class="wifi-value">__________________</span>
+      </div>
+      <div class="wifi-note">※ 開通後に記入してください / Fill in after setup</div>
+    </div>
+
+    <h3><span class="icon">📋</span> ルールまとめ / Rules at a Glance</h3>
+
+    <table class="summary-table">
+      <thead>
+        <tr><th>#</th><th></th><th style="text-align:left;">ルール</th><th style="text-align:left;">JP</th><th style="text-align:left;">EN</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td class="icon-col">🚭</td><td class="rule-col">禁煙</td><td>室内禁煙（庭はOK）</td><td style="color:#888;">No smoking indoors (garden OK)</td></tr>
+        <tr><td>2</td><td class="icon-col">👟</td><td class="rule-col">土足厳禁</td><td>玄関で靴を脱ぐ</td><td style="color:#888;">Remove shoes at entrance</td></tr>
+        <tr><td>3</td><td class="icon-col">🔐</td><td class="rule-col">施錠</td><td>外出時・就寝時は施錠</td><td style="color:#888;">Lock doors when leaving/sleeping</td></tr>
+        <tr><td>4</td><td class="icon-col">💡</td><td class="rule-col">節電</td><td>外出時は電源OFF</td><td style="color:#888;">Turn off power when going out</td></tr>
+        <tr><td>5</td><td class="icon-col">🧹</td><td class="rule-col">清潔</td><td>使用後は清掃</td><td style="color:#888;">Clean up after use</td></tr>
+        <tr><td>6</td><td class="icon-col">🔇</td><td class="rule-col">静粛</td><td>20:00以降は静かに</td><td style="color:#888;">Quiet after 8:00 PM</td></tr>
+        <tr><td>7</td><td class="icon-col">🔥</td><td class="rule-col">BBQ</td><td>20:00まで・後片付け必須</td><td style="color:#888;">Until 8 PM, clean up required</td></tr>
+        <tr><td>8</td><td class="icon-col">🗑️</td><td class="rule-col">ゴミ</td><td>分別して室内に保管</td><td style="color:#888;">Sort trash, keep inside</td></tr>
+        <tr><td>9</td><td class="icon-col">⏰</td><td class="rule-col">C/O</td><td>10:00 AMまで</td><td style="color:#888;">By 10:00 AM</td></tr>
+        <tr><td>10</td><td class="icon-col">📩</td><td class="rule-col">連絡</td><td>OTAメッセージのみ</td><td style="color:#888;">Contact via OTA message only</td></tr>
+      </tbody>
+    </table>
+
+    <div class="page-footer" style="padding:32px 0 0;">
+      <div class="closing">素敵なご滞在をお過ごしください！ 🌿</div>
+      <div class="closing-en">We hope you have a wonderful stay!</div>
+      <div style="margin-top:12px;">
+        <div class="brand">花隠れ — Hanakakure</div>
+        <div class="brand-en">Hidden Forest Retreat — Zushi, Kanagawa</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

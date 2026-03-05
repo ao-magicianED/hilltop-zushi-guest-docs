@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>花隠れ — Hanakakure</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap');
+  :root {
+    --green-dark: #2D5016;
+    --green-mid: #4A7C28;
+    --green-light: #E8F0E0;
+    --gold: #C7A951;
+    --gold-light: #F5EDD4;
+    --bg: #F5F0E8;
+    --white: #FFFFFF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: #2C2C2C;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+  .hero {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .hero .icon { font-size: 3.5rem; margin-bottom: 12px; }
+  .hero h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2.8rem;
+    color: var(--green-dark);
+    letter-spacing: 0.1em;
+  }
+  .hero .sub {
+    font-size: 1.1rem;
+    color: #888;
+    margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+  .hero .location {
+    font-size: 0.9rem;
+    color: #AAA;
+    margin-top: 8px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    max-width: 900px;
+    width: 100%;
+  }
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 32px 28px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  }
+  .card .card-icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .card h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.3rem;
+    color: var(--green-dark);
+    margin-bottom: 4px;
+  }
+  .card .card-en {
+    font-size: 0.85rem;
+    color: #AAA;
+    margin-bottom: 12px;
+  }
+  .card .card-desc {
+    font-size: 0.88rem;
+    color: #666;
+    line-height: 1.6;
+  }
+  .card .card-badge {
+    display: inline-block;
+    background: var(--gold-light);
+    color: var(--green-dark);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-top: 12px;
+  }
+  footer {
+    margin-top: 48px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #BBB;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="icon">🏡</div>
+  <h1>花隠れ</h1>
+  <div class="sub">Hanakakure</div>
+  <div class="location">逗子市池子 — 森の隠れ家 / Hidden Forest Retreat</div>
+</div>
+
+<div class="cards">
+  <a class="card" href="施設名提案_花隠れ.html">
+    <div class="card-icon">📋</div>
+    <h2>施設名提案</h2>
+    <div class="card-en">Property Name Proposals</div>
+    <div class="card-desc">インバウンド向けに響く施設名5案の比較・評価</div>
+  </a>
+  <a class="card" href="ハウスルール_花隠れ.html">
+    <div class="card-icon">📖</div>
+    <h2>ハウスルール</h2>
+    <div class="card-en">House Rules</div>
+    <div class="card-desc">全10ページ。禁煙・騒音・BBQ・ゴミ分別・緊急連絡先など</div>
+    <span class="card-badge">日本語 + English</span>
+  </a>
+  <a class="card" href="ゲストガイド_花隠れ.html">
+    <div class="card-icon">🗺️</div>
+    <h2>ゲストガイド</h2>
+    <div class="card-en">Guest Guide</div>
+    <div class="card-desc">全14ページ。チェックイン・設備の使い方・アクセス・観光情報</div>
+    <span class="card-badge">日本語 + English</span>
+  </a>
+</div>
+
+<footer>花隠れ — Hanakakure / Zushi, Kanagawa</footer>
+
+</body>
+</html>

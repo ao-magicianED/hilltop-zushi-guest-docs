@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ゲストガイド — 花隠れ（Hanakakure）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap');
+
+  :root {
+    --green-dark: #2D5016;
+    --green-mid: #4A7C28;
+    --green-light: #E8F0E0;
+    --gold: #C7A951;
+    --gold-light: #F5EDD4;
+    --bg: #F5F0E8;
+    --text: #2C2C2C;
+    --white: #FFFFFF;
+    --shadow: 0 4px 20px rgba(0,0,0,0.08);
+    --red: #C0392B;
+    --red-light: #FDEDEC;
+    --blue: #2980B9;
+    --blue-light: #E3F2FD;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+  }
+
+  /* ===== Cover ===== */
+  .page-cover {
+    background: linear-gradient(135deg, var(--green-dark) 0%, #1a3a0a 100%);
+    color: var(--white);
+    text-align: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 60px 20px;
+  }
+  .page-cover::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M40 0L20 20 0 0h40zm0 80L20 60 0 80h40zm40-40L60 20 80 0v40zm0 40L60 60 80 80V40zM20 40L0 20v40l20-20zm40 0L80 20v40L60 40zM40 20L20 0h40L40 20zm0 40L20 80h40L40 60z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.6;
+  }
+  .page-cover .icon { font-size: 4rem; position: relative; margin-bottom: 20px; }
+  .page-cover h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 3.5rem;
+    position: relative;
+    letter-spacing: 0.15em;
+  }
+  .page-cover .subtitle-en {
+    font-size: 1.3rem;
+    opacity: 0.8;
+    position: relative;
+    margin-bottom: 40px;
+    letter-spacing: 0.1em;
+  }
+  .page-cover .doc-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2.2rem;
+    color: var(--gold);
+    position: relative;
+    letter-spacing: 0.2em;
+    margin-bottom: 8px;
+  }
+  .page-cover .doc-title-jp {
+    font-size: 1.1rem;
+    opacity: 0.7;
+    position: relative;
+    margin-bottom: 36px;
+    letter-spacing: 0.15em;
+  }
+  .page-cover .info-row {
+    position: relative;
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .page-cover .info-item {
+    background: rgba(255,255,255,0.1);
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+  }
+  .page-cover .info-item strong {
+    font-size: 1.1rem;
+    color: var(--gold);
+  }
+  .page-cover .location {
+    position: relative;
+    font-size: 1rem;
+    opacity: 0.7;
+    margin-top: 20px;
+  }
+  .page-cover .location-en {
+    position: relative;
+    font-size: 0.9rem;
+    font-style: italic;
+    opacity: 0.5;
+  }
+  .page-cover .corner-deco {
+    position: absolute;
+    width: 80px; height: 80px;
+    border: 2px solid rgba(199,169,81,0.3);
+  }
+  .page-cover .corner-deco.tl { top: 30px; left: 30px; border-right: none; border-bottom: none; }
+  .page-cover .corner-deco.tr { top: 30px; right: 30px; border-left: none; border-bottom: none; }
+  .page-cover .corner-deco.bl { bottom: 30px; left: 30px; border-right: none; border-top: none; }
+  .page-cover .corner-deco.br { bottom: 30px; right: 30px; border-left: none; border-top: none; }
+
+  /* ===== Container ===== */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  /* ===== Page ===== */
+  .page {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 48px 40px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow);
+    page-break-inside: avoid;
+  }
+  .page-number {
+    display: inline-block;
+    background: var(--green-dark);
+    color: var(--white);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    letter-spacing: 0.05em;
+  }
+  .page h2 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.6rem;
+    color: var(--green-dark);
+    margin-bottom: 6px;
+  }
+  .page h2 + .subtitle {
+    font-size: 0.95rem;
+    color: #888;
+    margin-bottom: 24px;
+  }
+  .page h3 {
+    font-size: 1.15rem;
+    color: var(--green-dark);
+    margin-top: 28px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .page h3 .icon { font-size: 1.3rem; }
+  .page h4 {
+    font-size: 1rem;
+    color: var(--green-mid);
+    margin-top: 20px;
+    margin-bottom: 8px;
+  }
+
+  /* ===== Bilingual ===== */
+  .bilingual { margin-bottom: 16px; }
+  .bilingual .jp { margin-bottom: 4px; font-size: 0.95rem; }
+  .bilingual .en { color: #888; font-size: 0.88rem; }
+
+  /* ===== Divider ===== */
+  .divider {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 28px 0;
+  }
+
+  /* ===== Alert ===== */
+  .alert {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 0.9rem;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .alert .alert-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .alert-warning { background: #FFF8E1; border-left: 4px solid #F9A825; }
+  .alert-info { background: var(--blue-light); border-left: 4px solid var(--blue); }
+  .alert-danger { background: var(--red-light); border-left: 4px solid var(--red); }
+  .alert-success { background: var(--green-light); border-left: 4px solid var(--green-mid); }
+
+  /* ===== Step Table ===== */
+  .step-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin: 16px 0;
+  }
+  .step-table th {
+    background: var(--green-dark);
+    color: var(--white);
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .step-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #EEE;
+    vertical-align: top;
+  }
+  .step-table .step-num {
+    text-align: center;
+    font-weight: 700;
+    color: var(--green-dark);
+    width: 40px;
+  }
+  .step-table tbody tr:hover {
+    background: var(--green-light);
+  }
+
+  /* ===== Data Table ===== */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    margin: 16px 0;
+  }
+  .data-table th {
+    background: var(--green-dark);
+    color: var(--white);
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .data-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #EEE;
+    vertical-align: top;
+  }
+  .data-table tbody tr:hover {
+    background: var(--green-light);
+  }
+
+  /* ===== Photo Placeholder ===== */
+  .photo-placeholder {
+    background: #F0EDE5;
+    border: 2px dashed #CCC;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    color: #999;
+    font-size: 0.9rem;
+    margin: 16px 0;
+  }
+  .photo-placeholder .cam { font-size: 2rem; margin-bottom: 8px; }
+
+  /* ===== Room Grid ===== */
+  .room-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .room-card {
+    background: var(--green-light);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .room-card .room-icon { font-size: 1.4rem; }
+  .room-card .room-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--green-dark);
+  }
+  .room-card .room-desc {
+    font-size: 0.8rem;
+    color: #666;
+  }
+
+  /* ===== Checklist ===== */
+  .checklist {
+    list-style: none;
+    padding: 0;
+  }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #F0F0F0;
+    font-size: 0.9rem;
+  }
+  .checklist li::before {
+    content: '☐';
+    font-size: 1.1rem;
+    color: var(--green-mid);
+    flex-shrink: 0;
+  }
+
+  /* ===== Button Legend ===== */
+  .button-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .button-item {
+    background: #F8F8F8;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.88rem;
+  }
+  .button-item .btn-jp {
+    background: var(--green-dark);
+    color: var(--white);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* ===== Season Card ===== */
+  .season-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .season-card {
+    text-align: center;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #E8E8E8;
+  }
+  .season-card .season-icon { font-size: 1.5rem; margin-bottom: 4px; }
+  .season-card .season-name { font-weight: 600; font-size: 0.85rem; color: var(--green-dark); }
+  .season-card .season-mode { font-size: 0.8rem; color: #888; }
+  .season-card .season-temp { font-weight: 700; font-size: 1.1rem; color: var(--green-mid); margin-top: 4px; }
+
+  /* ===== Equipment List ===== */
+  .equip-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 12px 0;
+  }
+  .equip-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #FAFAFA;
+    border-radius: 8px;
+    font-size: 0.88rem;
+  }
+  .equip-item .equip-icon { font-size: 1.2rem; }
+
+  /* ===== BBQ Rules ===== */
+  .bbq-rule-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 16px 0;
+  }
+  .bbq-rule-item {
+    border-radius: 10px;
+    padding: 14px;
+    border: 1px solid #E8E8E8;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .bbq-rule-item .bbq-icon { font-size: 1.3rem; flex-shrink: 0; }
+  .bbq-rule-item .bbq-title { font-weight: 700; font-size: 0.88rem; color: var(--green-dark); }
+  .bbq-rule-item .bbq-desc { font-size: 0.82rem; color: #666; }
+
+  /* ===== Access Card ===== */
+  .access-highlight {
+    background: linear-gradient(135deg, var(--green-dark), #1a3a0a);
+    color: var(--white);
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .access-highlight .station {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+  }
+  .access-highlight .time {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .access-highlight .time-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  /* ===== Spot Card ===== */
+  .spot-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin: 12px 0;
+  }
+  .spot-card {
+    display: flex;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #E8E8E8;
+    transition: transform 0.15s;
+  }
+  .spot-card:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+  .spot-card .spot-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .spot-card .spot-name { font-weight: 700; color: var(--green-dark); font-size: 0.95rem; }
+  .spot-card .spot-name-en { font-size: 0.8rem; color: #AAA; }
+  .spot-card .spot-access { font-size: 0.82rem; color: #666; margin-top: 2px; }
+  .spot-card .spot-desc { font-size: 0.85rem; margin-top: 4px; }
+
+  /* ===== Category Header ===== */
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--gold);
+  }
+  .category-header .cat-icon { font-size: 1.4rem; }
+  .category-header .cat-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.1rem;
+    color: var(--green-dark);
+    font-weight: 700;
+  }
+  .category-header .cat-title-en { font-size: 0.85rem; color: #AAA; margin-left: 8px; }
+
+  /* ===== Trash ===== */
+  .trash-schedule {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin: 16px 0;
+  }
+  .trash-schedule th {
+    background: var(--green-dark);
+    color: var(--white);
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 0.8rem;
+  }
+  .trash-schedule td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #EEE;
+    vertical-align: top;
+  }
+  .trash-schedule .color-dot {
+    display: inline-block;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .trash-schedule .dot-red { background: #E74C3C; }
+  .trash-schedule .dot-yellow { background: #F1C40F; }
+  .trash-schedule .dot-blue { background: #3498DB; }
+  .trash-schedule .dot-brown { background: #8D6E63; }
+  .trash-schedule .dot-green { background: #27AE60; }
+  .trash-schedule .dot-orange { background: #E67E22; }
+
+  /* ===== Footer ===== */
+  .page-footer {
+    text-align: center;
+    padding: 48px 20px;
+  }
+  .page-footer .closing {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.3rem;
+    color: var(--green-dark);
+    margin-bottom: 4px;
+  }
+  .page-footer .closing-en {
+    font-size: 1rem;
+    color: #888;
+    margin-bottom: 12px;
+  }
+  .page-footer .brand {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.1rem;
+    color: var(--green-dark);
+    font-weight: 700;
+  }
+  .page-footer .brand-en {
+    font-size: 0.85rem;
+    color: #999;
+    font-style: italic;
+  }
+  .page-footer .contact-note {
+    margin-top: 12px;
+    font-size: 0.85rem;
+    color: #AAA;
+  }
+
+  /* ===== Print ===== */
+  @media print {
+    body { background: white; }
+    .page-cover { min-height: auto; padding: 120px 40px; }
+    .page { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+    .page-cover, .page { page-break-after: always; }
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 640px) {
+    .page-cover h1 { font-size: 2.4rem; }
+    .page-cover .doc-title { font-size: 1.6rem; }
+    .page { padding: 28px 20px; }
+    .room-grid, .button-grid, .equip-grid, .bbq-rule-grid { grid-template-columns: 1fr; }
+    .season-grid { grid-template-columns: 1fr; }
+    .page-cover .info-row { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== PAGE 1: 表紙 ==================== -->
+<div class="page-cover">
+  <div class="corner-deco tl"></div>
+  <div class="corner-deco tr"></div>
+  <div class="corner-deco bl"></div>
+  <div class="corner-deco br"></div>
+  <div class="icon">🏡</div>
+  <h1>花隠れ</h1>
+  <div class="subtitle-en">Hanakakure</div>
+  <div class="doc-title">GUEST GUIDE</div>
+  <div class="doc-title-jp">ゲストガイド</div>
+  <div class="info-row">
+    <div class="info-item">Check-in <strong>16:00</strong></div>
+    <div class="info-item">Check-out <strong>10:00</strong></div>
+    <div class="info-item">Max Guests <strong>12名</strong></div>
+  </div>
+  <div class="location">逗子市池子 — 森の隠れ家</div>
+  <div class="location-en">Hidden Forest Retreat — Zushi, Kanagawa</div>
+</div>
+
+<div class="container">
+
+  <!-- ==================== PAGE 2: チェックイン ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 2</span>
+    <h2>🔐 チェックイン手順</h2>
+    <div class="subtitle">Check-in Instructions — from 4:00 PM</div>
+
+    <h3><span class="icon">🔓</span> SwitchBotスマートロック — 解錠 / Unlocking</h3>
+
+    <div class="photo-placeholder">
+      <div class="cam">📷</div>
+      スマートロック（テンキー）の写真をここに配置<br>
+      <span style="font-size:0.8rem;">Photo of the smart lock keypad</span>
+    </div>
+
+    <table class="step-table">
+      <thead><tr><th>Step</th><th>日本語</th><th>English</th></tr></thead>
+      <tbody>
+        <tr><td class="step-num">1</td><td>玄関ドアのスマートロック（テンキー）を確認</td><td style="color:#888;">Locate the smart lock keypad on the front door</td></tr>
+        <tr><td class="step-num">2</td><td>暗証番号を入力してください</td><td style="color:#888;">Enter the PIN code</td></tr>
+        <tr><td class="step-num">3</td><td>「✓」ボタンを押します</td><td style="color:#888;">Press the "✓" button</td></tr>
+        <tr><td class="step-num">4</td><td>ロックが解除され、ドアが開きます</td><td style="color:#888;">The lock will disengage and the door will open</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">📩</span>
+      <div><strong>暗証番号はチェックイン日にOTAメッセージでお送りします。</strong><br><span style="color:#888;">The PIN code will be sent via OTA message on your check-in day.</span></div>
+    </div>
+
+    <h3><span class="icon">🔒</span> 施錠 / Locking</h3>
+
+    <table class="step-table">
+      <thead><tr><th>Step</th><th>日本語</th><th>English</th></tr></thead>
+      <tbody>
+        <tr><td class="step-num">1</td><td>ドアを閉めます</td><td style="color:#888;">Close the door</td></tr>
+        <tr><td class="step-num">2</td><td>テンキーの「🔒」ボタンを押します</td><td style="color:#888;">Press the "🔒" button on the keypad</td></tr>
+        <tr><td class="step-num">3</td><td>ピッと音がして施錠完了</td><td style="color:#888;">A beep confirms the door is locked</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-warning">
+      <span class="alert-icon">⚠️</span>
+      <div><strong>外出時・就寝時は必ず施錠してください。</strong><br><span style="color:#888;">Always lock the door when going out or sleeping.</span></div>
+    </div>
+
+    <hr class="divider">
+
+    <h3><span class="icon">🏠</span> 到着後の確認事項 / After Arrival Checklist</h3>
+    <ul class="checklist">
+      <li>スリッパに履き替える / <span style="color:#888;">Change to slippers</span></li>
+      <li>Wi-Fi に接続する（→ ハウスルール PAGE 10参照） / <span style="color:#888;">Connect to Wi-Fi</span></li>
+      <li>エアコン・照明の操作を確認する / <span style="color:#888;">Check AC and lighting controls</span></li>
+      <li>緊急連絡先を確認する（→ ハウスルール PAGE 8） / <span style="color:#888;">Note emergency contacts</span></li>
+    </ul>
+  </div>
+
+  <!-- ==================== PAGE 3: チェックアウト ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 3</span>
+    <h2>⏰ チェックアウト手順</h2>
+    <div class="subtitle">Check-out by 10:00 AM</div>
+
+    <h3><span class="icon">✅</span> チェックアウト前の確認リスト / Check-out Checklist</h3>
+
+    <table class="step-table">
+      <thead><tr><th>#</th><th>確認事項</th><th>Item</th><th style="width:40px;">✓</th></tr></thead>
+      <tbody>
+        <tr><td class="step-num">1</td><td>使った食器を洗い、元の場所に戻す</td><td style="color:#888;">Wash and return dishes</td><td style="text-align:center;">☐</td></tr>
+        <tr><td class="step-num">2</td><td>ゴミを分別して所定の場所にまとめる</td><td style="color:#888;">Sort trash and gather in designated area</td><td style="text-align:center;">☐</td></tr>
+        <tr><td class="step-num">3</td><td>お布団・ベッドリネンをまとめる</td><td style="color:#888;">Gather futons and bed linens</td><td style="text-align:center;">☐</td></tr>
+        <tr><td class="step-num">4</td><td>忘れ物がないか確認する</td><td style="color:#888;">Check for personal belongings</td><td style="text-align:center;">☐</td></tr>
+        <tr><td class="step-num">5</td><td>すべてのエアコンを消す</td><td style="color:#888;">Turn off all air conditioning</td><td style="text-align:center;">☐</td></tr>
+        <tr><td class="step-num">6</td><td>すべての照明を消す</td><td style="color:#888;">Turn off all lights</td><td style="text-align:center;">☐</td></tr>
+        <tr><td class="step-num">7</td><td>すべての窓を閉める</td><td style="color:#888;">Close all windows</td><td style="text-align:center;">☐</td></tr>
+        <tr><td class="step-num">8</td><td>水道の蛇口が閉まっているか確認</td><td style="color:#888;">Check all faucets are closed</td><td style="text-align:center;">☐</td></tr>
+        <tr><td class="step-num">9</td><td>BBQ機材を使った場合は清掃する</td><td style="color:#888;">Clean BBQ equipment if used</td><td style="text-align:center;">☐</td></tr>
+        <tr><td class="step-num">10</td><td>玄関のスマートロックを施錠する</td><td style="color:#888;">Lock the front door with smart lock</td><td style="text-align:center;">☐</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">📩</span>
+      <div>チェックアウト完了後、OTAメッセージで一報いただけると助かります。<br><span style="color:#888;">Please send us a message via OTA after you check out.</span></div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 4: 間取り案内 ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 4</span>
+    <h2>🏠 間取り案内</h2>
+    <div class="subtitle">Floor Plan</div>
+
+    <h3><span class="icon">🏠</span> 1F（1階）/ First Floor</h3>
+
+    <div class="photo-placeholder">
+      <div class="cam">📷</div>
+      1階の間取り図 or 写真をここに配置<br>
+      <span style="font-size:0.8rem;">First floor plan or photo</span>
+    </div>
+
+    <div class="room-grid">
+      <div class="room-card">
+        <div class="room-icon">🚪</div>
+        <div><div class="room-name">玄関 / Entrance</div><div class="room-desc">スマートロック・靴箱・スリッパ</div></div>
+      </div>
+      <div class="room-card">
+        <div class="room-icon">🍳</div>
+        <div><div class="room-name">キッチン / Kitchen</div><div class="room-desc">コンロ・電子レンジ・冷蔵庫・調理器具</div></div>
+      </div>
+      <div class="room-card">
+        <div class="room-icon">🛋️</div>
+        <div><div class="room-name">リビング / Living Room</div><div class="room-desc">テレビ・ソファ・テーブル</div></div>
+      </div>
+      <div class="room-card">
+        <div class="room-icon">🛁</div>
+        <div><div class="room-name">バスルーム / Bathroom</div><div class="room-desc">浴室・洗面台・トイレ</div></div>
+      </div>
+      <div class="room-card">
+        <div class="room-icon">🧺</div>
+        <div><div class="room-name">洗濯スペース / Laundry</div><div class="room-desc">洗濯機</div></div>
+      </div>
+      <div class="room-card">
+        <div class="room-icon">🌿</div>
+        <div><div class="room-name">庭 / Garden</div><div class="room-desc">BBQエリア・喫煙スペース</div></div>
+      </div>
+    </div>
+
+    <h3><span class="icon">🏠</span> 2F（2階）/ Second Floor</h3>
+
+    <div class="photo-placeholder">
+      <div class="cam">📷</div>
+      2階の間取り図 or 写真をここに配置<br>
+      <span style="font-size:0.8rem;">Second floor plan or photo</span>
+    </div>
+
+    <div class="room-grid">
+      <div class="room-card">
+        <div class="room-icon">🛏️</div>
+        <div><div class="room-name">寝室1 / Bedroom 1</div><div class="room-desc">布団 or ベッド</div></div>
+      </div>
+      <div class="room-card">
+        <div class="room-icon">🛏️</div>
+        <div><div class="room-name">寝室2 / Bedroom 2</div><div class="room-desc">布団 or ベッド</div></div>
+      </div>
+      <div class="room-card">
+        <div class="room-icon">🛏️</div>
+        <div><div class="room-name">寝室3 / Bedroom 3</div><div class="room-desc">布団 or ベッド</div></div>
+      </div>
+    </div>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">📝</span>
+      <div>部屋の詳細・寝具の配置は物件準備完了後に更新します。<br><span style="color:#888;">Room details and bedding arrangements will be updated after property setup.</span></div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 5: 給湯器 ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 5</span>
+    <h2>🚿 給湯器の使い方</h2>
+    <div class="subtitle">How to Use the Water Heater — 24-type Gas (Propane)</div>
+
+    <div class="photo-placeholder">
+      <div class="cam">📷</div>
+      給湯器リモコンの写真をここに配置<br>
+      <span style="font-size:0.8rem;">Photo of water heater remote control</span>
+    </div>
+
+    <h3><span class="icon">🔥</span> 基本操作 / Basic Operation</h3>
+
+    <table class="step-table">
+      <thead><tr><th>Step</th><th>日本語</th><th>English</th></tr></thead>
+      <tbody>
+        <tr><td class="step-num">1</td><td>リモコンの「運転」ボタンを押す（電源ON）</td><td style="color:#888;">Press the "運転" (Power) button on the remote</td></tr>
+        <tr><td class="step-num">2</td><td>温度設定ボタンで温度を調整（推奨: 40〜42℃）</td><td style="color:#888;">Adjust temperature with ▲▼ buttons (recommended: 40–42°C)</td></tr>
+        <tr><td class="step-num">3</td><td>蛇口をお湯側に回す</td><td style="color:#888;">Turn the faucet to the hot water side</td></tr>
+        <tr><td class="step-num">4</td><td>使用後は「運転」ボタンで電源OFF</td><td style="color:#888;">Press "運転" to turn off after use</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="divider">
+
+    <h3><span class="icon">🛁</span> お風呂の張り方 / Filling the Bathtub</h3>
+
+    <table class="step-table">
+      <thead><tr><th>Step</th><th>日本語</th><th>English</th></tr></thead>
+      <tbody>
+        <tr><td class="step-num">1</td><td>浴室リモコンの「運転」ボタンをON</td><td style="color:#888;">Turn on the bathroom remote</td></tr>
+        <tr><td class="step-num">2</td><td>「ふろ自動」ボタンを押す</td><td style="color:#888;">Press "ふろ自動" (Auto Bath) button</td></tr>
+        <tr><td class="step-num">3</td><td>自動でお湯が溜まり、設定温度で止まります</td><td style="color:#888;">Hot water fills automatically and stops at set temperature</td></tr>
+        <tr><td class="step-num">4</td><td>追い焚きは「追いだき」ボタン</td><td style="color:#888;">For reheating, press "追いだき" (Reheat) button</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-warning">
+      <span class="alert-icon">⚠️</span>
+      <div>
+        <strong>お風呂の水は最後に抜いてください。</strong> / Please drain the bath after your last use.<br>
+        <strong>換気扇を回してください。</strong> / Please turn on the ventilation fan.
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 6: エアコン ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 6</span>
+    <h2>❄️🔥 エアコンの使い方</h2>
+    <div class="subtitle">How to Use the Air Conditioner</div>
+
+    <div class="photo-placeholder">
+      <div class="cam">📷</div>
+      エアコンリモコンの写真をここに配置<br>
+      <span style="font-size:0.8rem;">Photo of AC remote control</span>
+    </div>
+
+    <h3><span class="icon">🎛️</span> リモコン操作 / Remote Control</h3>
+
+    <div class="button-grid">
+      <div class="button-item"><span class="btn-jp">運転/停止</span> Power ON/OFF</div>
+      <div class="button-item"><span class="btn-jp">モード切替</span> Cool↔Heat↔Dry↔Auto</div>
+      <div class="button-item"><span class="btn-jp">温度 ▲▼</span> Temperature</div>
+      <div class="button-item"><span class="btn-jp">風量</span> Fan Speed</div>
+      <div class="button-item"><span class="btn-jp">風向</span> Air Direction</div>
+    </div>
+
+    <h3><span class="icon">🌡️</span> 推奨設定 / Recommended Settings</h3>
+
+    <div class="season-grid">
+      <div class="season-card">
+        <div class="season-icon">🌸</div>
+        <div class="season-name">春・秋</div>
+        <div class="season-mode">自動 / Auto</div>
+        <div class="season-temp">24–26°C</div>
+      </div>
+      <div class="season-card">
+        <div class="season-icon">☀️</div>
+        <div class="season-name">夏</div>
+        <div class="season-mode">冷房 / Cool</div>
+        <div class="season-temp">26–28°C</div>
+      </div>
+      <div class="season-card">
+        <div class="season-icon">❄️</div>
+        <div class="season-name">冬</div>
+        <div class="season-mode">暖房 / Heat</div>
+        <div class="season-temp">20–22°C</div>
+      </div>
+    </div>
+
+    <div class="alert alert-success">
+      <span class="alert-icon">💡</span>
+      <div><strong>節電のお願い:</strong> 外出時はエアコンをお切りください。<br><span style="color:#888;"><strong>Energy saving:</strong> Please turn off the AC when you go out.</span></div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 7: キッチン ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 7</span>
+    <h2>🍳 キッチン設備の使い方</h2>
+    <div class="subtitle">Kitchen Equipment Guide</div>
+
+    <div class="photo-placeholder">
+      <div class="cam">📷</div>
+      キッチン全体の写真をここに配置<br>
+      <span style="font-size:0.8rem;">Photo of the kitchen</span>
+    </div>
+
+    <h3><span class="icon">🔥</span> ガスコンロ / Gas Stove</h3>
+    <table class="step-table">
+      <thead><tr><th>Step</th><th>日本語</th><th>English</th></tr></thead>
+      <tbody>
+        <tr><td class="step-num">1</td><td>つまみを押しながら回す</td><td style="color:#888;">Push and turn the knob</td></tr>
+        <tr><td class="step-num">2</td><td>「カチッ」と音がしたら点火</td><td style="color:#888;">Ignition when you hear a "click"</td></tr>
+        <tr><td class="step-num">3</td><td>火力はつまみで調整</td><td style="color:#888;">Adjust flame with the knob</td></tr>
+        <tr><td class="step-num">4</td><td>使用後はつまみを「消」に戻す</td><td style="color:#888;">Turn knob to "消" (OFF) after use</td></tr>
+      </tbody>
+    </table>
+
+    <h3><span class="icon">📡</span> 電子レンジ / Microwave</h3>
+    <table class="step-table">
+      <thead><tr><th>Step</th><th>日本語</th><th>English</th></tr></thead>
+      <tbody>
+        <tr><td class="step-num">1</td><td>ドアを開けて食品を入れる</td><td style="color:#888;">Open door and place food inside</td></tr>
+        <tr><td class="step-num">2</td><td>時間を設定する</td><td style="color:#888;">Set the time</td></tr>
+        <tr><td class="step-num">3</td><td>「スタート」ボタンを押す</td><td style="color:#888;">Press "Start"</td></tr>
+      </tbody>
+    </table>
+
+    <h3><span class="icon">🧊</span> 冷蔵庫 / Refrigerator</h3>
+    <ul style="list-style:none; padding:0; font-size:0.9rem;">
+      <li style="padding:4px 0;">✅ ご自由にお使いください / <span style="color:#888;">Feel free to use</span></li>
+      <li style="padding:4px 0;">✅ チェックアウト時に私物を忘れずにお持ちください / <span style="color:#888;">Remove all your items at check-out</span></li>
+      <li style="padding:4px 0;">✅ 冷凍庫もご利用いただけます / <span style="color:#888;">Freezer is also available</span></li>
+    </ul>
+
+    <hr class="divider">
+
+    <h3><span class="icon">🍽️</span> 利用可能な設備一覧 / Available Equipment</h3>
+    <div class="equip-grid">
+      <div class="equip-item"><span class="equip-icon">🔥</span> ガスコンロ / Gas Stove</div>
+      <div class="equip-item"><span class="equip-icon">📡</span> 電子レンジ / Microwave</div>
+      <div class="equip-item"><span class="equip-icon">🧊</span> 冷蔵庫・冷凍庫 / Fridge &amp; Freezer</div>
+      <div class="equip-item"><span class="equip-icon">☕</span> 電気ケトル / Electric Kettle</div>
+      <div class="equip-item"><span class="equip-icon">🍚</span> 炊飯器 / Rice Cooker</div>
+      <div class="equip-item"><span class="equip-icon">🍳</span> 調理器具 / Cooking Utensils</div>
+      <div class="equip-item"><span class="equip-icon">🍽️</span> 食器類 / Tableware</div>
+    </div>
+
+    <div class="alert alert-warning">
+      <span class="alert-icon">⚠️</span>
+      <div>使用後は食器を洗い、元の場所にお戻しください。<br><span style="color:#888;">Please wash and return all dishes after use.</span></div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 8: 洗濯機 ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 8</span>
+    <h2>🧺 洗濯機の使い方</h2>
+    <div class="subtitle">How to Use the Washing Machine</div>
+
+    <div class="photo-placeholder">
+      <div class="cam">📷</div>
+      洗濯機の写真をここに配置<br>
+      <span style="font-size:0.8rem;">Photo of the washing machine</span>
+    </div>
+
+    <h3><span class="icon">🧺</span> 基本操作 / Basic Operation</h3>
+    <table class="step-table">
+      <thead><tr><th>Step</th><th>日本語</th><th>English</th></tr></thead>
+      <tbody>
+        <tr><td class="step-num">1</td><td>洗濯物を入れる</td><td style="color:#888;">Put laundry inside</td></tr>
+        <tr><td class="step-num">2</td><td>洗剤を入れる（洗剤投入口に）</td><td style="color:#888;">Add detergent (into the detergent compartment)</td></tr>
+        <tr><td class="step-num">3</td><td>フタを閉める</td><td style="color:#888;">Close the lid</td></tr>
+        <tr><td class="step-num">4</td><td>「電源」ボタンを押す</td><td style="color:#888;">Press the "Power" button</td></tr>
+        <tr><td class="step-num">5</td><td>「スタート」ボタンを押す</td><td style="color:#888;">Press the "Start" button</td></tr>
+        <tr><td class="step-num">6</td><td>終了音が鳴ったらすぐに取り出す</td><td style="color:#888;">Remove laundry promptly when done</td></tr>
+      </tbody>
+    </table>
+
+    <h3><span class="icon">🏷️</span> ボタン表記 / Button Labels</h3>
+    <div class="button-grid">
+      <div class="button-item"><span class="btn-jp">電源</span> Power</div>
+      <div class="button-item"><span class="btn-jp">スタート</span> Start</div>
+      <div class="button-item"><span class="btn-jp">水量</span> Water Level</div>
+      <div class="button-item"><span class="btn-jp">コース</span> Course / Mode</div>
+      <div class="button-item"><span class="btn-jp">標準</span> Standard</div>
+      <div class="button-item"><span class="btn-jp">すすぎ</span> Rinse</div>
+      <div class="button-item"><span class="btn-jp">脱水</span> Spin Dry</div>
+    </div>
+
+    <h3><span class="icon">🧴</span> 洗剤について / Detergent</h3>
+    <ul style="list-style:none; padding:0; font-size:0.9rem;">
+      <li style="padding:4px 0;">✅ 洗濯洗剤を備え付けています / <span style="color:#888;">Laundry detergent is provided</span></li>
+      <li style="padding:4px 0;">✅ 柔軟剤もご利用いただけます / <span style="color:#888;">Fabric softener is also available</span></li>
+    </ul>
+
+    <div class="alert alert-warning">
+      <span class="alert-icon">⚠️</span>
+      <div>洗濯後は洗濯機のフタを開けて乾燥させてください。<br><span style="color:#888;">Please leave the lid open after washing to prevent mold.</span></div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 9: BBQエリア ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 9</span>
+    <h2>🔥 BBQエリアの使い方＆ルール</h2>
+    <div class="subtitle">BBQ Area Guide &amp; Rules</div>
+
+    <div class="photo-placeholder">
+      <div class="cam">📷</div>
+      庭・BBQエリアの写真をここに配置<br>
+      <span style="font-size:0.8rem;">Photo of garden / BBQ area</span>
+    </div>
+
+    <h3><span class="icon">🔥</span> BBQ手順 / How to BBQ</h3>
+    <table class="step-table">
+      <thead><tr><th>Step</th><th>日本語</th><th>English</th></tr></thead>
+      <tbody>
+        <tr><td class="step-num">1</td><td>BBQコンロを確認する</td><td style="color:#888;">Check the BBQ grill</td></tr>
+        <tr><td class="step-num">2</td><td>炭を並べて着火する</td><td style="color:#888;">Arrange charcoal and light it</td></tr>
+        <tr><td class="step-num">3</td><td>BBQを楽しむ！🍖</td><td style="color:#888;">Enjoy your BBQ! 🍖</td></tr>
+        <tr><td class="step-num">4</td><td>使用後は炭を完全に消火する</td><td style="color:#888;">Fully extinguish charcoal after use</td></tr>
+        <tr><td class="step-num">5</td><td>網・コンロを清掃する</td><td style="color:#888;">Clean the grill and grate</td></tr>
+        <tr><td class="step-num">6</td><td>ゴミを分別する</td><td style="color:#888;">Sort your trash</td></tr>
+      </tbody>
+    </table>
+
+    <h3><span class="icon">⚠️</span> BBQルール / BBQ Rules</h3>
+    <div class="bbq-rule-grid">
+      <div class="bbq-rule-item">
+        <div class="bbq-icon">⏰</div>
+        <div><div class="bbq-title">利用時間</div><div class="bbq-desc"><strong>20:00まで</strong> / Until 8:00 PM</div></div>
+      </div>
+      <div class="bbq-rule-item">
+        <div class="bbq-icon">🔇</div>
+        <div><div class="bbq-title">騒音</div><div class="bbq-desc">20:00以降は静かに / Quiet after 8 PM</div></div>
+      </div>
+      <div class="bbq-rule-item">
+        <div class="bbq-icon">🧹</div>
+        <div><div class="bbq-title">後片付け</div><div class="bbq-desc">必ず清掃 / Must clean up</div></div>
+      </div>
+      <div class="bbq-rule-item">
+        <div class="bbq-icon">🔥</div>
+        <div><div class="bbq-title">消火</div><div class="bbq-desc">炭は完全消火→指定容器へ</div></div>
+      </div>
+      <div class="bbq-rule-item">
+        <div class="bbq-icon">🗑️</div>
+        <div><div class="bbq-title">ゴミ</div><div class="bbq-desc">分別して室内の所定場所へ</div></div>
+      </div>
+      <div class="bbq-rule-item">
+        <div class="bbq-icon">🚫</div>
+        <div><div class="bbq-title">花火</div><div class="bbq-desc">手持ち花火のみ可 / Sparklers only</div></div>
+      </div>
+      <div class="bbq-rule-item" style="grid-column:span 2;">
+        <div class="bbq-icon">🌿</div>
+        <div><div class="bbq-title">庭</div><div class="bbq-desc">植木・花壇を傷つけないように / Do not damage plants or flower beds</div></div>
+      </div>
+    </div>
+
+    <h3><span class="icon">🛒</span> 食材・炭の購入先 / Where to Buy Supplies</h3>
+    <table class="data-table">
+      <thead><tr><th>店舗 / Store</th><th>場所 / Location</th><th>備考 / Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>スーパー三和 逗子店</strong></td><td>東逗子駅近く</td><td>食材・飲料</td></tr>
+        <tr><td><strong>コメリ 逗子店</strong></td><td>車で約10分</td><td>炭・BBQ用品</td></tr>
+        <tr><td><strong>セブンイレブン</strong></td><td>東逗子駅前</td><td>飲料・氷・軽食</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ==================== PAGE 10: ブレーカー ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 10</span>
+    <h2>⚡ ブレーカーが落ちた場合</h2>
+    <div class="subtitle">If the Circuit Breaker Trips</div>
+
+    <h3><span class="icon">❓</span> 原因 / Common Causes</h3>
+    <div class="bilingual">
+      <p class="jp">複数の電化製品を同時に使用した（エアコン＋電子レンジ＋ドライヤー等）</p>
+      <p class="en">Using multiple appliances simultaneously (AC + microwave + hair dryer, etc.)</p>
+    </div>
+
+    <h3><span class="icon">🔧</span> 復旧手順 / How to Reset</h3>
+
+    <div class="photo-placeholder">
+      <div class="cam">📷</div>
+      ブレーカーボックスの写真をここに配置<br>
+      <span style="font-size:0.8rem;">Photo of breaker box — "Flip this switch UP"</span>
+    </div>
+
+    <table class="step-table">
+      <thead><tr><th>Step</th><th>日本語</th><th>English</th></tr></thead>
+      <tbody>
+        <tr><td class="step-num">1</td><td>使用中の電化製品の電源をすべて切る</td><td style="color:#888;">Turn off all appliances in use</td></tr>
+        <tr><td class="step-num">2</td><td>ブレーカーボックスを開ける</td><td style="color:#888;">Open the breaker box</td></tr>
+        <tr><td class="step-num">3</td><td>落ちたブレーカー（下がっているスイッチ）を確認</td><td style="color:#888;">Find the tripped switch (in DOWN position)</td></tr>
+        <tr><td class="step-num">4</td><td>スイッチを上に上げる</td><td style="color:#888;">Flip the switch UP</td></tr>
+        <tr><td class="step-num">5</td><td>電気が復旧したことを確認</td><td style="color:#888;">Confirm power is restored</td></tr>
+        <tr><td class="step-num">6</td><td>電化製品を1つずつ使用再開</td><td style="color:#888;">Turn appliances back on one at a time</td></tr>
+      </tbody>
+    </table>
+
+    <h3><span class="icon">📍</span> ブレーカーの場所 / Breaker Location</h3>
+    <div class="alert alert-info">
+      <span class="alert-icon">📝</span>
+      <div>場所は物件準備完了後に写真付きで更新します。<br><span style="color:#888;">Location will be updated with photos after property setup.</span></div>
+    </div>
+
+    <div class="alert alert-warning">
+      <span class="alert-icon">⚠️</span>
+      <div>何度もブレーカーが落ちる場合は、OTAメッセージでご連絡ください。<br><span style="color:#888;">If the breaker trips repeatedly, please contact us via OTA message.</span></div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 11: アクセスガイド ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 11</span>
+    <h2>🚃 アクセスガイド</h2>
+    <div class="subtitle">How to Get Here</div>
+
+    <div class="access-highlight">
+      <div class="station">JR横須賀線 東逗子駅</div>
+      <div style="font-size:0.85rem; opacity:0.7;">Higashi-Zushi Station</div>
+      <div class="time">徒歩 約90秒</div>
+      <div class="time-label">Approx. 90 seconds on foot</div>
+    </div>
+
+    <h3><span class="icon">🚆</span> 主要駅からのアクセス / From Major Stations</h3>
+    <table class="data-table">
+      <thead><tr><th>出発地 / From</th><th>路線 / Line</th><th>所要時間</th><th>備考</th></tr></thead>
+      <tbody>
+        <tr><td><strong>東京駅</strong></td><td>JR横須賀線（直通）</td><td>約60分</td><td>乗り換えなし</td></tr>
+        <tr><td><strong>品川駅</strong></td><td>JR横須賀線（直通）</td><td>約50分</td><td>乗り換えなし</td></tr>
+        <tr><td><strong>横浜駅</strong></td><td>JR横須賀線</td><td>約30分</td><td>乗り換えなし</td></tr>
+        <tr><td><strong>鎌倉駅</strong></td><td>JR横須賀線</td><td>約10分</td><td>逗子方面</td></tr>
+        <tr><td><strong>羽田空港</strong></td><td>京急→横浜→JR横須賀線</td><td>約70分</td><td>横浜で乗り換え</td></tr>
+        <tr><td><strong>成田空港</strong></td><td>成田エクスプレス→横須賀線</td><td>約120分</td><td>大船で乗り換え</td></tr>
+      </tbody>
+    </table>
+
+    <h3><span class="icon">🚶</span> 駅からの道順 / Walking Directions</h3>
+
+    <div class="photo-placeholder">
+      <div class="cam">📷</div>
+      駅からの道順写真をここに配置（ステップごと）<br>
+      <span style="font-size:0.8rem;">Step-by-step walking direction photos</span>
+    </div>
+
+    <table class="step-table">
+      <thead><tr><th>Step</th><th>日本語</th><th>English</th></tr></thead>
+      <tbody>
+        <tr><td class="step-num">1</td><td>東逗子駅の改札を出ます</td><td style="color:#888;">Exit the ticket gate at Higashi-Zushi Station</td></tr>
+        <tr><td class="step-num">2</td><td>駅前ロータリーを直進します</td><td style="color:#888;">Walk straight through the station rotary</td></tr>
+        <tr><td class="step-num">3</td><td>約90秒で到着です</td><td style="color:#888;">Arrive in approximately 90 seconds</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">📩</span>
+      <div>詳しい道順は予約確認時にOTAメッセージでお送りします。<br><span style="color:#888;">Detailed walking directions will be sent via OTA message upon booking confirmation.</span></div>
+    </div>
+
+    <hr class="divider">
+
+    <h3><span class="icon">🚗</span> お車でお越しの場合 / By Car</h3>
+    <table class="data-table">
+      <thead><tr><th>項目</th><th>詳細</th></tr></thead>
+      <tbody>
+        <tr><td><strong>駐車場</strong></td><td>※近隣コインパーキングをご利用ください / <span style="color:#888;">Please use nearby coin parking</span></td></tr>
+        <tr><td><strong>住所（カーナビ用）</strong></td><td>神奈川県逗子市池子2-10-9</td></tr>
+        <tr><td><strong>Address (GPS)</strong></td><td>2-10-9 Ikego, Zushi, Kanagawa 249-0003</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ==================== PAGE 12: 周辺施設 ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 12</span>
+    <h2>🗺️ 周辺施設ガイド</h2>
+    <div class="subtitle">Neighborhood Guide</div>
+
+    <div class="category-header">
+      <span class="cat-icon">🏪</span>
+      <span class="cat-title">コンビニ</span>
+      <span class="cat-title-en">Convenience Stores</span>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>店名 / Store</th><th>距離</th><th>営業時間</th></tr></thead>
+      <tbody>
+        <tr><td><strong>セブンイレブン 東逗子駅前店</strong></td><td>徒歩約2分</td><td>24時間 / 24hrs</td></tr>
+      </tbody>
+    </table>
+
+    <div class="category-header">
+      <span class="cat-icon">🛒</span>
+      <span class="cat-title">スーパーマーケット</span>
+      <span class="cat-title-en">Supermarkets</span>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>店名 / Store</th><th>距離</th><th>備考</th></tr></thead>
+      <tbody>
+        <tr><td><strong>スーパー三和 逗子店</strong></td><td>東逗子駅近く</td><td>食材・日用品</td></tr>
+        <tr><td><strong>ヤオコー 逗子店</strong></td><td>車で約5分</td><td>大型スーパー</td></tr>
+      </tbody>
+    </table>
+
+    <div class="category-header">
+      <span class="cat-icon">🍜</span>
+      <span class="cat-title">レストラン・飲食店</span>
+      <span class="cat-title-en">Restaurants</span>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>ジャンル / Genre</th><th>備考 / Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>和食</strong> / Japanese</td><td>逗子駅・東逗子駅周辺に多数</td></tr>
+        <tr><td><strong>カフェ</strong> / Cafe</td><td>海沿いのおしゃれカフェ多数</td></tr>
+        <tr><td><strong>ラーメン</strong> / Ramen</td><td>逗子駅周辺</td></tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">📩</span>
+      <div>おすすめのレストランはOTAメッセージでお気軽にお尋ねください。<br><span style="color:#888;">Feel free to ask us for restaurant recommendations via OTA message.</span></div>
+    </div>
+
+    <div class="category-header">
+      <span class="cat-icon">🏥</span>
+      <span class="cat-title">医療施設</span>
+      <span class="cat-title-en">Medical</span>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>施設</th><th>備考</th></tr></thead>
+      <tbody>
+        <tr><td><strong>逗子中央医院</strong></td><td>内科・外科</td></tr>
+        <tr><td><strong>逗子市休日急患診療所</strong></td><td>休日・夜間</td></tr>
+      </tbody>
+    </table>
+
+    <div class="category-header">
+      <span class="cat-icon">💴</span>
+      <span class="cat-title">ATM</span>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>場所 / Location</th><th>備考 / Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>セブンイレブン ATM</strong></td><td>24時間 / 海外カード対応 / International cards OK</td></tr>
+        <tr><td><strong>ゆうちょ銀行 逗子店</strong></td><td>逗子駅近く</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ==================== PAGE 13: 観光スポット ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 13</span>
+    <h2>🌊 おすすめ観光スポット</h2>
+    <div class="subtitle">Must-See Spots</div>
+
+    <div class="category-header">
+      <span class="cat-icon">🏖️</span>
+      <span class="cat-title">ビーチ</span>
+      <span class="cat-title-en">Beaches</span>
+    </div>
+    <div class="spot-grid">
+      <div class="spot-card">
+        <div class="spot-icon">🏖️</div>
+        <div>
+          <div class="spot-name">逗子海岸 <span class="spot-name-en">Zushi Beach</span></div>
+          <div class="spot-access">🚌 バスで約10分</div>
+          <div class="spot-desc">穏やかな波、夕日が美しい / <span style="color:#888;">Calm waves, beautiful sunset</span></div>
+        </div>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon">🏄</div>
+        <div>
+          <div class="spot-name">材木座海岸 <span class="spot-name-en">Zaimokuza Beach</span></div>
+          <div class="spot-access">🚗 車で約15分</div>
+          <div class="spot-desc">サーフィン・SUP人気 / <span style="color:#888;">Popular for surfing &amp; SUP</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-header">
+      <span class="cat-icon">⛩️</span>
+      <span class="cat-title">寺社仏閣</span>
+      <span class="cat-title-en">Temples &amp; Shrines</span>
+    </div>
+    <div class="spot-grid">
+      <div class="spot-card">
+        <div class="spot-icon">⛩️</div>
+        <div>
+          <div class="spot-name">鶴岡八幡宮 <span class="spot-name-en">Tsurugaoka Hachimangu</span></div>
+          <div class="spot-access">🚶 鎌倉駅から徒歩10分</div>
+          <div class="spot-desc">鎌倉のシンボル / <span style="color:#888;">Symbol of Kamakura</span></div>
+        </div>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon">🗿</div>
+        <div>
+          <div class="spot-name">高徳院（鎌倉大仏） <span class="spot-name-en">Great Buddha</span></div>
+          <div class="spot-access">🚶 長谷駅から徒歩7分</div>
+          <div class="spot-desc">国宝・大仏 / <span style="color:#888;">National treasure</span></div>
+        </div>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon">🎋</div>
+        <div>
+          <div class="spot-name">報国寺（竹寺） <span class="spot-name-en">Hokoku-ji</span></div>
+          <div class="spot-access">🚌 鎌倉駅からバス10分</div>
+          <div class="spot-desc">竹林と抹茶 / <span style="color:#888;">Bamboo grove &amp; matcha</span></div>
+        </div>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon">💜</div>
+        <div>
+          <div class="spot-name">明月院 <span class="spot-name-en">Meigetsuin</span></div>
+          <div class="spot-access">🚶 北鎌倉駅から徒歩10分</div>
+          <div class="spot-desc">紫陽花の名所 / <span style="color:#888;">Famous for hydrangeas</span></div>
+        </div>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon">🏔️</div>
+        <div>
+          <div class="spot-name">神武寺 <span class="spot-name-en">Jimmu-ji Temple</span></div>
+          <div class="spot-access">🚶 徒歩約15分</div>
+          <div class="spot-desc">地元の古刹・ハイキング / <span style="color:#888;">Local temple, hiking</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-header">
+      <span class="cat-icon">🌿</span>
+      <span class="cat-title">自然・公園</span>
+      <span class="cat-title-en">Nature &amp; Parks</span>
+    </div>
+    <div class="spot-grid">
+      <div class="spot-card">
+        <div class="spot-icon">🗻</div>
+        <div>
+          <div class="spot-name">披露山公園 <span class="spot-name-en">Hiroyama Park</span></div>
+          <div class="spot-access">🚗 車で約10分</div>
+          <div class="spot-desc">富士山・江の島の絶景パノラマ / <span style="color:#888;">Panoramic view of Mt. Fuji &amp; Enoshima</span></div>
+        </div>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon">⛵</div>
+        <div>
+          <div class="spot-name">葉山マリーナ <span class="spot-name-en">Hayama Marina</span></div>
+          <div class="spot-access">🚗 車で約15分</div>
+          <div class="spot-desc">海辺の散歩・レストラン / <span style="color:#888;">Seaside walk &amp; restaurants</span></div>
+        </div>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon">🥾</div>
+        <div>
+          <div class="spot-name">神武寺〜鷹取山ハイキング</div>
+          <div class="spot-access">🚶 東逗子駅から</div>
+          <div class="spot-desc">地元のおすすめハイク / <span style="color:#888;">Local favorite hike</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-header">
+      <span class="cat-icon">🛍️</span>
+      <span class="cat-title">ショッピング・体験</span>
+      <span class="cat-title-en">Shopping &amp; Experiences</span>
+    </div>
+    <div class="spot-grid">
+      <div class="spot-card">
+        <div class="spot-icon">🛍️</div>
+        <div>
+          <div class="spot-name">小町通り <span class="spot-name-en">Komachi-dori</span></div>
+          <div class="spot-access">🚶 鎌倉駅すぐ</div>
+          <div class="spot-desc">食べ歩き・お土産 / <span style="color:#888;">Street food &amp; souvenirs</span></div>
+        </div>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon">🚃</div>
+        <div>
+          <div class="spot-name">江ノ電 <span class="spot-name-en">Enoden Railway</span></div>
+          <div class="spot-access">🚶 鎌倉駅から</div>
+          <div class="spot-desc">海沿い絶景ローカル線 / <span style="color:#888;">Scenic coastal train</span></div>
+        </div>
+      </div>
+      <div class="spot-card">
+        <div class="spot-icon">🌅</div>
+        <div>
+          <div class="spot-name">葉山の朝市 <span class="spot-name-en">Hayama Morning Market</span></div>
+          <div class="spot-access">日曜開催</div>
+          <div class="spot-desc">地元の新鮮食材 / <span style="color:#888;">Fresh local produce</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-success" style="margin-top:20px; background:var(--green-light); border-left-color:var(--green-mid);">
+      <span class="alert-icon">🗾</span>
+      <div><strong>鎌倉へは東逗子駅からJR横須賀線で約10分！</strong><br><span style="color:#888;">Kamakura is only about 10 minutes from Higashi-Zushi Station by JR!</span></div>
+    </div>
+  </div>
+
+  <!-- ==================== PAGE 14: ゴミ分別詳細（マンスリー向け） ==================== -->
+  <div class="page">
+    <span class="page-number">PAGE 14</span>
+    <h2>🗑️ 逗子市ゴミ分別ガイド</h2>
+    <div class="subtitle">Zushi City Trash Sorting Guide (for Monthly Guests)</div>
+
+    <div class="alert alert-info">
+      <span class="alert-icon">📋</span>
+      <div>
+        このページは<strong>長期滞在（マンスリー）のお客さま向け</strong>です。短期滞在のお客さまは、ハウスルール PAGE 7をご参照ください。<br>
+        <span style="color:#888;">This page is for <strong>monthly/long-term guests</strong>. Short-term guests, please refer to House Rules PAGE 7.</span>
+      </div>
+    </div>
+
+    <h3><span class="icon">📅</span> 収集日カレンダー（池子エリア） / Collection Schedule</h3>
+
+    <table class="trash-schedule">
+      <thead><tr><th>カテゴリ / Category</th><th>収集日 / Day</th><th>袋・出し方</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="color-dot dot-red"></span><strong>燃やすごみ</strong> / Burnable</td>
+          <td><strong>毎週 火・金</strong> / Tue &amp; Fri</td>
+          <td>半透明袋</td>
+        </tr>
+        <tr>
+          <td><span class="color-dot dot-yellow"></span><strong>容器包装プラ</strong> / Plastic Pkg.</td>
+          <td><strong>毎週 水</strong> / Wed</td>
+          <td>半透明袋</td>
+        </tr>
+        <tr>
+          <td><span class="color-dot dot-blue"></span><strong>不燃ごみ</strong> &amp; <strong>ペットボトル</strong></td>
+          <td><strong>毎週 木</strong> / Thu</td>
+          <td>分けて出す</td>
+        </tr>
+        <tr>
+          <td><span class="color-dot dot-brown"></span><strong>あきびん</strong> / Glass Bottles</td>
+          <td><strong>第2・第4 水</strong> / 2nd &amp; 4th Wed</td>
+          <td>色別に分けなくてOK</td>
+        </tr>
+        <tr>
+          <td><span class="color-dot dot-green"></span><strong>草・葉・植木</strong> / Garden Waste</td>
+          <td><strong>第1・3・5 月</strong> / 1st, 3rd, 5th Mon</td>
+          <td>ひもで束ねる</td>
+        </tr>
+        <tr>
+          <td><span class="color-dot dot-orange"></span><strong>危険有害・小型家電</strong></td>
+          <td><strong>第2・第4 月</strong> / 2nd &amp; 4th Mon</td>
+          <td>透明袋</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="alert alert-warning">
+      <span class="alert-icon">⏰</span>
+      <div><strong>ゴミ出し時間: 朝8:00まで</strong> / Put out trash by 8:00 AM<br><span style="color:#888;">前日の夜に出さないでください / Do not put out trash the night before</span></div>
+    </div>
+
+    <hr class="divider">
+
+    <h3><span class="icon">📝</span> 分別詳細 / Sorting Details</h3>
+
+    <h4>🔴 燃やすごみ / Burnable Trash</h4>
+    <ul style="list-style:none; padding:0; font-size:0.85rem;">
+      <li>• 生ゴミ（水切りをしっかり）/ <span style="color:#888;">Food waste (drain well)</span></li>
+      <li>• 紙くず・ティッシュ / <span style="color:#888;">Paper waste, tissues</span></li>
+      <li>• 布・革製品 / <span style="color:#888;">Cloth, leather</span></li>
+      <li>• 木製品 / <span style="color:#888;">Wood products</span></li>
+      <li>• プラスチック製品（商品として購入したもの）/ <span style="color:#888;">Plastic products purchased as goods</span></li>
+    </ul>
+
+    <h4>🟡 容器包装プラスチック / Plastic Packaging</h4>
+    <ul style="list-style:none; padding:0; font-size:0.85rem;">
+      <li>• 食品トレー / <span style="color:#888;">Food trays</span></li>
+      <li>• ペットボトルのラベル・キャップ / <span style="color:#888;">PET bottle labels &amp; caps</span></li>
+      <li>• レジ袋・ビニール袋 / <span style="color:#888;">Plastic bags</span></li>
+      <li>• お菓子の袋 / <span style="color:#888;">Snack wrappers</span></li>
+    </ul>
+    <div class="alert alert-info" style="padding:10px 16px;">
+      <span class="alert-icon">💡</span>
+      <div style="font-size:0.85rem;"><strong>見分け方:</strong>「プラ」マークが付いているものが対象です。/ <span style="color:#888;">Items with the "プラ" mark.</span></div>
+    </div>
+
+    <h4>🔵 不燃ごみ / Non-burnable</h4>
+    <ul style="list-style:none; padding:0; font-size:0.85rem;">
+      <li>• 金属製品 / <span style="color:#888;">Metal items</span></li>
+      <li>• ガラス（割れたもの）/ <span style="color:#888;">Broken glass</span></li>
+      <li>• 陶磁器 / <span style="color:#888;">Ceramics</span></li>
+    </ul>
+
+    <h4>♻️ ペットボトル / PET Bottles</h4>
+    <ul style="list-style:none; padding:0; font-size:0.85rem;">
+      <li>• ラベルとキャップを外す（→プラスチックへ）/ <span style="color:#888;">Remove label &amp; cap (→ Plastic)</span></li>
+      <li>• 中身を洗う / <span style="color:#888;">Rinse inside</span></li>
+      <li>• つぶして出す / <span style="color:#888;">Crush before disposal</span></li>
+    </ul>
+
+    <hr class="divider">
+
+    <h3><span class="icon">📍</span> ゴミ集積所の場所 / Trash Collection Point</h3>
+    <div class="alert alert-info">
+      <span class="alert-icon">📝</span>
+      <div>最寄りのゴミ集積所の場所は、入居時にご案内します。<br><span style="color:#888;">The nearest trash collection point will be shown upon move-in.</span></div>
+    </div>
+
+    <h3><span class="icon">📱</span> 便利アプリ / Useful App</h3>
+    <div style="background:var(--green-light); border-radius:12px; padding:20px; display:flex; gap:16px; align-items:center;">
+      <div style="font-size:2.5rem;">📱</div>
+      <div>
+        <div style="font-weight:700; color:var(--green-dark); font-size:1.05rem;">さんあ〜る</div>
+        <div style="font-size:0.85rem; color:#666;">逗子市公式ゴミ分別アプリ。品目検索・収集日カレンダー・通知機能付き</div>
+        <div style="font-size:0.82rem; color:#888;">Official Zushi City trash sorting app. Search items, calendar, notifications</div>
+        <div style="font-size:0.8rem; color:var(--green-mid); margin-top:4px;">App Store / Google Play で「さんあーる 逗子」で検索</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Footer ===== -->
+  <div class="page-footer">
+    <div class="closing">素敵なご滞在をお過ごしください！ 🌿</div>
+    <div class="closing-en">We hope you have a wonderful stay!</div>
+    <div class="brand">花隠れ — Hanakakure</div>
+    <div class="brand-en">Hidden Forest Retreat — Zushi, Kanagawa</div>
+    <div class="contact-note">📩 ご不明な点はOTAメッセージでお気軽にお尋ねください。<br>Please feel free to contact us via OTA message if you have any questions.</div>
+  </div>
+
+</div>
+
+</body>
+</html>
