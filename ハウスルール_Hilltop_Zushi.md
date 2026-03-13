@@ -1,4 +1,4 @@
-# ハウスルール — 花隠れ（Hanakakure）
+# ハウスルール — Hilltop Zushi
 
 <!--
 ==========================================================
@@ -26,8 +26,8 @@
 
 # 🏡
 
-# 花隠れ
-### Hanakakure
+# Hilltop Zushi
+### 森の隠れ家 — Hidden Forest Retreat
 
 &nbsp;
 
@@ -36,7 +36,7 @@
 
 &nbsp;
 
-**逗子市池子 — 森の隠れ家**
+**Hilltop Zushi — 森の隠れ家**
 *Hidden Forest Retreat — Zushi, Kanagawa*
 
 </div>
@@ -55,14 +55,14 @@
 
 <div align="center">
 
-### ようこそ、花隠れへ
-### Welcome to Hanakakure
+### ようこそ、Hilltop Zushi へ
+### Welcome to Hilltop Zushi
 
 </div>
 
 &nbsp;
 
-この度は花隠れをお選びいただき、誠にありがとうございます。
+この度はHilltop Zushiをお選びいただき、誠にありがとうございます。
 当施設は逗子の豊かな自然に囲まれた一軒家です。
 鎌倉・葉山・逗子海岸へのアクセスも良好で、
 森の静けさと海辺のリゾート感を同時にお楽しみいただけます。
@@ -72,7 +72,7 @@
 
 &nbsp;
 
-Thank you for choosing Hanakakure.
+Thank you for choosing Hilltop Zushi.
 Our property is a private house nestled in the lush nature of Zushi.
 With easy access to Kamakura, Hayama, and Zushi Beach,
 you can enjoy both the tranquility of the forest and the charm of the coast.
@@ -521,7 +521,7 @@ BBQ in the garden is welcome! Please follow these rules.
 ### 素敵なご滞在をお過ごしください！ 🌿
 ### We hope you have a wonderful stay! 🌿
 
-**花隠れ — Hanakakure**
+**Hilltop Zushi — 森の隠れ家**
 *Hidden Forest Retreat — Zushi, Kanagawa*
 
 </div>

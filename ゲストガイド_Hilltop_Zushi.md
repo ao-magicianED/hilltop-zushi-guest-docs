@@ -1,4 +1,4 @@
-# ゲストガイド — 花隠れ（Hanakakure）
+# ゲストガイド — Hilltop Zushi
 
 <!--
 ==========================================================
@@ -26,8 +26,8 @@
 
 # 🏡
 
-# 花隠れ
-### Hanakakure
+# Hilltop Zushi
+### 森の隠れ家 — Hidden Forest Retreat
 
 &nbsp;
 
@@ -36,7 +36,7 @@
 
 &nbsp;
 
-**逗子市池子 — 森の隠れ家**
+**Hilltop Zushi — 森の隠れ家**
 *Hidden Forest Retreat — Zushi, Kanagawa*
 
 &nbsp;
@@ -796,7 +796,7 @@ BBQ equipment is set up in the designated garden area.
 ### 素敵なご滞在をお過ごしください！ 🌿
 ### We hope you have a wonderful stay! 🌿
 
-**花隠れ — Hanakakure**
+**Hilltop Zushi — 森の隠れ家**
 *Hidden Forest Retreat — Zushi, Kanagawa*
 
 📩 ご不明な点はOTAメッセージでお気軽にお尋ねください。
