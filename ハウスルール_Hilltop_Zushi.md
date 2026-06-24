@@ -196,6 +196,42 @@ Separate your trash as instructed (→ see PAGE 7).
 
 ---
 
+### 🐾 ペット同伴について / Pets
+
+ペットと一緒にご滞在いただけます（1匹 ¥4,400）。庭はOK、寝室はNGです。
+ペットが物を破損・汚損した場合は、弁償をお願いする場合がございます。
+**ペット同伴は必ず事前にお申し出ください。未申告の場合、弁済費が高額になりますのでご注意ください。**
+
+Pets are welcome (¥4,400 per pet). Allowed in the garden, but not in the bedrooms.
+You may be charged for any damage or soiling caused by your pet.
+**Please declare your pet in advance. Undeclared pets will incur a significantly higher charge.**
+
+---
+
+### 📹 防犯カメラについて / Security Cameras
+
+防犯・安全管理のため、屋外（玄関・敷地の出入口・庭まわり）に防犯カメラを設置しています。
+**室内には設置しておりません。** あらかじめご了承ください。
+
+For safety and security, surveillance cameras are installed outdoors
+(entrance, property access points, and around the garden).
+**There are no cameras inside the house.**
+
+---
+
+### ⚠️ 敷地内の安全 / Safety on the Property
+
+当物件は高台にあり、敷地の崖側は急勾配です。**花壇より先は立入禁止**です。
+フェンスのない箇所もあるため、**お子様・ペットが崖に近づかないよう**十分ご注意ください。
+**2階ベランダの窓は安全のため開けないでください。**
+
+This property sits on a hilltop and the cliffside is steep.
+**Do not go beyond the flower beds.** Some areas have no fence,
+so please keep children and pets away from the edge.
+**For safety, please do not open the 2nd-floor balcony windows.**
+
+---
+
 <!-- ==================== PAGE 5: HOUSE RULE 2 ==================== -->
 
 ## PAGE 5 — HOUSE RULE 2
@@ -294,22 +330,28 @@ Late check-out may incur additional charges.
 
 <!-- デザイン指示: BBQグリルのアイコン付きカード -->
 
-**庭でのBBQは歓迎です！以下のルールをお守りください。**
+**庭でのガス式BBQをご用意しています（予約制）。以下のルールをお守りください。**
 
-BBQ in the garden is welcome! Please follow these rules.
+We offer a gas BBQ in the garden (reservation required). Please follow these rules.
 
 &nbsp;
 
 | ルール / Rule | 詳細 / Details |
 |---|---|
-| ⏰ **利用時間** | **20:00まで** / Until 8:00 PM |
+| 📅 **予約制** | 事前予約 ¥4,400 ／ 当日予約 ¥6,600 / Advance ¥4,400 / Same-day ¥6,600 |
+| 🔥 **ガス式** | ガス式BBQです（炭は不要） / Gas BBQ (no charcoal needed) |
+| ⏰ **火気使用** | **19:00まで** / Open flame until 7:00 PM |
+| ⏰ **BBQ利用** | **20:00まで** / BBQ until 8:00 PM |
 | 🧹 **後片付け** | 使用後は必ず清掃してください / Clean up after use |
-| 🔥 **炭の処理** | 完全に消火し、指定の容器に入れてください / Fully extinguish charcoal and place in designated container |
-| 🗑️ **ゴミ** | 燃えるゴミ・ビン・カンに分別してください / Separate into burnable, bottles, and cans |
+| 🗑️ **ゴミ** | 分別して室内の所定場所へ / Sort and bring inside to the designated area |
 | 🔇 **騒音** | 20:00以降は静粛にお願いします / Keep quiet after 8:00 PM |
-| 🚭 **場所** | 庭の指定エリアでのみ使用可能 / Use only in the designated garden area |
+| 📍 **場所** | 庭の指定エリアでのみ使用可能 / Use only in the designated garden area |
 
 &nbsp;
+
+> ⚠️ **BBQのご利用は必ず事前にお申し出ください。未申告で利用された場合は ¥16,000 を申し受けます。**
+>
+> Please reserve BBQ in advance. Unreported BBQ use will be charged ¥16,000.
 
 > ⚠️ BBQ機材の汚損・破損があった場合、修理・交換費用を請求する場合があります。
 >
@@ -331,10 +373,12 @@ BBQ in the garden is welcome! Please follow these rules.
 
 &nbsp;
 
-> **短期滞在のお客さまへ：ゴミはお部屋の中で分別し、所定の場所にまとめてください。**
+> **短期滞在のお客さまへ：ゴミは室内（キッチン・リビング）で分別してまとめてください。**
+> 入り切らない場合は、玄関近くの「銀のゴミストッカー」に入れてください。
 > ゴミ回収はチェックアウト後にホストが行います。
 >
-> **For short-stay guests: Please sort your trash and leave it in the designated area inside the house.**
+> **For short-stay guests: Please sort your trash inside (kitchen & living room).**
+> If it does not fit, please use the silver trash stocker near the entrance.
 > Trash collection will be handled by the host after check-out.
 
 &nbsp;
@@ -468,8 +512,8 @@ BBQ in the garden is welcome! Please follow these rules.
 
 ### 🏠 目印 / Landmarks
 
-- JR東逗子駅（Higashi-Zushi Station）から徒歩約90秒
-- Near JR Higashi-Zushi Station, approximately 90 seconds on foot
+- 京急逗子線「神武寺駅」から徒歩約3分（高台の一軒家）
+- Near Jimmuji Station (Keikyu Zushi Line), approx. 3 min on foot — a house on the hilltop
 
 ---
 
@@ -488,10 +532,8 @@ BBQ in the garden is welcome! Please follow these rules.
 
 | | |
 |---|---|
-| **SSID（ネットワーク名）** | `__________________` |
-| **Password（パスワード）** | `__________________` |
-
-> ※ 開通後に記入してください / Fill in after setup
+| **SSID（ネットワーク名）** | `kakurega` |
+| **Password（パスワード）** | `kakurega` |
 
 &nbsp;
 
@@ -509,10 +551,11 @@ BBQ in the garden is welcome! Please follow these rules.
 | 4 | 💡 節電 | 外出時は電源OFF | Turn off power when going out |
 | 5 | 🧹 清潔 | 使用後は清掃 | Clean up after use |
 | 6 | 🔇 静粛 | 20:00以降は静かに | Quiet after 8:00 PM |
-| 7 | 🔥 BBQ | 20:00まで・後片付け必須 | Until 8 PM, clean up required |
+| 7 | 🔥 BBQ | 予約制・火気19時/BBQ20時まで | Reservation required, flame 7 PM / BBQ 8 PM |
 | 8 | 🗑️ ゴミ | 分別して室内に保管 | Sort trash, keep inside |
 | 9 | ⏰ C/O | 10:00 AMまで | By 10:00 AM |
 | 10 | 📩 連絡 | OTAメッセージのみ | Contact via OTA message only |
+| 11 | 🐾 ペット | 1匹¥4,400・庭OK寝室NG・要申告 | ¥4,400/pet, garden OK / bedrooms NG, declare in advance |
 
 &nbsp;
 

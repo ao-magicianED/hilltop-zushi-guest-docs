@@ -550,6 +550,10 @@
     .season-grid { grid-template-columns: 1fr; }
     .page-cover .info-row { flex-direction: column; gap: 8px; }
   }
+
+  /* ===== Document photo ===== */
+  .doc-photo{display:block;width:100%;max-height:320px;object-fit:cover;border-radius:12px;margin:16px 0;box-shadow:0 4px 16px rgba(0,0,0,.08)}
+  .doc-photo.contain{max-height:480px;object-fit:contain;background:#fff;padding:10px;border:1px solid #eee}
 </style>
 </head>
 <body>
@@ -670,11 +674,8 @@
 
     <h3><span class="icon">🏠</span> 1F（1階）/ First Floor</h3>
 
-    <div class="photo-placeholder">
-      <div class="cam">📷</div>
-      1階の間取り図 or 写真をここに配置<br>
-      <span style="font-size:0.8rem;">First floor plan or photo</span>
-    </div>
+    <img class="doc-photo contain" src="hilltop-zushi-site/images/ph-floorplan.png" alt="間取り図 / Floor plan (5SLDK)">
+    <p style="font-size:0.82rem; color:#888; text-align:center; margin-top:-6px;">間取り図（5SLDK・118㎡）/ Floor plan</p>
 
     <div class="room-grid">
       <div class="room-card">
@@ -836,11 +837,7 @@
     <h2>🍳 キッチン設備の使い方</h2>
     <div class="subtitle">Kitchen Equipment Guide</div>
 
-    <div class="photo-placeholder">
-      <div class="cam">📷</div>
-      キッチン全体の写真をここに配置<br>
-      <span style="font-size:0.8rem;">Photo of the kitchen</span>
-    </div>
+    <img class="doc-photo" src="hilltop-zushi-site/images/ph-kitchen.jpg" alt="キッチン / Kitchen">
 
     <h3><span class="icon">🔥</span> ガスコンロ / Gas Stove</h3>
     <table class="step-table">
@@ -943,30 +940,40 @@
     <h2>🔥 BBQエリアの使い方＆ルール</h2>
     <div class="subtitle">BBQ Area Guide &amp; Rules</div>
 
-    <div class="photo-placeholder">
-      <div class="cam">📷</div>
-      庭・BBQエリアの写真をここに配置<br>
-      <span style="font-size:0.8rem;">Photo of garden / BBQ area</span>
-    </div>
+    <img class="doc-photo" src="hilltop-zushi-site/images/ph-hero-bbq-terrace.jpg" alt="庭・BBQエリア / Garden & BBQ area">
 
     <h3><span class="icon">🔥</span> BBQ手順 / How to BBQ</h3>
+
+    <div class="alert alert-danger">
+      <span class="alert-icon">⚠️</span>
+      <div><strong>BBQはガス式・予約制です。</strong>事前予約 ¥4,400／当日予約 ¥6,600。必ず事前にお申し出ください（未申告利用は ¥16,000）。<br><span style="color:#888;">Gas BBQ, reservation required. Advance ¥4,400 / Same-day ¥6,600. Please reserve in advance (unreported use: ¥16,000).</span></div>
+    </div>
+
     <table class="step-table">
       <thead><tr><th>Step</th><th>日本語</th><th>English</th></tr></thead>
       <tbody>
-        <tr><td class="step-num">1</td><td>BBQコンロを確認する</td><td style="color:#888;">Check the BBQ grill</td></tr>
-        <tr><td class="step-num">2</td><td>炭を並べて着火する</td><td style="color:#888;">Arrange charcoal and light it</td></tr>
-        <tr><td class="step-num">3</td><td>BBQを楽しむ！🍖</td><td style="color:#888;">Enjoy your BBQ! 🍖</td></tr>
-        <tr><td class="step-num">4</td><td>使用後は炭を完全に消火する</td><td style="color:#888;">Fully extinguish charcoal after use</td></tr>
-        <tr><td class="step-num">5</td><td>網・コンロを清掃する</td><td style="color:#888;">Clean the grill and grate</td></tr>
-        <tr><td class="step-num">6</td><td>ゴミを分別する</td><td style="color:#888;">Sort your trash</td></tr>
+        <tr><td class="step-num">1</td><td>BBQのご利用を事前にお申し出ください</td><td style="color:#888;">Reserve BBQ in advance</td></tr>
+        <tr><td class="step-num">2</td><td>ガス式BBQコンロを確認する（炭は不要）</td><td style="color:#888;">Check the gas BBQ grill (no charcoal needed)</td></tr>
+        <tr><td class="step-num">3</td><td>点火してBBQを楽しむ！🍖</td><td style="color:#888;">Ignite and enjoy your BBQ! 🍖</td></tr>
+        <tr><td class="step-num">4</td><td>火気の使用は19:00まで</td><td style="color:#888;">Open flame use until 7:00 PM</td></tr>
+        <tr><td class="step-num">5</td><td>使用後は網・コンロを清掃する</td><td style="color:#888;">Clean the grill and grate after use</td></tr>
+        <tr><td class="step-num">6</td><td>ゴミを分別して室内へ</td><td style="color:#888;">Sort trash and bring inside</td></tr>
       </tbody>
     </table>
 
     <h3><span class="icon">⚠️</span> BBQルール / BBQ Rules</h3>
     <div class="bbq-rule-grid">
       <div class="bbq-rule-item">
+        <div class="bbq-icon">📅</div>
+        <div><div class="bbq-title">予約制</div><div class="bbq-desc">事前¥4,400／当日¥6,600（未申告¥16,000）</div></div>
+      </div>
+      <div class="bbq-rule-item">
+        <div class="bbq-icon">🔥</div>
+        <div><div class="bbq-title">火気使用</div><div class="bbq-desc"><strong>19:00まで</strong> / Flame until 7 PM</div></div>
+      </div>
+      <div class="bbq-rule-item">
         <div class="bbq-icon">⏰</div>
-        <div><div class="bbq-title">利用時間</div><div class="bbq-desc"><strong>20:00まで</strong> / Until 8:00 PM</div></div>
+        <div><div class="bbq-title">BBQ利用</div><div class="bbq-desc"><strong>20:00まで</strong> / BBQ until 8 PM</div></div>
       </div>
       <div class="bbq-rule-item">
         <div class="bbq-icon">🔇</div>
@@ -977,16 +984,12 @@
         <div><div class="bbq-title">後片付け</div><div class="bbq-desc">必ず清掃 / Must clean up</div></div>
       </div>
       <div class="bbq-rule-item">
-        <div class="bbq-icon">🔥</div>
-        <div><div class="bbq-title">消火</div><div class="bbq-desc">炭は完全消火→指定容器へ</div></div>
-      </div>
-      <div class="bbq-rule-item">
         <div class="bbq-icon">🗑️</div>
         <div><div class="bbq-title">ゴミ</div><div class="bbq-desc">分別して室内の所定場所へ</div></div>
       </div>
       <div class="bbq-rule-item">
-        <div class="bbq-icon">🚫</div>
-        <div><div class="bbq-title">花火</div><div class="bbq-desc">手持ち花火のみ可 / Sparklers only</div></div>
+        <div class="bbq-icon">🎆</div>
+        <div><div class="bbq-title">花火</div><div class="bbq-desc">手持ち花火のみ可（テラス・各自購入）</div></div>
       </div>
       <div class="bbq-rule-item" style="grid-column:span 2;">
         <div class="bbq-icon">🌿</div>
@@ -994,15 +997,23 @@
       </div>
     </div>
 
-    <h3><span class="icon">🛒</span> 食材・炭の購入先 / Where to Buy Supplies</h3>
+    <h3><span class="icon">🛒</span> 食材の購入先 / Where to Buy Supplies</h3>
+    <div class="alert alert-info" style="padding:10px 16px;">
+      <span class="alert-icon">💡</span>
+      <div style="font-size:0.85rem;">ガス式のため炭は不要です。食材・飲み物は近隣でお求めいただけます。/ <span style="color:#888;">Gas BBQ — no charcoal needed.</span></div>
+    </div>
     <table class="data-table">
       <thead><tr><th>店舗 / Store</th><th>場所 / Location</th><th>備考 / Notes</th></tr></thead>
       <tbody>
-        <tr><td><strong>スーパー三和 逗子店</strong></td><td>東逗子駅近く</td><td>食材・飲料</td></tr>
-        <tr><td><strong>コメリ 逗子店</strong></td><td>車で約10分</td><td>炭・BBQ用品</td></tr>
-        <tr><td><strong>セブンイレブン</strong></td><td>東逗子駅前</td><td>飲料・氷・軽食</td></tr>
+        <tr><td><strong>スーパー三和 逗子店</strong></td><td>車・タクシーで約5分</td><td>食材・飲料</td></tr>
+        <tr><td><strong>セブンイレブン</strong></td><td>駅周辺</td><td>飲料・氷・軽食</td></tr>
       </tbody>
     </table>
+
+    <div class="alert alert-danger">
+      <span class="alert-icon">⚠️</span>
+      <div><strong>庭・テラスの安全：</strong>高台のため崖側は急勾配です。花壇より先は立入禁止。フェンスのない箇所もあり、お子様・ペットが崖に近づかないようご注意ください。2階ベランダの窓は開けないでください。<br><span style="color:#888;">The cliffside is steep. Do not go beyond the flower beds; keep children and pets away from the edge. Do not open the 2nd-floor balcony windows.</span></div>
+    </div>
   </div>
 
   <!-- ==================== PAGE 10: ブレーカー ==================== -->
@@ -1038,9 +1049,9 @@
     </table>
 
     <h3><span class="icon">📍</span> ブレーカーの場所 / Breaker Location</h3>
-    <div class="alert alert-info">
-      <span class="alert-icon">📝</span>
-      <div>場所は物件準備完了後に写真付きで更新します。<br><span style="color:#888;">Location will be updated with photos after property setup.</span></div>
+    <div class="alert alert-success">
+      <span class="alert-icon">📍</span>
+      <div><strong>冷蔵庫の上にあります。</strong><br><span style="color:#888;">Located on top of the refrigerator.</span></div>
     </div>
 
     <div class="alert alert-warning">
@@ -1056,54 +1067,66 @@
     <div class="subtitle">How to Get Here</div>
 
     <div class="access-highlight">
-      <div class="station">JR横須賀線 東逗子駅</div>
-      <div style="font-size:0.85rem; opacity:0.7;">Higashi-Zushi Station</div>
-      <div class="time">徒歩 約90秒</div>
-      <div class="time-label">Approx. 90 seconds on foot</div>
+      <div class="station">京急逗子線 神武寺駅</div>
+      <div style="font-size:0.85rem; opacity:0.7;">Jimmuji Station (Keikyu Line)</div>
+      <div class="time">徒歩 約3分</div>
+      <div class="time-label">Approx. 3 min — with ≈50 steps near the end</div>
     </div>
 
-    <h3><span class="icon">🚆</span> 主要駅からのアクセス / From Major Stations</h3>
+    <div class="alert alert-warning">
+      <span class="alert-icon">⚠️</span>
+      <div>駅から物件まで、後半に上り階段が約50段あります。歩きやすい靴でお越しください。大きなお荷物は両手が空くリュックがおすすめ。夜間は足元が暗くなる場合があります。<br><span style="color:#888;">~50 steps near the end of the route. Wear comfortable shoes; a backpack is recommended for large luggage. The path can be dark at night.</span></div>
+    </div>
+
+    <h3><span class="icon">🚆</span> 主要エリアからのアクセス / Access from Major Areas</h3>
     <table class="data-table">
-      <thead><tr><th>出発地 / From</th><th>路線 / Line</th><th>所要時間</th><th>備考</th></tr></thead>
+      <thead><tr><th>出発地 / From</th><th>経路 / Route</th><th>所要時間</th></tr></thead>
       <tbody>
-        <tr><td><strong>東京駅</strong></td><td>JR横須賀線（直通）</td><td>約60分</td><td>乗り換えなし</td></tr>
-        <tr><td><strong>品川駅</strong></td><td>JR横須賀線（直通）</td><td>約50分</td><td>乗り換えなし</td></tr>
-        <tr><td><strong>横浜駅</strong></td><td>JR横須賀線</td><td>約30分</td><td>乗り換えなし</td></tr>
-        <tr><td><strong>鎌倉駅</strong></td><td>JR横須賀線</td><td>約10分</td><td>逗子方面</td></tr>
-        <tr><td><strong>羽田空港</strong></td><td>京急→横浜→JR横須賀線</td><td>約70分</td><td>横浜で乗り換え</td></tr>
-        <tr><td><strong>成田空港</strong></td><td>成田エクスプレス→横須賀線</td><td>約120分</td><td>大船で乗り換え</td></tr>
+        <tr><td><strong>JR東逗子駅</strong></td><td>タクシー / Taxi</td><td>約5分（徒歩約20分）</td></tr>
+        <tr><td><strong>JR逗子駅</strong></td><td>タクシー / Taxi</td><td>約10分</td></tr>
+        <tr><td><strong>鎌倉</strong></td><td>電車・タクシー / Train or Taxi</td><td>約20分</td></tr>
+        <tr><td><strong>逗子海岸</strong></td><td>タクシー / Taxi</td><td>約15分</td></tr>
+        <tr><td><strong>羽田空港</strong></td><td>車 / Car</td><td>約45分</td></tr>
       </tbody>
     </table>
 
-    <h3><span class="icon">🚶</span> 駅からの道順 / Walking Directions</h3>
+    <h3><span class="icon">🚶</span> 神武寺駅からの道順 / Walking Directions from Jimmuji Station</h3>
 
-    <div class="photo-placeholder">
-      <div class="cam">📷</div>
-      駅からの道順写真をここに配置（ステップごと）<br>
-      <span style="font-size:0.8rem;">Step-by-step walking direction photos</span>
-    </div>
+    <img class="doc-photo" src="hilltop-zushi-site/images/ph-station.jpg" alt="京急 神武寺駅 / Jimmuji Station">
 
     <table class="step-table">
       <thead><tr><th>Step</th><th>日本語</th><th>English</th></tr></thead>
       <tbody>
-        <tr><td class="step-num">1</td><td>東逗子駅の改札を出ます</td><td style="color:#888;">Exit the ticket gate at Higashi-Zushi Station</td></tr>
-        <tr><td class="step-num">2</td><td>駅前ロータリーを直進します</td><td style="color:#888;">Walk straight through the station rotary</td></tr>
-        <tr><td class="step-num">3</td><td>約90秒で到着です</td><td style="color:#888;">Arrive in approximately 90 seconds</td></tr>
+        <tr><td class="step-num">1</td><td>「神武寺駅」改札を出ます（※米軍専用改札は使用しないでください）</td><td style="color:#888;">Exit the gate at Jimmuji Station (do not use the US military-only gate)</td></tr>
+        <tr><td class="step-num">2</td><td>道なりにまっすぐ進み、最初の信号を右折します</td><td style="color:#888;">Go straight, then turn right at the first traffic light</td></tr>
+        <tr><td class="step-num">3</td><td>まっすぐ進むと「池子会館」が見えます。建物を目印に角を左折します</td><td style="color:#888;">Continue to the "Ikego Kaikan" community hall; turn left at that corner</td></tr>
+        <tr><td class="step-num">4</td><td>まっすぐ進むと正面に上り階段（約50段）。階段を上ります</td><td style="color:#888;">Go straight to the stairs ahead (≈50 steps) and climb up</td></tr>
+        <tr><td class="step-num">5</td><td>上り切る少し手前、左手に当物件。「Hilltop Zushi」の看板が目印です</td><td style="color:#888;">Just before the top, the house is on your left — look for the "Hilltop Zushi" sign</td></tr>
       </tbody>
     </table>
 
     <div class="alert alert-info">
       <span class="alert-icon">📩</span>
-      <div>詳しい道順は予約確認時にOTAメッセージでお送りします。<br><span style="color:#888;">Detailed walking directions will be sent via OTA message upon booking confirmation.</span></div>
+      <div>写真付きの詳しい道順は、予約確認時にOTAメッセージでもお送りします。<br><span style="color:#888;">A detailed guide with photos will also be sent via OTA message upon booking confirmation.</span></div>
     </div>
 
     <hr class="divider">
 
     <h3><span class="icon">🚗</span> お車でお越しの場合 / By Car</h3>
+    <div class="alert alert-info">
+      <span class="alert-icon">🅿️</span>
+      <div>当施設に駐車場はございません。近隣のコインパーキングをご利用ください。<br><span style="color:#888;">There is no parking at the property. Please use nearby coin parking.</span></div>
+    </div>
     <table class="data-table">
-      <thead><tr><th>項目</th><th>詳細</th></tr></thead>
+      <thead><tr><th>コインパーキング / Coin Parking</th><th>場所 / Location</th></tr></thead>
       <tbody>
-        <tr><td><strong>駐車場</strong></td><td>※近隣コインパーキングをご利用ください / <span style="color:#888;">Please use nearby coin parking</span></td></tr>
+        <tr><td><strong>三井のリパーク 神武寺駅前第2</strong></td><td>神武寺駅前</td></tr>
+        <tr><td><strong>三井のリパーク 神武寺駅前</strong></td><td>神武寺駅前</td></tr>
+        <tr><td><strong>マイライフパーク池子</strong></td><td>池子</td></tr>
+      </tbody>
+    </table>
+    <table class="data-table">
+      <tbody>
         <tr><td><strong>住所（カーナビ用）</strong></td><td>神奈川県逗子市池子2-10-9</td></tr>
         <tr><td><strong>Address (GPS)</strong></td><td>2-10-9 Ikego, Zushi, Kanagawa 249-0003</td></tr>
       </tbody>
@@ -1202,7 +1225,7 @@
         <div class="spot-icon">🏖️</div>
         <div>
           <div class="spot-name">逗子海岸 <span class="spot-name-en">Zushi Beach</span></div>
-          <div class="spot-access">🚌 バスで約10分</div>
+          <div class="spot-access">🚕 タクシー約15分</div>
           <div class="spot-desc">穏やかな波、夕日が美しい / <span style="color:#888;">Calm waves, beautiful sunset</span></div>
         </div>
       </div>
@@ -1290,7 +1313,7 @@
         <div class="spot-icon">🥾</div>
         <div>
           <div class="spot-name">神武寺〜鷹取山ハイキング</div>
-          <div class="spot-access">🚶 東逗子駅から</div>
+          <div class="spot-access">🚶 神武寺駅・東逗子駅から</div>
           <div class="spot-desc">地元のおすすめハイク / <span style="color:#888;">Local favorite hike</span></div>
         </div>
       </div>
@@ -1330,7 +1353,7 @@
 
     <div class="alert alert-success" style="margin-top:20px; background:var(--green-light); border-left-color:var(--green-mid);">
       <span class="alert-icon">🗾</span>
-      <div><strong>鎌倉へは東逗子駅からJR横須賀線で約10分！</strong><br><span style="color:#888;">Kamakura is only about 10 minutes from Higashi-Zushi Station by JR!</span></div>
+      <div><strong>鎌倉へは電車・タクシーで約20分！</strong><br><span style="color:#888;">Kamakura is about 20 minutes away by train or taxi!</span></div>
     </div>
   </div>
 
@@ -1435,7 +1458,7 @@
     <h3><span class="icon">📍</span> ゴミ集積所の場所 / Trash Collection Point</h3>
     <div class="alert alert-info">
       <span class="alert-icon">📝</span>
-      <div>最寄りのゴミ集積所の場所は、入居時にご案内します。<br><span style="color:#888;">The nearest trash collection point will be shown upon move-in.</span></div>
+      <div><strong>短期滞在の方：</strong>室内（キッチン・リビング）で分別し、入り切らない場合は玄関近くの「銀のゴミストッカー」へ（→ ハウスルール PAGE 7）。長期（マンスリー）の集積所は入居時にご案内します。<br><span style="color:#888;">Short stays: sort inside and use the silver trash stocker near the entrance (House Rules P7). For monthly guests, the point will be shown upon move-in.</span></div>
     </div>
 
     <h3><span class="icon">📱</span> 便利アプリ / Useful App</h3>

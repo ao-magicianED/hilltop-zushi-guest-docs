@@ -417,14 +417,20 @@ BBQ equipment is set up in the designated garden area.
 
 #### 🔥 BBQ手順 / How to BBQ
 
+> ⚠️ **BBQはガス式・予約制です。** 事前予約 ¥4,400／当日予約 ¥6,600。
+> ご利用は必ず事前にお申し出ください（未申告利用は ¥16,000）。
+>
+> ⚠️ **Gas BBQ, reservation required.** Advance ¥4,400 / Same-day ¥6,600.
+> Please reserve in advance (unreported use: ¥16,000).
+
 | Step | 日本語 | English |
 |------|--------|---------|
-| 1 | BBQコンロを確認する | Check the BBQ grill |
-| 2 | 炭を並べて着火する | Arrange charcoal and light it |
-| 3 | BBQを楽しむ！🍖 | Enjoy your BBQ! 🍖 |
-| 4 | 使用後は炭を完全に消火する | Fully extinguish charcoal after use |
-| 5 | 網・コンロを清掃する | Clean the grill and grate |
-| 6 | ゴミを分別する | Sort your trash |
+| 1 | BBQのご利用を事前にお申し出ください | Reserve BBQ in advance |
+| 2 | ガス式BBQコンロを確認する（炭は不要） | Check the gas BBQ grill (no charcoal needed) |
+| 3 | 点火してBBQを楽しむ！🍖 | Ignite and enjoy your BBQ! 🍖 |
+| 4 | 火気の使用は19:00まで | Open flame use until 7:00 PM |
+| 5 | 使用後は網・コンロを清掃する | Clean the grill and grate after use |
+| 6 | ゴミを分別して室内へ | Sort trash and bring inside |
 
 &nbsp;
 
@@ -432,23 +438,38 @@ BBQ equipment is set up in the designated garden area.
 
 | ルール / Rule | 詳細 / Details |
 |---|---|
-| ⏰ **利用時間** | **20:00まで** / Until 8:00 PM |
+| 📅 **予約制** | 事前 ¥4,400 ／ 当日 ¥6,600（未申告 ¥16,000）/ Advance ¥4,400 / Same-day ¥6,600 (unreported ¥16,000) |
+| 🔥 **火気使用** | **19:00まで** / Open flame until 7:00 PM |
+| ⏰ **BBQ利用** | **20:00まで** / BBQ until 8:00 PM |
 | 🔇 **騒音** | 20:00以降は静かに / Keep quiet after 8 PM |
 | 🧹 **後片付け** | 必ず清掃してください / Must clean up after use |
-| 🔥 **消火** | 炭は完全に消火し指定容器へ / Fully extinguish, place in designated container |
 | 🗑️ **ゴミ** | 分別して室内の所定場所へ / Sort and bring inside to designated area |
-| 🚫 **花火** | 手持ち花火のみ可（打上花火禁止） / Sparklers only (no aerial fireworks) |
+| 🎆 **花火** | 手持ち花火のみ可（テラスで・各自購入）/ Sparklers only (on the terrace, bring your own) |
 | 🌿 **庭** | 植木・花壇を傷つけないように / Do not damage plants or flower beds |
 
 &nbsp;
 
-#### 🛒 食材・炭の購入先 / Where to Buy Supplies
+#### 🛒 食材の購入先 / Where to Buy Supplies
+
+> ガス式のため炭は不要です。食材・飲み物は近隣でお求めいただけます。
+> Gas BBQ — no charcoal needed. Food and drinks are available nearby.
 
 | 店舗 / Store | 場所 / Location | 備考 / Notes |
 |---|---|---|
-| スーパー三和 逗子店 | 東逗子駅近く | 食材・飲料 / Food & drinks |
-| コメリ 逗子店 | 車で約10分 | 炭・BBQ用品 / Charcoal & supplies |
-| セブンイレブン | 東逗子駅前 | 飲料・氷・軽食 / Drinks, ice, snacks |
+| スーパー三和 逗子店 | 車・タクシーで約5分 | 食材・飲料 / Food & drinks |
+| セブンイレブン | 駅周辺 | 飲料・氷・軽食 / Drinks, ice, snacks |
+
+&nbsp;
+
+#### ⚠️ 庭・テラスの安全 / Safety in the Garden & Terrace
+
+当物件は高台にあり、崖側は急勾配です。**花壇より先は立入禁止**です。
+フェンスのない箇所もあるため、**お子様・ペットが崖に近づかないよう**ご注意ください。
+**2階ベランダの窓は安全のため開けないでください。**
+
+The property sits on a hilltop and the cliffside is steep. **Do not go beyond the flower beds.**
+Some areas have no fence, so please keep children and pets away from the edge.
+**For safety, please do not open the 2nd-floor balcony windows.**
 
 ---
 
@@ -489,10 +510,7 @@ BBQ equipment is set up in the designated garden area.
 
 #### 📍 ブレーカーの場所 / Breaker Location
 
-<!-- 物件確認後に記入 -->
-> ※ 場所は物件準備完了後に写真付きで更新します。
->
-> Location will be updated with photos after property setup.
+> **冷蔵庫の上にあります。** / Located on top of the refrigerator.
 
 &nbsp;
 
@@ -519,45 +537,60 @@ BBQ equipment is set up in the designated garden area.
 
 | | |
 |---|---|
-| **最寄り駅** | **JR横須賀線 東逗子駅（Higashi-Zushi Station）** |
-| **徒歩** | **約90秒** / Approx. 90 seconds on foot |
+| **最寄り駅** | **京急逗子線 神武寺駅（Jimmuji Station）** |
+| **徒歩** | **約3分**（道のり後半に上り階段 約50段）/ Approx. 3 min (≈50 steps near the end) |
+
+> ⚠️ 駅から物件まで、後半に上り階段が約50段あります。歩きやすい靴でお越しください。
+> 大きなお荷物がある方は両手が空くリュック等がおすすめです。夜間は足元が暗くなる場合がありますのでご注意ください。
+>
+> ⚠️ There are about 50 steps near the end of the route. Please wear comfortable shoes.
+> A backpack is recommended if you have large luggage. The path can be dark at night, so please take care.
 
 &nbsp;
 
-#### 🚆 主要駅からのアクセス / From Major Stations
+#### 🚆 主要エリアからのアクセス / Access from Major Areas
 
-| 出発地 / From | 路線 / Line | 所要時間 / Duration | 備考 / Notes |
-|---|---|---|---|
-| **東京駅** | JR横須賀線（直通） | 約60分 | 乗り換えなし / No transfer |
-| **品川駅** | JR横須賀線（直通） | 約50分 | 乗り換えなし / No transfer |
-| **横浜駅** | JR横須賀線 | 約30分 | 乗り換えなし / No transfer |
-| **鎌倉駅** | JR横須賀線 | 約10分 | 逗子方面 / Toward Zushi |
-| **羽田空港** | 京急→横浜→JR横須賀線 | 約70分 | 横浜で乗り換え / Transfer at Yokohama |
-| **成田空港** | 成田エクスプレス→横須賀線 | 約120分 | 大船で乗り換え / Transfer at Ofuna |
+| 出発地 / From | 経路 / Route | 所要時間 / Duration |
+|---|---|---|
+| **JR東逗子駅** | タクシー / Taxi | 約5分（徒歩約20分）|
+| **JR逗子駅** | タクシー / Taxi | 約10分 |
+| **鎌倉** | 電車・タクシー / Train or Taxi | 約20分 |
+| **逗子海岸** | タクシー / Taxi | 約15分 |
+| **羽田空港** | 車 / Car | 約45分 |
 
 &nbsp;
 
-#### 🚶 駅からの道順 / Walking Directions from Station
+#### 🚶 神武寺駅からの道順 / Walking Directions from Jimmuji Station
 
 <!-- デザイン指示: 各ステップに写真を配置（撮影後差し替え） -->
 
 | Step | 日本語 | English |
 |------|--------|---------|
-| 1 | 東逗子駅の改札を出ます | Exit the ticket gate at Higashi-Zushi Station |
-| 2 | 駅前ロータリーを直進します | Walk straight through the station rotary |
-| 3 | 約90秒で到着です | Arrive in approximately 90 seconds |
+| 1 | 「神武寺駅」改札を出ます（※米軍専用改札は使用しないでください） | Exit the gate at Jimmuji Station (do not use the US military-only gate) |
+| 2 | 道なりにまっすぐ進み、最初の信号を右折します | Go straight, then turn right at the first traffic light |
+| 3 | まっすぐ進むと「池子会館」が見えます。建物を目印に角を左折します | Continue to the "Ikego Kaikan" community hall; turn left at that corner |
+| 4 | まっすぐ進むと正面に上り階段（約50段）があります。階段を上ります | Go straight to the stairs ahead (≈50 steps) and climb up |
+| 5 | 上り切る少し手前、左手に当物件があります。「Hilltop Zushi」の看板が目印です | Just before the top, the house is on your left — look for the "Hilltop Zushi" sign |
 
-> ※ 詳しい道順は予約確認時にOTAメッセージでお送りします。
+> ※ 写真付きの詳しい道順は、予約確認時にOTAメッセージでもお送りします。
 >
-> Detailed walking directions will be sent via OTA message upon booking confirmation.
+> A detailed guide with photos will also be sent via OTA message upon booking confirmation.
 
 &nbsp;
 
 #### 🚗 お車でお越しの場合 / By Car
 
+当施設に駐車場はございません。近隣のコインパーキングをご利用ください。
+There is no parking at the property. Please use nearby coin parking.
+
+| コインパーキング / Coin Parking | 場所 / Location |
+|---|---|
+| 三井のリパーク 神武寺駅前第2 | 神武寺駅前 |
+| 三井のリパーク 神武寺駅前 | 神武寺駅前 |
+| マイライフパーク池子 | 池子 |
+
 | | |
 |---|---|
-| **駐車場** | ※近隣コインパーキングをご利用ください / Please use nearby coin parking |
 | **住所（カーナビ用）** | 神奈川県逗子市池子2-10-9 |
 | **Address (GPS)** | 2-10-9 Ikego, Zushi, Kanagawa 249-0003 |
 
@@ -643,7 +676,7 @@ BBQ equipment is set up in the designated garden area.
 
 | スポット / Spot | アクセス / Access | おすすめポイント / Highlights |
 |---|---|---|
-| **逗子海岸** / Zushi Beach | バスで約10分 | 穏やかな波、夕日が美しい / Calm waves, beautiful sunset |
+| **逗子海岸** / Zushi Beach | タクシー約15分 | 穏やかな波、夕日が美しい / Calm waves, beautiful sunset |
 | **材木座海岸** / Zaimokuza Beach | 車で約15分 | サーフィン・SUP人気 / Popular for surfing & SUP |
 
 &nbsp;
@@ -667,7 +700,7 @@ BBQ equipment is set up in the designated garden area.
 | **披露山公園** / Hiroyama Park | 車で約10分 | 富士山・江の島の絶景パノラマ / Panoramic view of Mt. Fuji & Enoshima |
 | **葉山マリーナ** / Hayama Marina | 車で約15分 | 海辺の散歩・レストラン / Seaside walk & restaurants |
 | **鎌倉ハイキングコース** | 鎌倉駅から | 天園コース・大仏コース等 / Multiple hiking trails |
-| **神武寺〜鷹取山ハイキング** | 東逗子駅から | 地元のおすすめハイク / Local favorite hike |
+| **神武寺〜鷹取山ハイキング** | 神武寺駅・東逗子駅から | 地元のおすすめハイク / Local favorite hike |
 
 &nbsp;
 
@@ -681,9 +714,9 @@ BBQ equipment is set up in the designated garden area.
 
 &nbsp;
 
-> 🗾 **鎌倉へは東逗子駅からJR横須賀線で約10分！**
+> 🗾 **鎌倉へは電車・タクシーで約20分！**
 >
-> Kamakura is only about 10 minutes from Higashi-Zushi Station by JR!
+> Kamakura is about 20 minutes away by train or taxi!
 
 ---
 
@@ -769,10 +802,11 @@ BBQ equipment is set up in the designated garden area.
 
 #### 📍 ゴミ集積所の場所 / Trash Collection Point
 
-<!-- 物件確認後に記入 -->
-> ※ 最寄りのゴミ集積所の場所は、入居時にご案内します。
+> ※ 短期滞在の方は、室内（キッチン・リビング）で分別し、入り切らない場合は玄関近くの「銀のゴミストッカー」へ（→ ハウスルール PAGE 7）。
+> 長期滞在（マンスリー）の方の集積所は、入居時にご案内します。
 >
-> The nearest trash collection point will be shown upon move-in.
+> Short-stay guests: sort inside and use the silver trash stocker near the entrance (House Rules PAGE 7).
+> For monthly guests, the collection point will be shown upon move-in.
 
 &nbsp;
 
