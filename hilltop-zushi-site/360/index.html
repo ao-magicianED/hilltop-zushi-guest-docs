@@ -29,18 +29,13 @@
   header a.back { margin-left: auto; font-size: 0.8rem; color: rgba(255,255,255,.8); text-decoration: none; border: 1px solid rgba(255,255,255,.3); padding: .35rem .9rem; border-radius: 30px; }
   header a.back:hover { color: #fff; border-color: #C9A56D; }
 
-  #viewer {
-    flex: 1;
-    min-height: 0;
-    width: 100%;
-    background: #000;
-  }
+  #viewer { flex: 1; min-height: 0; width: 100%; background: #000; }
 
   .gallery {
     flex-shrink: 0;
     display: flex;
     gap: 0.5rem;
-    padding: 0.7rem 1rem;
+    padding: 0.8rem 1rem;
     overflow-x: auto;
     background: rgba(0,0,0,0.65);
     border-top: 1px solid rgba(255,255,255,0.08);
@@ -49,34 +44,27 @@
   .gallery::-webkit-scrollbar { height: 8px; }
   .gallery::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 4px; }
 
-  .thumb {
+  .chip {
     flex: 0 0 auto;
-    width: 140px;
-    height: 70px;
-    border-radius: 6px;
-    overflow: hidden;
+    min-width: 96px;
+    height: 46px;
+    padding: 0 1.1rem;
+    border-radius: 24px;
     cursor: pointer;
-    border: 2px solid transparent;
-    position: relative;
-    transition: transform 0.15s ease, border-color 0.15s ease;
-    background: #222;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.84rem; white-space: nowrap; color: rgba(255,255,255,0.9);
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   }
-  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .thumb .label {
-    position: absolute; left: 0; right: 0; bottom: 0;
-    padding: 2px 6px;
-    font-size: 0.7rem;
-    background: linear-gradient(transparent, rgba(0,0,0,0.85));
-    text-align: left;
-  }
-  .thumb:hover { transform: translateY(-2px); }
-  .thumb.active { border-color: #C9A56D; box-shadow: 0 0 0 2px rgba(201,165,109,0.3); }
+  .chip:hover { background: rgba(201,165,109,0.18); border-color: rgba(201,165,109,0.5); }
+  .chip.active { background: #C9A56D; border-color: #C9A56D; color: #16291f; font-weight: 600; }
 
   @media (max-width: 600px) {
     header .brand { font-size: 1.05rem; }
     header h1 { font-size: 0.92rem; }
     header p { font-size: 0.68rem; width: 100%; }
-    .thumb { width: 110px; height: 55px; }
+    .chip { min-width: 84px; height: 42px; font-size: 0.78rem; }
   }
 </style>
 </head>
@@ -85,7 +73,7 @@
 <header>
   <span class="brand">Hilltop Zushi</span>
   <h1>360°バーチャル内見</h1>
-  <p>ドラッグで見渡す／下のサムネイルで部屋を切替</p>
+  <p>ドラッグで見渡す／下のボタンで部屋を切替</p>
   <a class="back" href="../index.html">← サイトに戻る</a>
 </header>
 
@@ -108,16 +96,11 @@
   ];
 
   let viewer = null;
-  let currentIndex = 0;
 
   function loadPanorama(index) {
-    currentIndex = index;
     const p = photos[index];
     const ext = p.ext || 'JPG';
-
-    if (viewer) {
-      viewer.destroy();
-    }
+    if (viewer) { viewer.destroy(); }
     viewer = pannellum.viewer('viewer', {
       type: 'equirectangular',
       panorama: p.file + '.' + ext,
@@ -129,25 +112,21 @@
       mouseZoom: true,
       hfov: 100,
       minHfov: 50,
-      maxHfov: 120,
-      hotSpotDebug: false,
+      maxHfov: 120
     });
-
-    document.querySelectorAll('.thumb').forEach((el, i) => {
+    document.querySelectorAll('.chip').forEach((el, i) => {
       el.classList.toggle('active', i === index);
     });
   }
 
   const gallery = document.getElementById('gallery');
   photos.forEach((p, i) => {
-    const thumb = document.createElement('div');
-    thumb.className = 'thumb' + (i === 0 ? ' active' : '');
-    thumb.innerHTML = `
-      <img src="thumbs/${p.file}_thumb.jpg" alt="${p.name}" loading="lazy">
-      <span class="label">${p.name}</span>
-    `;
-    thumb.addEventListener('click', () => loadPanorama(i));
-    gallery.appendChild(thumb);
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip' + (i === 0 ? ' active' : '');
+    chip.textContent = p.name;
+    chip.addEventListener('click', () => loadPanorama(i));
+    gallery.appendChild(chip);
   });
 
   loadPanorama(0);
