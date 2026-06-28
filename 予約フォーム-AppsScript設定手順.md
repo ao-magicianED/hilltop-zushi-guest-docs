@@ -29,42 +29,60 @@
 const NOTIFY_EMAIL = 'ao.magician@gmail.com'; // ←受信したいメールに変更
 
 function doPost(e) {
+  const lock = LockService.getScriptLock();
   try {
+    lock.waitLock(5000);
     const p = (e && e.parameter) ? e.parameter : {};
-    const sh = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
 
-    // 初回: ヘッダー行を用意
+    // 1) ハニーポット: bot が隠し項目(company)を埋めていたら静かに破棄
+    if (p.company) return ok_();
+
+    // 2) 必須・形式チェック（不正は破棄して攻撃者に情報を返さない）
+    const name = String(p.name || '').trim();
+    const email = String(p.email || '').trim();
+    const checkin = String(p.checkin || '').trim();
+    const checkout = String(p.checkout || '').trim();
+    const emailOk = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+    const dateOk = /^\d{4}-\d{2}-\d{2}$/.test(checkin) && /^\d{4}-\d{2}-\d{2}$/.test(checkout) && checkin < checkout;
+    if (!name || !emailOk || !dateOk) return ok_();
+
+    // 3) 簡易レート制限: 同一メールの連投を60秒ブロック
+    const cache = CacheService.getScriptCache();
+    if (cache.get('rl_' + email)) return ok_();
+    cache.put('rl_' + email, '1', 60);
+
+    // 4) 長さ制限 + 式注入対策(=,+,-,@ 始まりは先頭に ' を付与)
+    const clip = function (s, n) { return String(s == null ? '' : s).slice(0, n); };
+    const safe = function (s, n) { s = clip(s, n); return /^[=+\-@]/.test(s) ? "'" + s : s; };
+
+    const sh = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
     if (sh.getLastRow() === 0) {
       sh.appendRow(['受信日時','チェックイン','チェックアウト','人数','お名前','メール','電話','言語','ご質問・ご要望']);
     }
+    sh.appendRow([
+      new Date(), safe(checkin, 12), safe(checkout, 12), safe(p.guests, 4),
+      safe(name, 100), safe(email, 200), safe(p.phone, 40),
+      safe(p.lang, 8), safe(p.message, 2000)
+    ]);
 
-    const row = [
-      new Date(),
-      p.checkin || '', p.checkout || '', p.guests || '',
-      p.name || '', p.email || '', p.phone || '',
-      p.lang || '', p.message || ''
-    ];
-    sh.appendRow(row);
+    MailApp.sendEmail(NOTIFY_EMAIL, '【Hilltop Zushi】予約リクエスト: ' + clip(name, 80),
+      'チェックイン: ' + checkin + '\nチェックアウト: ' + checkout +
+      '\n人数: ' + clip(p.guests, 4) + '\nお名前: ' + name + '\nメール: ' + email +
+      '\n電話: ' + clip(p.phone, 40) + '\n言語: ' + clip(p.lang, 8) +
+      '\nご質問・ご要望:\n' + clip(p.message, 2000));
 
-    // オーナーへ通知メール
-    const body =
-      '新しい予約リクエストが届きました。\n\n' +
-      'チェックイン: ' + (p.checkin || '-') + '\n' +
-      'チェックアウト: ' + (p.checkout || '-') + '\n' +
-      '人数: ' + (p.guests || '-') + '\n' +
-      'お名前: ' + (p.name || '-') + '\n' +
-      'メール: ' + (p.email || '-') + '\n' +
-      '電話: ' + (p.phone || '-') + '\n' +
-      '言語: ' + (p.lang || '-') + '\n' +
-      'ご質問・ご要望:\n' + (p.message || '-') + '\n';
-    MailApp.sendEmail(NOTIFY_EMAIL, '【Hilltop Zushi】予約リクエスト: ' + (p.name || '名前なし'), body);
-
-    return ContentService.createTextOutput(JSON.stringify({ ok: true }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return ok_();
   } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
+    return ContentService.createTextOutput(JSON.stringify({ ok: false }))
       .setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    try { lock.releaseLock(); } catch (e2) {}
   }
+}
+
+function ok_() {
+  return ContentService.createTextOutput(JSON.stringify({ ok: true }))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 function doGet() {
@@ -74,5 +92,9 @@ function doGet() {
 
 ## 仕組みメモ
 - サイト側は `fetch(URL, {method:'POST', mode:'no-cors', body: フォームデータ})` で送信（CORS回避のため
-  応答は読まず、送信できたら成功表示）。データはスプレッドシートとメールに確実に届く。
-- 送信項目: checkin / checkout / guests / name / email / phone / lang / message
+  応答は読まず、送信できたら成功表示）。データはスプレッドシートとメールに届く。
+- 送信項目: checkin / checkout / guests / name / email / phone / lang / message / company(ハニーポット)
+- 上記コードはスパム対策込み: ①ハニーポット ②必須/メール/日付の形式チェック ③同一メール60秒レート制限
+  ④式注入対策(=+-@始まりを無害化) ⑤LockServiceで競合防止。不正な送信は黙って破棄。
+- 注意: `mode:'no-cors'` は応答を読めないため、サイトは「送信失敗」を検知できない。将来より厳密にするなら
+  Cloudflare Pages Function `POST /request` を作り、GAS URLをSecretにしてサーバー側中継→同一オリジンで応答を読む構成にできる（任意）。

@@ -27,13 +27,15 @@ export async function onRequestGet(context) {
       headers: { "user-agent": "HilltopZushi-Availability/1.0" },
       cf: { cacheTtl: 1800, cacheEverything: true },
     });
-    if (!res.ok) return json({ configured: true, error: `ical_fetch_${res.status}`, blocked: [] }, 300);
+    // 失敗時は configured:false を返す = フロントは「空き状況を表示しない」。
+    // 絶対に「全日空き」に見せない(ダブルブッキング防止のフェイルセーフ)。
+    if (!res.ok) return json({ configured: false, error: true }, 120);
 
     const text = await res.text();
     const blocked = parseIcalBlocked(text);
     return json({ configured: true, updated: new Date().toISOString(), blocked }, 1800);
   } catch (e) {
-    return json({ configured: true, error: "ical_exception", blocked: [] }, 60);
+    return json({ configured: false, error: true }, 60);
   }
 }
 
