@@ -5,6 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hilltop Zushi — A Forest Retreat Above the Sea</title>
 <meta name="description" content="Hilltop Zushi: a spacious hilltop retreat in Zushi, Kanagawa. Up to 12 guests, 5 bedrooms, BBQ terrace, a 3-minute walk from Jimmuji Station (Keikyu Line).">
+<link rel="canonical" href="https://hilltop-zushi-arh.pages.dev/">
+<meta name="theme-color" content="#1F3A34">
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hilltop Zushi">
+<meta property="og:title" content="Hilltop Zushi — 海を望む、森の隠れ家｜逗子の一棟貸し">
+<meta property="og:description" content="逗子・神武寺駅から徒歩3分。最大12名・5寝室・BBQテラスの一棟貸し。公式サイト限定の直予約特典あり。">
+<meta property="og:url" content="https://hilltop-zushi-arh.pages.dev/">
+<meta property="og:image" content="https://hilltop-zushi-arh.pages.dev/images/ph-hero-living-garden.jpg">
+<meta property="og:image:alt" content="Hilltop Zushi — リビングから庭を望む">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:locale:alternate" content="en_US">
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hilltop Zushi — 海を望む、森の隠れ家">
+<meta name="twitter:description" content="逗子・神武寺駅 徒歩3分。最大12名・5寝室・BBQテラスの一棟貸し。">
+<meta name="twitter:image" content="https://hilltop-zushi-arh.pages.dev/images/ph-hero-living-garden.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
@@ -147,10 +167,14 @@ footer .footer-social{display:flex;justify-content:center;gap:1.5rem;margin:1rem
 footer .footer-social a{color:rgba(255,255,255,.5);font-size:1.2rem;transition:color .2s}
 footer .footer-social a:hover{color:var(--accent)}
 
-/* ===== MOBILE STICKY BOOK ===== */
-.mobile-book{display:none;position:fixed;bottom:0;left:0;width:100%;padding:.8rem;background:var(--primary);z-index:999;text-align:center}
-.mobile-book a{display:block;padding:.8rem;background:var(--accent);color:#fff;font-weight:600;border-radius:4px;font-size:.95rem}
-@media(max-width:768px){.mobile-book{display:block}footer{padding-bottom:5rem}}
+/* ===== STICKY FLOATING CTA ===== */
+.sticky-cta{position:fixed;right:1.6rem;bottom:1.6rem;z-index:999;opacity:0;visibility:hidden;transform:translateY(18px);transition:opacity .35s ease,transform .35s ease,visibility .35s}
+.sticky-cta.show{opacity:1;visibility:visible;transform:translateY(0)}
+.sticky-cta a{display:inline-flex;align-items:center;gap:.55rem;padding:.95rem 1.9rem;background:var(--accent);color:#fff;font-weight:700;font-size:.95rem;letter-spacing:.02em;border-radius:40px;box-shadow:0 12px 32px rgba(201,165,109,.55)}
+.sticky-cta a:hover{background:var(--accent-d)}
+.sticky-cta .pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;animation:ctaPulse 2s infinite}
+@keyframes ctaPulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.6)}70%{box-shadow:0 0 0 8px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+@media(max-width:768px){.sticky-cta{left:1rem;right:1rem;bottom:1rem}.sticky-cta a{justify-content:center;width:100%;padding:1.05rem;font-size:1.02rem}footer{padding-bottom:6rem}}
 
 /* ===================== REFINED v2 ===================== */
 :root{--accent-d:#b8944f;--muted:#6f6f68}
@@ -371,8 +395,7 @@ body{-webkit-font-smoothing:antialiased;background:#F6F4F0}
   <h2 class="section-title fade-in" data-i18n="book_title">Ready to Experience Hilltop Zushi?</h2>
   <p class="fade-in" data-i18n="book_desc">Book your stay through our trusted partners or contact us directly for inquiries.</p>
   <div class="book-buttons fade-in">
-    <a href="#" class="book-btn primary" data-i18n="book_airbnb">Book on Airbnb</a>
-    <a href="#" class="book-btn secondary" data-i18n="book_booking">Book on Booking.com</a>
+    <a href="https://www.airbnb.jp/h/hilltopzushi" target="_blank" rel="noopener" class="book-btn secondary" data-i18n="book_airbnb">Book on Airbnb</a>
   </div>
   <div class="book-contact fade-in">
     <a href="mailto:info@hilltopzushi.com" data-i18n="book_contact">Contact Us</a>
@@ -392,9 +415,9 @@ body{-webkit-font-smoothing:antialiased;background:#F6F4F0}
   </div>
 </footer>
 
-<!-- MOBILE STICKY BOOK -->
-<div class="mobile-book">
-  <a href="#book" data-i18n="nav_book">Book Now</a>
+<!-- STICKY FLOATING CTA -->
+<div class="sticky-cta" id="stickyCta">
+  <a href="#book"><span class="pulse"></span><span data-i18n="nav_book">Book Now</span></a>
 </div>
 
 <script>
@@ -493,8 +516,15 @@ document.getElementById('langSelect').addEventListener('change', function() {
 
 /* ===== HEADER SCROLL ===== */
 const header = document.getElementById('header');
+const stickyCta = document.getElementById('stickyCta');
+const bookSection = document.getElementById('book');
 window.addEventListener('scroll', () => {
   header.classList.toggle('scrolled', window.scrollY > 50);
+  /* 追従CTA: ヒーローを過ぎたら表示。予約セクション自体が見えている間は隠す(ボタン重複回避) */
+  const past = window.scrollY > window.innerHeight * 0.5;
+  const bookTop = bookSection.getBoundingClientRect().top;
+  const inBook = bookTop < window.innerHeight * 0.9 && bookTop > -bookSection.offsetHeight;
+  stickyCta.classList.toggle('show', past && !inBook);
 });
 
 /* ===== HAMBURGER MENU ===== */
