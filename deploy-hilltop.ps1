@@ -58,7 +58,14 @@ if (-not $script:ok) {
 }
 
 Write-Host "`n 全チェック通過。本番へデプロイします..." -ForegroundColor Cyan
-npx wrangler pages deploy "$SiteDir" --project-name=$ProjectName --branch=$Branch --commit-dirty=true --commit-message="Deploy hilltop-zushi site"
+# 重要: functions/ は「カレントディレクトリ基準」で検出される。
+# 必ず SiteDir の中に入って "." をデプロイすること(でないとPages Functionがコンパイルされず /availability が消える)。
+Push-Location $SiteDir
+try {
+  npx wrangler pages deploy . --project-name=$ProjectName --branch=$Branch --commit-dirty=true --commit-message="Deploy hilltop-zushi site"
+} finally {
+  Pop-Location
+}
 if ($LASTEXITCODE -ne 0) { Write-Host "`n wrangler デプロイが失敗しました。" -ForegroundColor Red; exit 1 }
 
 # 4. デプロイ後、本番ドメインで全360画像を検証
