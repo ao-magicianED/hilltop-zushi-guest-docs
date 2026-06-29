@@ -1,0 +1,10 @@
+# これを .dev.vars にコピーしてローカル開発で使う（.dev.vars はgit管理外）
+# MASTER_KEY は「base64の32バイト」。生成例:
+#   node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+MASTER_KEY="REPLACE_WITH_BASE64_32BYTES"
+
+# 任意: Slack通知
+SLACK_WEBHOOK_URL=""
+
+# 管理者はDBの admins テーブルで管理（メール＋パスワード＋TOTP 2FA）。
+# 最初のマスター管理者は seed（README参照）。以降はマスターが /admin/admins から追加。

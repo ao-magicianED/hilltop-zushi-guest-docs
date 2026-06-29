@@ -1,0 +1,35 @@
+name = "hilltop-guest-registration"
+main = "src/index.ts"
+compatibility_date = "2025-06-01"
+workers_dev = true
+
+# ---- D1（名簿DB）----
+[[d1_databases]]
+binding = "DB"
+database_name = "hilltop-guest"
+database_id = "49983d2e-a937-4ef0-99e3-e4dccf8a3289"
+migrations_dir = "migrations"
+
+# ---- KV（トークン引当・進捗・レート制限・パスポート画像の暗号化保存）----
+# 注: R2未有効化のためMVPでは画像もKVに格納。R2有効化後に署名直PUT＋再エンコードへ移行。
+[[kv_namespaces]]
+binding = "KV"
+id = "c2f7ecdcd3784c678e1adf26a3477657"
+
+# ---- 定期実行（自動削除・リマインド）----
+# MVPでは scheduled() は雛形。実運用時に下記を有効化:
+# [triggers]
+# crons = ["0 18 * * *"]
+
+[vars]
+APP_BASE_URL = "https://hilltop-guest-registration.2520000530.workers.dev"
+# 物件名（複数物件展開時はここを増やす）
+PROPERTY_NAME = "Hilltop Zushi"
+# データ保存年数（オーナー決定 v1.2 = 5年）
+DATA_RETENTION_YEARS = "5"
+
+# ---- シークレット（本番は `wrangler secret put <NAME>`、ローカルは .dev.vars）----
+# MASTER_KEY            : 機微情報の暗号化マスター鍵（base64の32バイト）
+# ADMIN_USER           : 管理画面ユーザー名（MVP簡易認証）
+# ADMIN_PASSWORD_HASH  : 管理画面パスワードのSHA-256(hex)
+# SLACK_WEBHOOK_URL    : 通知用（任意）
