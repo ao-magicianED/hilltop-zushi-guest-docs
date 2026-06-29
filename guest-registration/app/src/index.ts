@@ -745,15 +745,15 @@ app.post("/admin/ical/import", async (c) => {
       if (n <= 0) continue;
       const existing = await c.env.DB.prepare("SELECT id FROM reservations WHERE ical_uid=?").bind(ev.uid).first<{ id: string }>();
       if (existing) {
-        await c.env.DB.prepare("UPDATE reservations SET check_in_date=?, check_out_date=?, nights=?, updated_at=? WHERE id=?").bind(ev.start, ev.end, n, now, existing.id).run();
+        await c.env.DB.prepare("UPDATE reservations SET check_in_date=?, check_out_date=?, nights=?, airbnb_reservation_code=COALESCE(airbnb_reservation_code, ?), updated_at=? WHERE id=?").bind(ev.start, ev.end, n, ev.code ?? null, now, existing.id).run();
         updated++;
       } else {
         const id = newId("r_");
         const purge = addYears(laterIso(now, ev.end + "T00:00:00Z"), parseInt(c.env.DATA_RETENTION_YEARS || "5", 10));
         await c.env.DB.prepare(
-          `INSERT INTO reservations (id, property_name, check_in_date, check_out_date, nights, expected_guests, preferred_lang, ical_uid, status, review_status, currency, channel, source, created_at, updated_at, data_purge_at)
-           VALUES (?,?,?,?,?,0,'ja',?, 'open','pending','JPY','airbnb','ical',?,?,?)`
-        ).bind(id, c.env.PROPERTY_NAME || "Hilltop Zushi", ev.start, ev.end, n, ev.uid, now, now, purge).run();
+          `INSERT INTO reservations (id, airbnb_reservation_code, property_name, check_in_date, check_out_date, nights, expected_guests, preferred_lang, ical_uid, status, review_status, currency, channel, source, created_at, updated_at, data_purge_at)
+           VALUES (?,?,?,?,?,?,0,'ja',?, 'open','pending','JPY','airbnb','ical',?,?,?)`
+        ).bind(id, ev.code ?? null, c.env.PROPERTY_NAME || "Hilltop Zushi", ev.start, ev.end, n, ev.uid, now, now, purge).run();
         imported++;
       }
     }

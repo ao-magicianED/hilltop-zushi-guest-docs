@@ -6,6 +6,7 @@ export type IcalEvent = {
   start: string; // YYYY-MM-DD
   end: string; // YYYY-MM-DD（排他＝チェックアウト日）
   summary: string;
+  code?: string; // Airbnb確認コード（DESCRIPTIONから抽出）
 };
 
 function unfold(text: string): string[] {
@@ -50,6 +51,10 @@ export function parseIcal(text: string): IcalEvent[] {
       else if (key === "DTSTART") cur.start = toDate(value) ?? cur.start;
       else if (key === "DTEND") cur.end = toDate(value) ?? cur.end;
       else if (key === "SUMMARY") cur.summary = value;
+      else if (key === "DESCRIPTION") {
+        const m = value.match(/reservations\/details\/([A-Z0-9]+)/i);
+        if (m) cur.code = m[1];
+      }
     }
   }
   return events;
