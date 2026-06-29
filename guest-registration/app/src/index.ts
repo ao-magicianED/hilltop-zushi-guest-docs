@@ -730,34 +730,41 @@ app.get("/admin/metrics", async (c) => {
   return c.html(layout({ title: "指標", lang: "ja", path: "/admin/metrics", showLangs: false, body: metricsPage({ nav: navFor(c, "metrics"), m: metrics, ym: cur, prevYm: shiftYm(y, m, -1), nextYm: shiftYm(y, m, 1) }) }));
 });
 
-// iCal取込（手動）
+// iCal取込のコア（手動ボタンとCronで共用）。actorEmail=null はCron実行。
+async function importIcalReservations(env: Env, actorEmail: string | null): Promise<{ imported: number; updated: number }> {
+  let imported = 0, updated = 0;
+  const resp = await fetch(env.ICAL_URL!);
+  if (!resp.ok) throw new Error(`ical fetch ${resp.status}`);
+  const text = await resp.text();
+  const events = reservedEvents(parseIcal(text));
+  const now = nowIso();
+  for (const ev of events) {
+    const n = nights(ev.start, ev.end);
+    if (n <= 0) continue;
+    const existing = await env.DB.prepare("SELECT id FROM reservations WHERE ical_uid=?").bind(ev.uid).first<{ id: string }>();
+    if (existing) {
+      await env.DB.prepare("UPDATE reservations SET check_in_date=?, check_out_date=?, nights=?, airbnb_reservation_code=COALESCE(airbnb_reservation_code, ?), updated_at=? WHERE id=?").bind(ev.start, ev.end, n, ev.code ?? null, now, existing.id).run();
+      updated++;
+    } else {
+      const id = newId("r_");
+      const purge = addYears(laterIso(now, ev.end + "T00:00:00Z"), parseInt(env.DATA_RETENTION_YEARS || "5", 10));
+      await env.DB.prepare(
+        `INSERT INTO reservations (id, airbnb_reservation_code, property_name, check_in_date, check_out_date, nights, expected_guests, preferred_lang, ical_uid, status, review_status, currency, channel, source, created_at, updated_at, data_purge_at)
+         VALUES (?,?,?,?,?,?,0,'ja',?, 'open','pending','JPY','airbnb','ical',?,?,?)`
+      ).bind(id, ev.code ?? null, env.PROPERTY_NAME || "Hilltop Zushi", ev.start, ev.end, n, ev.uid, now, now, purge).run();
+      imported++;
+    }
+  }
+  await appendAudit(env, { actorType: actorEmail ? "admin" : "system", actorId: actorEmail, action: "ical_import", detail: { imported, updated } });
+  return { imported, updated };
+}
+
+// iCal取込（手動ボタン）
 app.post("/admin/ical/import", async (c) => {
   const sess = c.get("admin");
   if (!c.env.ICAL_URL) return c.redirect("/admin/reservations?flash=" + encodeURIComponent("ICAL_URLが未設定です。"));
-  let imported = 0, updated = 0;
   try {
-    const resp = await fetch(c.env.ICAL_URL);
-    const text = await resp.text();
-    const events = reservedEvents(parseIcal(text));
-    const now = nowIso();
-    for (const ev of events) {
-      const n = nights(ev.start, ev.end);
-      if (n <= 0) continue;
-      const existing = await c.env.DB.prepare("SELECT id FROM reservations WHERE ical_uid=?").bind(ev.uid).first<{ id: string }>();
-      if (existing) {
-        await c.env.DB.prepare("UPDATE reservations SET check_in_date=?, check_out_date=?, nights=?, airbnb_reservation_code=COALESCE(airbnb_reservation_code, ?), updated_at=? WHERE id=?").bind(ev.start, ev.end, n, ev.code ?? null, now, existing.id).run();
-        updated++;
-      } else {
-        const id = newId("r_");
-        const purge = addYears(laterIso(now, ev.end + "T00:00:00Z"), parseInt(c.env.DATA_RETENTION_YEARS || "5", 10));
-        await c.env.DB.prepare(
-          `INSERT INTO reservations (id, airbnb_reservation_code, property_name, check_in_date, check_out_date, nights, expected_guests, preferred_lang, ical_uid, status, review_status, currency, channel, source, created_at, updated_at, data_purge_at)
-           VALUES (?,?,?,?,?,?,0,'ja',?, 'open','pending','JPY','airbnb','ical',?,?,?)`
-        ).bind(id, ev.code ?? null, c.env.PROPERTY_NAME || "Hilltop Zushi", ev.start, ev.end, n, ev.uid, now, now, purge).run();
-        imported++;
-      }
-    }
-    await appendAudit(c.env, { actorType: "admin", actorId: sess.email, action: "ical_import", detail: { imported, updated } });
+    const { imported, updated } = await importIcalReservations(c.env, sess.email);
     return c.redirect("/admin/reservations?flash=" + encodeURIComponent(`iCal取込: 新規${imported}件・更新${updated}件。姓と売上を各予約で補完してください。`));
   } catch (e) {
     return c.redirect("/admin/reservations?flash=" + encodeURIComponent("iCal取込に失敗しました。URLをご確認ください。"));
@@ -915,10 +922,61 @@ app.get("/pin/:token", async (c) => {
   return c.html(layout({ title: "Hilltop Zushi", lang: "ja", path: "/pin", body: messagePage("ja", { title: "チェックイン情報", message: "（ここに暗証番号が表示されます。MVPでは番号管理は未実装）", kind: "ok" }) }));
 });
 
-// 定期実行（自動削除・リマインド）— MVPは雛形
-async function scheduled(_event: ScheduledController, env: Env, _ctx: ExecutionContext): Promise<void> {
-  // TODO: data_purge_at / img_purge_at を過ぎたレコードの削除、未提出リマインド生成
-  void env;
+// 保存期限切れデータの自動削除。画像=KVから削除、名簿本体=予約ごとD1から完全削除（CASCADE）。
+// 監査ログ(audit_logs)はFK無しの追記専用なので削除後も証跡として残る。冪等（再実行で対象0件）。
+async function purgeExpiredData(env: Env): Promise<{ imagesPurged: number; reservationsPurged: number }> {
+  const now = nowIso();
+  let imagesPurged = 0, reservationsPurged = 0;
+
+  // フェーズA: 画像のみ保存期限切れ（img_purge_at <= now）→ KVから画像を消しメタをクリア
+  const imgRows = await env.DB.prepare(
+    "SELECT id, passport_img_key FROM guests WHERE passport_img_key IS NOT NULL AND img_purge_at IS NOT NULL AND img_purge_at <= ?"
+  ).bind(now).all<{ id: string; passport_img_key: string }>();
+  for (const g of imgRows.results ?? []) {
+    try { await env.KV.delete(g.passport_img_key); } catch { /* KV不在は無視 */ }
+    await env.DB.prepare(
+      "UPDATE guests SET passport_img_key=NULL, passport_img_mime=NULL, passport_img_size=NULL, updated_at=? WHERE id=?"
+    ).bind(now, g.id).run();
+    imagesPurged++;
+  }
+
+  // フェーズB: 名簿本体の保存期限切れ（data_purge_at <= now）→ 予約ごと完全削除
+  const resRows = await env.DB.prepare(
+    "SELECT id FROM reservations WHERE data_purge_at IS NOT NULL AND data_purge_at <= ?"
+  ).bind(now).all<{ id: string }>();
+  for (const r of resRows.results ?? []) {
+    // 残存画像をKVから掃除（フェーズAで消えていない分の保険）
+    const gs = await env.DB.prepare(
+      "SELECT passport_img_key FROM guests WHERE reservation_id=? AND passport_img_key IS NOT NULL"
+    ).bind(r.id).all<{ passport_img_key: string }>();
+    for (const g of gs.results ?? []) { try { await env.KV.delete(g.passport_img_key); } catch { /* 無視 */ } }
+    // 削除前に監査記録（reservation_idを残す。PIIは含めない）
+    await appendAudit(env, { reservationId: r.id, actorType: "system", action: "data_purge", detail: { reason: "retention_expired" } });
+    await env.DB.prepare("DELETE FROM reservations WHERE id=?").bind(r.id).run(); // CASCADEでguests/tokens等も削除
+    reservationsPurged++;
+  }
+  return { imagesPurged, reservationsPurged };
+}
+
+// 定期実行（Cron）: ①iCal自動取込 ②保存期限切れデータの自動削除。
+// どちらも失敗が他方を巻き込まないよう個別にtry。waitUntilでハンドラ完了後も処理継続。
+async function scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+  ctx.waitUntil((async () => {
+    if (env.ICAL_URL) {
+      try {
+        const r = await importIcalReservations(env, null);
+        console.log("[cron] ical import", JSON.stringify(r));
+      } catch (e) {
+        console.error("[cron] ical import failed", e);
+      }
+    }
+    try {
+      const p = await purgeExpiredData(env);
+      console.log("[cron] purge", JSON.stringify(p));
+    } catch (e) {
+      console.error("[cron] purge failed", e);
+    }
+  })());
 }
 
 export default { fetch: app.fetch, scheduled };

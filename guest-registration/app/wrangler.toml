@@ -16,10 +16,11 @@ migrations_dir = "migrations"
 binding = "KV"
 id = "c2f7ecdcd3784c678e1adf26a3477657"
 
-# ---- 定期実行（自動削除・リマインド）----
-# MVPでは scheduled() は雛形。実運用時に下記を有効化:
-# [triggers]
-# crons = ["0 18 * * *"]
+# ---- 定期実行（Cron）----
+# scheduled() が ①iCal自動取込 ②保存期限切れデータ(5年)の自動削除 を実行。
+# cronはUTC指定。JST 6:00 = UTC 21:00 / JST 18:00 = UTC 9:00 の1日2回。
+[triggers]
+crons = ["0 21 * * *", "0 9 * * *"]
 
 [vars]
 APP_BASE_URL = "https://hilltop-guest-registration.2520000530.workers.dev"
