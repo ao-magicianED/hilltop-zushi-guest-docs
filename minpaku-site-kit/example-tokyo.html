@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKYLOFT Tokyo — 眠らない街の隠れ家ロフト</title>
+<meta name="description" content="SKYLOFT Tokyo: 港区・六本木の夜景デザイナーズ民泊。最大6名・2ベッドルーム・駅徒歩1分。これはセミナー配布用のサンプルサイトです。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   SKYLOFT Tokyo — 民泊ゲストサイト・サンプル（セミナー配布用ダミー）
+   ・色やフォントは下の :root を変えるだけで全体が変わります
+   ・写真は data-ph によるプレースホルダ自動生成（実写真に差し替え可）
+   ・文言は最下部 <script> の i18nData を編集してください
+   ===================================================================== */
+
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#0B0B12;          /* ベース（濃紺ブラック） */
+  --surface:#15151F;          /* カード背景 */
+  --surface-2:#1E1E2B;        /* カード背景（濃いめ） */
+  --bg:#0A0A0F;               /* ページ背景 */
+  --accent:#E8B84B;           /* ゴールド（差し色） */
+  --accent-2:#7C6CF0;         /* ネオンパープル（サブ差し色） */
+  --text:#ECECF2;             /* 本文テキスト（明） */
+  --text-dim:#9A9AA8;         /* 補助テキスト */
+  --line:rgba(255,255,255,.10);
+  --font-heading:'Poppins','Noto Sans JP',sans-serif;
+  --font-body:'Inter','Noto Sans JP',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--text);background:var(--bg);line-height:1.7;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{font-family:var(--font-heading);font-weight:600;line-height:1.3;letter-spacing:.01em}
+.section-title{font-size:clamp(1.8rem,4vw,2.8rem);text-align:center;margin-bottom:.4em;color:#fff}
+.section-title::after{content:"";display:block;width:48px;height:3px;background:var(--accent);margin:.5em auto 0;border-radius:2px}
+.section-subtitle{text-align:center;max-width:680px;margin:0 auto 2.5em;color:var(--text-dim);font-size:.95rem}
+
+/* ===== ANIMATIONS ===== */
+.fade-in{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+/* ===== HEADER ===== */
+header{position:fixed;top:0;left:0;width:100%;z-index:1000;padding:1.1rem 2rem;display:flex;align-items:center;justify-content:space-between;transition:background .3s,box-shadow .3s,padding .3s}
+header.scrolled{background:rgba(11,11,18,.92);backdrop-filter:blur(10px);box-shadow:0 2px 30px rgba(0,0,0,.5);padding:.7rem 2rem}
+.logo{font-family:var(--font-heading);font-size:1.4rem;font-weight:700;color:#fff;letter-spacing:.12em}
+.logo span{color:var(--accent)}
+nav{display:flex;align-items:center;gap:1.5rem}
+nav a{color:rgba(255,255,255,.82);font-size:.85rem;font-weight:500;letter-spacing:.03em;transition:color .2s}
+nav a:hover{color:var(--accent)}
+.lang-select{background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;padding:.3rem .5rem;border-radius:4px;font-size:.8rem;cursor:pointer}
+.lang-select option{color:#333;background:#fff}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:5px}
+.hamburger span{width:24px;height:2px;background:#fff;transition:transform .3s,opacity .3s}
+.hamburger.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.active span:nth-child(2){opacity:0}
+.hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+@media(max-width:768px){
+  nav{position:fixed;top:0;right:-100%;width:72%;height:100vh;background:var(--primary);flex-direction:column;justify-content:center;gap:2rem;transition:right .3s}
+  nav.open{right:0}
+  nav a{font-size:1.1rem}
+  .hamburger{display:flex;z-index:1100}
+  .lang-select{position:absolute;bottom:2rem}
+}
+
+/* ===== HERO ===== */
+.hero{position:relative;height:100vh;overflow:hidden;background:#0a0a0f}
+.hero-slides{position:absolute;inset:0}
+.hero-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease}
+.hero-slide.active{opacity:1}
+.hero-slide.s1{background:linear-gradient(160deg,#241537 0%,#5a2d4d 48%,#c2603f 100%)}
+.hero-slide.s2{background:linear-gradient(160deg,#080813 0%,#15233f 52%,#26477a 100%)}
+.hero-slide.s3{background:linear-gradient(160deg,#0b0b16 0%,#2b1147 46%,#7c2f6e 100%)}
+.hero-skyline{position:absolute;left:0;right:0;bottom:0;height:46%;z-index:2;pointer-events:none}
+.hero-skyline svg{width:100%;height:100%;display:block}
+.hero-overlay{position:absolute;inset:0;z-index:3;background:radial-gradient(120% 90% at 50% 35%,rgba(0,0,0,.05) 0%,rgba(0,0,0,.5) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem}
+.hero-overlay h1{font-size:clamp(2.6rem,8vw,5.5rem);color:#fff;letter-spacing:.14em;margin-bottom:.15em;text-shadow:0 4px 40px rgba(0,0,0,.5);font-weight:700}
+.hero-overlay h1 b{color:var(--accent);font-weight:700}
+.hero-overlay p{font-size:clamp(1rem,2.5vw,1.35rem);color:rgba(255,255,255,.9);font-family:var(--font-body);font-weight:300;letter-spacing:.18em;text-transform:uppercase;margin-bottom:2rem}
+.hero-cta{display:inline-block;padding:.9rem 2.6rem;background:var(--accent);color:#1a1300;font-weight:600;font-size:.95rem;border-radius:2px;letter-spacing:.06em;transition:background .3s,transform .2s,box-shadow .3s}
+.hero-cta:hover{background:#f2c95f;transform:translateY(-2px);box-shadow:0 10px 30px rgba(232,184,75,.3)}
+.hero-dots{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:4}
+.hero-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer;transition:background .3s,transform .3s}
+.hero-dot.active{background:var(--accent);transform:scale(1.3)}
+
+/* ===== ABOUT ===== */
+.about{padding:6rem 2rem;max-width:1100px;margin:0 auto}
+.about-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin-top:2rem}
+.about-card{text-align:center;padding:2rem 1rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;transition:transform .3s,border-color .3s}
+.about-card:hover{transform:translateY(-5px);border-color:var(--accent)}
+.about-card .icon{font-size:2.4rem;margin-bottom:.7rem}
+.about-card h3{font-size:1rem;color:#fff;margin-bottom:.3rem}
+@media(max-width:600px){.about-cards{grid-template-columns:repeat(2,1fr)}}
+
+/* ===== GALLERY ===== */
+.gallery{padding:6rem 2rem;background:var(--primary)}
+.gallery-inner{max-width:1200px;margin:0 auto}
+.gallery-filters{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-bottom:2rem}
+.gallery-filters button{padding:.5rem 1.2rem;border:1px solid var(--line);background:transparent;color:var(--text-dim);font-family:var(--font-body);font-size:.85rem;cursor:pointer;border-radius:30px;transition:all .2s}
+.gallery-filters button.active,.gallery-filters button:hover{background:var(--accent);color:#1a1300;border-color:var(--accent)}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.gallery-item{overflow:hidden;border-radius:8px;cursor:pointer;position:relative;aspect-ratio:4/3;background:var(--surface)}
+.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.gallery-item:hover img{transform:scale(1.05)}
+.gallery-item.hidden{display:none}
+
+/* ===== LIGHTBOX ===== */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:2000;align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox img{max-width:90vw;max-height:85vh;object-fit:contain;border-radius:6px}
+.lightbox-close{position:absolute;top:1.5rem;right:2rem;color:#fff;font-size:2rem;cursor:pointer;z-index:10;width:40px;height:40px;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.lightbox-close:hover{transform:scale(1.2)}
+.lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);color:#fff;font-size:2.5rem;cursor:pointer;padding:1rem;transition:opacity .2s;user-select:none}
+.lightbox-nav:hover{opacity:.7}
+.lightbox-prev{left:1rem}
+.lightbox-next{right:1rem}
+
+/* ===== AMENITIES ===== */
+.amenities{padding:6rem 2rem;max-width:1100px;margin:0 auto}
+.amenities-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem}
+.amenity-card{display:flex;align-items:center;gap:1rem;padding:1.2rem 1.4rem;background:var(--surface);border:1px solid var(--line);border-radius:10px;transition:transform .2s,border-color .2s}
+.amenity-card:hover{transform:translateY(-3px);border-color:var(--accent-2)}
+.amenity-card .icon{font-size:1.7rem;flex-shrink:0}
+.amenity-card span{font-size:.9rem;font-weight:500}
+@media(max-width:768px){.amenities-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.amenities-grid{grid-template-columns:1fr}}
+
+/* ===== LOCATION ===== */
+.location{padding:6rem 2rem;background:var(--primary)}
+.location-inner{max-width:1100px;margin:0 auto}
+.location-content{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-top:2rem}
+.location-map{border-radius:12px;overflow:hidden;min-height:350px;border:1px solid var(--line)}
+.location-map iframe{width:100%;height:100%;border:0;min-height:350px;filter:grayscale(.3) contrast(1.05)}
+.location-info{display:flex;flex-direction:column;gap:1.2rem}
+.access-item{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--surface);border-radius:10px}
+.access-item .icon{font-size:1.5rem}
+.access-item span{font-size:.9rem}
+.nearby-spots{margin-top:1rem}
+.nearby-spots h3{font-size:1.1rem;color:#fff;margin-bottom:.8rem}
+.nearby-spots ul{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.nearby-spots li{padding-left:1.2rem;position:relative;font-size:.9rem;color:var(--text-dim)}
+.nearby-spots li::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;background:var(--accent);border-radius:50%}
+@media(max-width:768px){.location-content{grid-template-columns:1fr}}
+
+/* ===== BOOK NOW ===== */
+.book{padding:6rem 2rem;background:linear-gradient(160deg,#15151F 0%,#0B0B12 100%);color:#fff;text-align:center}
+.book p{color:var(--text-dim);max-width:600px;margin:0 auto 2rem;font-size:.95rem}
+.book-buttons{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+.book-btn{padding:.9rem 2.2rem;border-radius:2px;font-weight:600;font-size:.95rem;transition:all .3s;display:inline-block}
+.book-btn.primary{background:var(--accent);color:#1a1300}
+.book-btn.primary:hover{background:#f2c95f;transform:translateY(-2px)}
+.book-btn.secondary{background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff}
+.book-btn.secondary:hover{border-color:#fff;background:rgba(255,255,255,.08)}
+.book-contact{margin-top:1.5rem}
+.book-contact a{color:var(--accent);font-weight:500;transition:color .2s}
+.book-contact a:hover{color:#f2c95f}
+
+/* ===== FOOTER ===== */
+footer{padding:3rem 2rem;background:#070709;color:var(--text-dim);text-align:center;font-size:.85rem}
+footer .footer-inner{max-width:800px;margin:0 auto}
+footer .footer-brand{font-family:var(--font-heading);font-size:1.3rem;color:#fff;letter-spacing:.12em;margin-bottom:.5rem}
+footer .footer-brand span{color:var(--accent)}
+footer .footer-social{display:flex;justify-content:center;gap:1.5rem;margin:1rem 0}
+footer .footer-social a{color:rgba(255,255,255,.5);font-size:1.2rem;transition:color .2s}
+footer .footer-social a:hover{color:var(--accent)}
+footer .footer-note{font-size:.75rem;color:#55555f;margin-top:1rem}
+
+/* ===== MOBILE STICKY BOOK ===== */
+.mobile-book{display:none;position:fixed;bottom:0;left:0;width:100%;padding:.8rem;background:rgba(11,11,18,.95);backdrop-filter:blur(8px);z-index:999;text-align:center;border-top:1px solid var(--line)}
+.mobile-book a{display:block;padding:.8rem;background:var(--accent);color:#1a1300;font-weight:600;border-radius:4px;font-size:.95rem}
+@media(max-width:768px){.mobile-book{display:block}footer{padding-bottom:5rem}}
+</style>
+</head>
+<body>
+
+<!-- ===================================================================
+     これは「完成例」サンプルです。自分の物件用に作るときは：
+     1) 文言 → 最下部 <script> の i18nData を編集
+     2) 写真 → <img data-ph="..."> を <img src="写真のパス"> に差し替え
+     3) 色   → 一番上の :root の色コードを変更
+     =================================================================== -->
+
+<!-- HEADER -->
+<header id="header">
+  <a href="#" class="logo">SKYLOFT<span>.</span>Tokyo</a>
+  <div class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </div>
+  <nav id="nav">
+    <a href="#about" data-i18n="nav_about">About</a>
+    <a href="#gallery" data-i18n="nav_gallery">Gallery</a>
+    <a href="#amenities" data-i18n="nav_amenities">Amenities</a>
+    <a href="#location" data-i18n="nav_location">Location</a>
+    <a href="#book" data-i18n="nav_book">Book Now</a>
+    <select class="lang-select" id="langSelect" aria-label="Language">
+      <option value="en">EN</option>
+      <option value="ja">JA</option>
+      <option value="fr">FR</option>
+      <option value="es">ES</option>
+      <option value="ko">KO</option>
+      <option value="zh">ZH</option>
+    </select>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-slides">
+    <div class="hero-slide s2 active"></div>
+    <div class="hero-slide s1"></div>
+    <div class="hero-slide s3"></div>
+  </div>
+  <div class="hero-skyline" aria-hidden="true">
+    <svg viewBox="0 0 1440 320" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+      <g fill="#05050a" opacity="0.65">
+        <rect x="20" y="170" width="70" height="150"/>
+        <rect x="100" y="120" width="55" height="200"/>
+        <rect x="165" y="200" width="80" height="120"/>
+        <rect x="255" y="90" width="60" height="230"/>
+        <rect x="325" y="160" width="70" height="160"/>
+        <rect x="405" y="210" width="95" height="110"/>
+        <rect x="510" y="60" width="64" height="260"/>
+        <rect x="584" y="150" width="76" height="170"/>
+        <rect x="670" y="110" width="58" height="210"/>
+        <rect x="738" y="190" width="90" height="130"/>
+        <rect x="838" y="80" width="62" height="240"/>
+        <rect x="910" y="170" width="74" height="150"/>
+        <rect x="994" y="130" width="56" height="190"/>
+        <rect x="1060" y="200" width="92" height="120"/>
+        <rect x="1162" y="100" width="60" height="220"/>
+        <rect x="1232" y="165" width="78" height="155"/>
+        <rect x="1320" y="205" width="100" height="115"/>
+      </g>
+      <g fill="#E8B84B" opacity="0.85">
+        <rect x="36" y="186" width="6" height="9"/><rect x="52" y="186" width="6" height="9"/><rect x="44" y="210" width="6" height="9"/>
+        <rect x="116" y="138" width="6" height="9"/><rect x="132" y="138" width="6" height="9"/><rect x="116" y="166" width="6" height="9"/><rect x="132" y="194" width="6" height="9"/>
+        <rect x="270" y="110" width="6" height="9"/><rect x="288" y="110" width="6" height="9"/><rect x="270" y="150" width="6" height="9"/><rect x="288" y="190" width="6" height="9"/>
+        <rect x="526" y="84" width="6" height="9"/><rect x="544" y="84" width="6" height="9"/><rect x="526" y="130" width="6" height="9"/><rect x="544" y="180" width="6" height="9"/><rect x="526" y="230" width="6" height="9"/>
+        <rect x="686" y="132" width="6" height="9"/><rect x="704" y="132" width="6" height="9"/><rect x="686" y="180" width="6" height="9"/>
+        <rect x="854" y="104" width="6" height="9"/><rect x="872" y="104" width="6" height="9"/><rect x="854" y="150" width="6" height="9"/><rect x="872" y="200" width="6" height="9"/>
+        <rect x="1010" y="154" width="6" height="9"/><rect x="1010" y="200" width="6" height="9"/>
+        <rect x="1178" y="124" width="6" height="9"/><rect x="1196" y="124" width="6" height="9"/><rect x="1178" y="170" width="6" height="9"/><rect x="1196" y="220" width="6" height="9"/>
+      </g>
+    </svg>
+  </div>
+  <div class="hero-overlay">
+    <h1 data-i18n="hero_title">SKYLOFT Tokyo</h1>
+    <p data-i18n="hero_subtitle">A Hidden Loft Above the City Lights</p>
+    <a href="#book" class="hero-cta" data-i18n="hero_cta">Book Your Stay</a>
+  </div>
+  <div class="hero-dots"></div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="fade-in">
+    <h2 class="section-title" data-i18n="about_title">Welcome to SKYLOFT Tokyo</h2>
+    <p class="section-subtitle" data-i18n="about_desc">A design-led loft in the heart of Roppongi, just one minute from the station. Floor-to-ceiling windows frame the glittering Tokyo skyline, while a calm, contemporary interior offers the perfect base for up to 6 guests. Whether for a city break, a business trip, or a celebration, SKYLOFT Tokyo puts the energy of the city at your doorstep — and a quiet retreat above it.</p>
+  </div>
+  <div class="about-cards fade-in">
+    <div class="about-card"><div class="icon">&#x1F465;</div><h3 data-i18n="about_guests">Up to 6 Guests</h3></div>
+    <div class="about-card"><div class="icon">&#x1F6CF;</div><h3 data-i18n="about_bedrooms">2 Bedrooms</h3></div>
+    <div class="about-card"><div class="icon">&#x1F303;</div><h3 data-i18n="about_view">City Night View</h3></div>
+    <div class="about-card"><div class="icon">&#x1F687;</div><h3 data-i18n="about_station">1 min to Station</h3></div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery" id="gallery">
+  <div class="gallery-inner">
+    <h2 class="section-title fade-in" data-i18n="gallery_title">Gallery</h2>
+    <div class="gallery-filters fade-in">
+      <button class="active" data-filter="all" data-i18n="gallery_all">All</button>
+      <button data-filter="interior" data-i18n="gallery_interior">Interior</button>
+      <button data-filter="view" data-i18n="gallery_view">View</button>
+      <button data-filter="building" data-i18n="gallery_building">Building</button>
+      <button data-filter="night" data-i18n="gallery_night">Night</button>
+    </div>
+    <!-- 写真は data-ph="絵文字|ラベル" のプレースホルダ。実写真は src="..." に差し替え -->
+    <div class="gallery-grid" id="galleryGrid">
+      <div class="gallery-item" data-category="interior"><img data-ph="&#x1F6CB;|Living Lounge" alt="Living Lounge"></div>
+      <div class="gallery-item" data-category="interior"><img data-ph="&#x1F6CF;|Master Bedroom" alt="Master Bedroom"></div>
+      <div class="gallery-item" data-category="interior"><img data-ph="&#x1F373;|Designer Kitchen" alt="Designer Kitchen"></div>
+      <div class="gallery-item" data-category="interior"><img data-ph="&#x1F6C1;|Bath &amp; Amenities" alt="Bath and Amenities"></div>
+      <div class="gallery-item" data-category="interior"><img data-ph="&#x1FA91;|Work Corner" alt="Work Corner"></div>
+      <div class="gallery-item" data-category="interior"><img data-ph="&#x1F6AA;|Entrance" alt="Entrance"></div>
+      <div class="gallery-item" data-category="view"><img data-ph="&#x1F303;|Night Skyline" alt="Night Skyline"></div>
+      <div class="gallery-item" data-category="view"><img data-ph="&#x1F305;|Sunset View" alt="Sunset View"></div>
+      <div class="gallery-item" data-category="view"><img data-ph="&#x1F5FC;|Tokyo Tower View" alt="Tokyo Tower View"></div>
+      <div class="gallery-item" data-category="building"><img data-ph="&#x1F3E2;|Tower Facade" alt="Tower Facade"></div>
+      <div class="gallery-item" data-category="building"><img data-ph="&#x1F6CE;|Lobby" alt="Lobby"></div>
+      <div class="gallery-item" data-category="night"><img data-ph="&#x1F319;|Night Lounge" alt="Night Lounge"></div>
+      <div class="gallery-item" data-category="night"><img data-ph="&#x2728;|Illuminated Terrace" alt="Illuminated Terrace"></div>
+    </div>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-close" id="lightboxClose">&#x2715;</div>
+  <div class="lightbox-nav lightbox-prev" id="lightboxPrev">&#x276E;</div>
+  <div class="lightbox-nav lightbox-next" id="lightboxNext">&#x276F;</div>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- AMENITIES -->
+<section class="amenities" id="amenities">
+  <h2 class="section-title fade-in" data-i18n="amenities_title">Amenities &amp; Features</h2>
+  <div class="amenities-grid fade-in">
+    <div class="amenity-card"><div class="icon">&#x1F4F6;</div><span data-i18n="am_wifi">High-Speed Wi-Fi (1Gbps)</span></div>
+    <div class="amenity-card"><div class="icon">&#x1F510;</div><span data-i18n="am_lock">Smart Lock Entry</span></div>
+    <div class="amenity-card"><div class="icon">&#x2615;</div><span data-i18n="am_coffee">Nespresso Machine</span></div>
+    <div class="amenity-card"><div class="icon">&#x1F4FA;</div><span data-i18n="am_tv">65" 4K Smart TV</span></div>
+    <div class="amenity-card"><div class="icon">&#x1F6BF;</div><span data-i18n="am_washlet">Washlet Toilet</span></div>
+    <div class="amenity-card"><div class="icon">&#x1F6D7;</div><span data-i18n="am_elevator">Elevator Access</span></div>
+    <div class="amenity-card"><div class="icon">&#x1F3EA;</div><span data-i18n="am_conveni">Konbini 30 sec away</span></div>
+    <div class="amenity-card"><div class="icon">&#x1F3A7;</div><span data-i18n="am_support">24h Guest Support</span></div>
+  </div>
+</section>
+
+<!-- LOCATION -->
+<section class="location" id="location">
+  <div class="location-inner">
+    <h2 class="section-title fade-in" data-i18n="location_title">Location &amp; Access</h2>
+    <div class="location-content fade-in">
+      <div class="location-map">
+        <!-- 自分の物件用に作るときは、Googleマップ「共有→地図を埋め込む」の src に差し替え -->
+        <iframe src="https://www.google.com/maps?q=Roppongi,Minato,Tokyo&hl=ja&z=15&output=embed" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Map"></iframe>
+      </div>
+      <div class="location-info">
+        <div class="access-item"><div class="icon">&#x1F687;</div><span data-i18n="loc_station">Roppongi Station — 1 min walk</span></div>
+        <div class="access-item"><div class="icon">&#x1F6EB;</div><span data-i18n="loc_haneda">Haneda Airport — 35 min</span></div>
+        <div class="access-item"><div class="icon">&#x1F687;</div><span data-i18n="loc_shibuya">Shibuya — 12 min by metro</span></div>
+        <div class="nearby-spots">
+          <h3 data-i18n="loc_nearby_title">Nearby Attractions</h3>
+          <ul>
+            <li data-i18n="loc_tower">Tokyo Tower</li>
+            <li data-i18n="loc_hills">Roppongi Hills</li>
+            <li data-i18n="loc_azabu">Azabudai Hills</li>
+            <li data-i18n="loc_art">The National Art Center</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOK NOW -->
+<section class="book" id="book">
+  <h2 class="section-title" style="color:#fff" data-i18n="book_title">Ready to Experience SKYLOFT Tokyo?</h2>
+  <p class="fade-in" data-i18n="book_desc">Book your stay through our trusted partners, or contact us directly for any inquiries.</p>
+  <div class="book-buttons fade-in">
+    <a href="#" class="book-btn primary" data-i18n="book_airbnb">Book on Airbnb</a>
+    <a href="#" class="book-btn secondary" data-i18n="book_booking">Book on Booking.com</a>
+  </div>
+  <div class="book-contact fade-in">
+    <a href="mailto:stay@skyloft.tokyo" data-i18n="book_contact">Contact Us</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">SKYLOFT<span>.</span>Tokyo</div>
+    <p data-i18n="footer_address">Roppongi, Minato-ku, Tokyo, Japan</p>
+    <div class="footer-social">
+      <a href="#" aria-label="Instagram">&#x1F4F7;</a>
+      <a href="#" aria-label="Airbnb">&#x1F3E0;</a>
+    </div>
+    <p data-i18n="footer_copyright">&copy; 2026 SKYLOFT Tokyo. All rights reserved.</p>
+    <p class="footer-note" data-i18n="footer_note">This is a sample site for a seminar. The property is fictional.</p>
+  </div>
+</footer>
+
+<!-- MOBILE STICKY BOOK -->
+<div class="mobile-book">
+  <a href="#book" data-i18n="nav_book">Book Now</a>
+</div>
+
+<script>
+/* ===== 文言データ（ここを編集すれば全言語の表示が変わります） ===== */
+const i18nData = {
+  en: {
+    nav_about:"About",nav_gallery:"Gallery",nav_amenities:"Amenities",nav_location:"Location",nav_book:"Book Now",
+    hero_title:"SKYLOFT Tokyo",hero_subtitle:"A Hidden Loft Above the City Lights",hero_cta:"Book Your Stay",
+    about_title:"Welcome to SKYLOFT Tokyo",
+    about_desc:"A design-led loft in the heart of Roppongi, just one minute from the station. Floor-to-ceiling windows frame the glittering Tokyo skyline, while a calm, contemporary interior offers the perfect base for up to 6 guests. Whether for a city break, a business trip, or a celebration, SKYLOFT Tokyo puts the energy of the city at your doorstep — and a quiet retreat above it.",
+    about_guests:"Up to 6 Guests",about_bedrooms:"2 Bedrooms",about_view:"City Night View",about_station:"1 min to Station",
+    gallery_title:"Gallery",gallery_all:"All",gallery_interior:"Interior",gallery_view:"View",gallery_building:"Building",gallery_night:"Night",
+    amenities_title:"Amenities & Features",am_wifi:"High-Speed Wi-Fi (1Gbps)",am_lock:"Smart Lock Entry",am_coffee:"Nespresso Machine",am_tv:"65\" 4K Smart TV",am_washlet:"Washlet Toilet",am_elevator:"Elevator Access",am_conveni:"Konbini 30 sec away",am_support:"24h Guest Support",
+    location_title:"Location & Access",loc_station:"Roppongi Station — 1 min walk",loc_haneda:"Haneda Airport — 35 min",loc_shibuya:"Shibuya — 12 min by metro",loc_nearby_title:"Nearby Attractions",loc_tower:"Tokyo Tower",loc_hills:"Roppongi Hills",loc_azabu:"Azabudai Hills",loc_art:"The National Art Center",
+    book_title:"Ready to Experience SKYLOFT Tokyo?",book_desc:"Book your stay through our trusted partners, or contact us directly for any inquiries.",book_airbnb:"Book on Airbnb",book_booking:"Book on Booking.com",book_contact:"Contact Us",
+    footer_address:"Roppongi, Minato-ku, Tokyo, Japan",footer_copyright:"© 2026 SKYLOFT Tokyo. All rights reserved.",footer_note:"This is a sample site for a seminar. The property is fictional."
+  },
+  ja: {
+    nav_about:"お部屋について",nav_gallery:"ギャラリー",nav_amenities:"設備・アメニティ",nav_location:"アクセス",nav_book:"予約する",
+    hero_title:"SKYLOFT Tokyo",hero_subtitle:"街の光を見下ろす、隠れ家ロフト",hero_cta:"ご予約はこちら",
+    about_title:"SKYLOFT Tokyo へようこそ",
+    about_desc:"六本木駅から徒歩１分、都心の中心にたたずむデザイナーズロフト。天井までの大きな窓からは、きらめく東京の夜景が一望。落ち着いたモダンな内装は、最大６名様の滞在に最適です。観光も、出張も、お祝いの旅も——都会の賑わいを足元に、しかし静かな隠れ家で。",
+    about_guests:"最大６名様",about_bedrooms:"寝室２室",about_view:"都会の夜景",about_station:"駅徒歩１分",
+    gallery_title:"ギャラリー",gallery_all:"すべて",gallery_interior:"室内",gallery_view:"眺め",gallery_building:"建物",gallery_night:"ナイト",
+    amenities_title:"設備・アメニティ",am_wifi:"高速Wi-Fi（1Gbps）",am_lock:"スマートロック",am_coffee:"ネスプレッソ",am_tv:"65インチ4Kテレビ",am_washlet:"温水洗浄便座",am_elevator:"エレベーター完備",am_conveni:"コンビニ徒歩30秒",am_support:"24時間サポート",
+    location_title:"アクセス・周辺情報",loc_station:"六本木駅 — 徒歩１分",loc_haneda:"羽田空港 — 35分",loc_shibuya:"渋谷 — メトロで12分",loc_nearby_title:"周辺のおすすめスポット",loc_tower:"東京タワー",loc_hills:"六本木ヒルズ",loc_azabu:"麻布台ヒルズ",loc_art:"国立新美術館",
+    book_title:"SKYLOFT Tokyo で特別な体験を",book_desc:"提携予約サイトからご予約いただくか、お気軽に直接お問い合わせください。",book_airbnb:"Airbnbで予約する",book_booking:"Booking.comで予約する",book_contact:"お問い合わせ",
+    footer_address:"東京都港区六本木",footer_copyright:"© 2026 SKYLOFT Tokyo. All rights reserved.",footer_note:"これはセミナー用のサンプルサイトです。物件は架空です。"
+  },
+  fr: {
+    nav_about:"À propos",nav_gallery:"Galerie",nav_amenities:"Équipements",nav_location:"Accès",nav_book:"Réserver",
+    hero_title:"SKYLOFT Tokyo",hero_subtitle:"Un loft secret au-dessus des lumières de la ville",hero_cta:"Réserver votre séjour",
+    about_title:"Bienvenue à SKYLOFT Tokyo",
+    about_desc:"Un loft de designer au cœur de Roppongi, à une minute à peine de la gare. De grandes baies vitrées encadrent le scintillant horizon de Tokyo, tandis qu’un intérieur contemporain et apaisant accueille jusqu’à 6 personnes. Escapade urbaine, voyage d’affaires ou célébration : SKYLOFT Tokyo met l’énergie de la ville à votre porte, et un refuge paisible juste au-dessus.",
+    about_guests:"Jusqu’à 6 personnes",about_bedrooms:"2 chambres",about_view:"Vue nocturne",about_station:"1 min de la gare",
+    gallery_title:"Galerie",gallery_all:"Tout",gallery_interior:"Intérieur",gallery_view:"Vue",gallery_building:"Bâtiment",gallery_night:"Nuit",
+    amenities_title:"Équipements & Services",am_wifi:"Wi-Fi haut débit (1 Gbps)",am_lock:"Serrure connectée",am_coffee:"Machine Nespresso",am_tv:"TV 4K 65 pouces",am_washlet:"Toilettes japonaises",am_elevator:"Ascenseur",am_conveni:"Konbini à 30 s",am_support:"Assistance 24h/24",
+    location_title:"Situation & Accès",loc_station:"Gare de Roppongi — 1 min à pied",loc_haneda:"Aéroport de Haneda — 35 min",loc_shibuya:"Shibuya — 12 min en métro",loc_nearby_title:"À proximité",loc_tower:"Tour de Tokyo",loc_hills:"Roppongi Hills",loc_azabu:"Azabudai Hills",loc_art:"Centre national d’art",
+    book_title:"Prêt à vivre SKYLOFT Tokyo ?",book_desc:"Réservez via nos partenaires de confiance ou contactez-nous directement.",book_airbnb:"Réserver sur Airbnb",book_booking:"Réserver sur Booking.com",book_contact:"Nous contacter",
+    footer_address:"Roppongi, Minato-ku, Tokyo, Japon",footer_copyright:"© 2026 SKYLOFT Tokyo. Tous droits réservés.",footer_note:"Ceci est un site exemple pour un séminaire. Le logement est fictif."
+  },
+  es: {
+    nav_about:"Acerca de",nav_gallery:"Galería",nav_amenities:"Servicios",nav_location:"Ubicación",nav_book:"Reservar",
+    hero_title:"SKYLOFT Tokyo",hero_subtitle:"Un loft secreto sobre las luces de la ciudad",hero_cta:"Reserva tu estancia",
+    about_title:"Bienvenido a SKYLOFT Tokyo",
+    about_desc:"Un loft de diseño en el corazón de Roppongi, a solo un minuto de la estación. Sus ventanales de suelo a techo enmarcan el deslumbrante horizonte de Tokio, mientras que un interior sereno y contemporáneo acoge hasta a 6 huéspedes. Para una escapada urbana, un viaje de negocios o una celebración, SKYLOFT Tokyo pone la energía de la ciudad a tus pies y un refugio tranquilo por encima de ella.",
+    about_guests:"Hasta 6 huéspedes",about_bedrooms:"2 habitaciones",about_view:"Vista nocturna",about_station:"1 min a la estación",
+    gallery_title:"Galería",gallery_all:"Todo",gallery_interior:"Interior",gallery_view:"Vistas",gallery_building:"Edificio",gallery_night:"Noche",
+    amenities_title:"Servicios e Instalaciones",am_wifi:"Wi-Fi de alta velocidad (1 Gbps)",am_lock:"Cerradura inteligente",am_coffee:"Cafetera Nespresso",am_tv:"TV 4K de 65\"",am_washlet:"Inodoro japonés",am_elevator:"Ascensor",am_conveni:"Konbini a 30 s",am_support:"Asistencia 24 h",
+    location_title:"Ubicación y Acceso",loc_station:"Estación de Roppongi — 1 min a pie",loc_haneda:"Aeropuerto de Haneda — 35 min",loc_shibuya:"Shibuya — 12 min en metro",loc_nearby_title:"Lugares cercanos",loc_tower:"Torre de Tokio",loc_hills:"Roppongi Hills",loc_azabu:"Azabudai Hills",loc_art:"Centro Nacional de Arte",
+    book_title:"¿Listo para vivir SKYLOFT Tokyo?",book_desc:"Reserva a través de nuestros socios de confianza o contáctanos directamente.",book_airbnb:"Reservar en Airbnb",book_booking:"Reservar en Booking.com",book_contact:"Contáctanos",
+    footer_address:"Roppongi, Minato-ku, Tokio, Japón",footer_copyright:"© 2026 SKYLOFT Tokyo. Todos los derechos reservados.",footer_note:"Este es un sitio de ejemplo para un seminario. El alojamiento es ficticio."
+  },
+  ko: {
+    nav_about:"소개",nav_gallery:"갤러리",nav_amenities:"편의시설",nav_location:"오시는 길",nav_book:"예약하기",
+    hero_title:"SKYLOFT Tokyo",hero_subtitle:"도시의 불빛 위 숨은 로프트",hero_cta:"지금 예약하기",
+    about_title:"SKYLOFT Tokyo에 오신 것을 환영합니다",
+    about_desc:"롯폰기역에서 도보 1분, 도심 한가운데에 자리한 디자이너스 로프트입니다. 천장까지 이어진 큰 창으로 반짝이는 도쿄의 야경이 펼쳐지고, 차분하고 현대적인 인테리어는 최대 6명이 머물기에 완벽합니다. 관광도, 출장도, 축하 여행도 — 도시의 활기를 발밑에 두고, 그 위에서 고요한 휴식을 누리세요.",
+    about_guests:"최대 6명",about_bedrooms:"침실 2개",about_view:"도시 야경",about_station:"역에서 1분",
+    gallery_title:"갤러리",gallery_all:"전체",gallery_interior:"실내",gallery_view:"전망",gallery_building:"건물",gallery_night:"밤",
+    amenities_title:"편의시설 및 특징",am_wifi:"고속 Wi-Fi (1Gbps)",am_lock:"스마트 도어락",am_coffee:"네스프레소 머신",am_tv:"65인치 4K TV",am_washlet:"비데 화장실",am_elevator:"엘리베이터",am_conveni:"편의점 30초",am_support:"24시간 지원",
+    location_title:"위치 및 교통",loc_station:"롯폰기역 — 도보 1분",loc_haneda:"하네다 공항 — 35분",loc_shibuya:"시부야 — 메트로 12분",loc_nearby_title:"주변 명소",loc_tower:"도쿄 타워",loc_hills:"롯폰기 힐즈",loc_azabu:"아자부다이 힐즈",loc_art:"국립신미술관",
+    book_title:"SKYLOFT Tokyo의 특별한 경험을 지금",book_desc:"신뢰할 수 있는 파트너를 통해 예약하거나 직접 문의하세요.",book_airbnb:"Airbnb에서 예약",book_booking:"Booking.com에서 예약",book_contact:"문의하기",
+    footer_address:"일본 도쿄도 미나토구 롯폰기",footer_copyright:"© 2026 SKYLOFT Tokyo. All rights reserved.",footer_note:"이것은 세미나용 샘플 사이트입니다. 숙소는 가상입니다."
+  },
+  zh: {
+    nav_about:"关于",nav_gallery:"图库",nav_amenities:"设施",nav_location:"位置交通",nav_book:"立即预订",
+    hero_title:"SKYLOFT Tokyo",hero_subtitle:"俯瞰城市灯火的隐秘阁楼",hero_cta:"预订您的住宿",
+    about_title:"欢迎来到 SKYLOFT Tokyo",
+    about_desc:"这是一间位于六本木中心的设计师loft，距车站仅需步行1分钟。落地大窗将闪耀的东京夜景尽收眼底，室内沉静而现代，可容纳多达6位宾客。无论是都市度假、商务出差还是节日庆祝，SKYLOFT Tokyo 将城市的活力置于脚下，又在其上为您保留一份宁静。",
+    about_guests:"最多6位客人",about_bedrooms:"2间卧室",about_view:"城市夜景",about_station:"步行1分钟到站",
+    gallery_title:"图库",gallery_all:"全部",gallery_interior:"室内",gallery_view:"景观",gallery_building:"建筑",gallery_night:"夜景",
+    amenities_title:"设施与特色",am_wifi:"高速Wi-Fi（1Gbps）",am_lock:"智能门锁",am_coffee:"Nespresso咖啡机",am_tv:"65英寸4K电视",am_washlet:"智能马桶",am_elevator:"电梯",am_conveni:"便利店30秒路程",am_support:"24小时支持",
+    location_title:"位置与交通",loc_station:"六本木站 — 步行1分钟",loc_haneda:"羽田机场 — 35分钟",loc_shibuya:"渋谷 — 地铁12分钟",loc_nearby_title:"周边景点",loc_tower:"东京塔",loc_hills:"六本木丘",loc_azabu:"麻布台丘",loc_art:"国立新美术馆",
+    book_title:"准备好体验 SKYLOFT Tokyo 了吗？",book_desc:"通过我们的合作平台预订，或直接与我们联系。",book_airbnb:"在Airbnb预订",book_booking:"在Booking.com预订",book_contact:"联系我们",
+    footer_address:"日本东京都港区六本木",footer_copyright:"© 2026 SKYLOFT Tokyo. 保留所有权利。",footer_note:"这是用于研讨会的示例网站，房源为虚构。"
+  }
+};
+
+/* ===== プレースホルダー画像生成（写真がなくても成立させる） ===== */
+const phColors = {
+  interior:["#1b1b2b","#2a2342"],
+  view:["#0e1a2f","#243b63"],
+  building:["#1a1320","#3a2230"],
+  night:["#0b0b16","#2b2350"]
+};
+function makePlaceholder(icon,label,c1,c2){
+  const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  icon = esc(icon); label = esc(label);
+  const svg =
+    "<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'>"+
+    "<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>"+
+    "<stop offset='0' stop-color='"+c1+"'/><stop offset='1' stop-color='"+c2+"'/></linearGradient></defs>"+
+    "<rect width='800' height='600' fill='url(#g)'/>"+
+    "<text x='400' y='300' font-size='160' text-anchor='middle' dominant-baseline='central'>"+icon+"</text>"+
+    "<text x='400' y='470' font-size='34' fill='rgba(255,255,255,.85)' text-anchor='middle' font-family='sans-serif'>"+label+"</text>"+
+    "<rect x='8' y='8' width='784' height='584' fill='none' stroke='rgba(255,255,255,.12)' stroke-width='2' rx='10'/>"+
+    "</svg>";
+  return "data:image/svg+xml;utf8,"+encodeURIComponent(svg);
+}
+document.querySelectorAll("img[data-ph]").forEach(img=>{
+  const raw = img.getAttribute("data-ph");
+  const sep = raw.indexOf("|");
+  const icon = raw.slice(0,sep);
+  const label = raw.slice(sep+1);
+  const cat = (img.closest(".gallery-item") && img.closest(".gallery-item").getAttribute("data-category")) || "interior";
+  const c = phColors[cat] || phColors.interior;
+  img.src = makePlaceholder(icon,label,c[0],c[1]);
+});
+
+/* ===== LANGUAGE SWITCHER ===== */
+function setLanguage(lang){
+  const data = i18nData[lang];
+  if(!data) return;
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const key = el.getAttribute("data-i18n");
+    if(data[key]) el.textContent = data[key];
+  });
+  localStorage.setItem("skyloft-lang", lang);
+  document.getElementById("langSelect").value = lang;
+}
+document.getElementById("langSelect").addEventListener("change", function(){ setLanguage(this.value); });
+
+/* ===== HEADER SCROLL ===== */
+const header = document.getElementById("header");
+window.addEventListener("scroll", ()=>{ header.classList.toggle("scrolled", window.scrollY > 50); });
+
+/* ===== HAMBURGER MENU ===== */
+const hamburger = document.getElementById("hamburger");
+const nav = document.getElementById("nav");
+hamburger.addEventListener("click", ()=>{ hamburger.classList.toggle("active"); nav.classList.toggle("open"); });
+nav.querySelectorAll("a").forEach(link=>{
+  link.addEventListener("click", ()=>{ hamburger.classList.remove("active"); nav.classList.remove("open"); });
+});
+
+/* ===== HERO SLIDESHOW ===== */
+const slides = document.querySelectorAll(".hero-slide");
+const dotsContainer = document.querySelector(".hero-dots");
+let currentSlide = 0, slideInterval;
+slides.forEach((_,i)=>{
+  const dot = document.createElement("div");
+  dot.classList.add("hero-dot");
+  if(i===0) dot.classList.add("active");
+  dot.addEventListener("click", ()=>goToSlide(i));
+  dotsContainer.appendChild(dot);
+});
+function goToSlide(n){
+  slides[currentSlide].classList.remove("active");
+  dotsContainer.children[currentSlide].classList.remove("active");
+  currentSlide = n;
+  slides[currentSlide].classList.add("active");
+  dotsContainer.children[currentSlide].classList.add("active");
+  resetInterval();
+}
+function nextSlide(){ goToSlide((currentSlide+1) % slides.length); }
+function resetInterval(){ clearInterval(slideInterval); slideInterval = setInterval(nextSlide, 6000); }
+resetInterval();
+
+/* ===== GALLERY FILTER ===== */
+const filterBtns = document.querySelectorAll(".gallery-filters button");
+const galleryItems = document.querySelectorAll(".gallery-item");
+filterBtns.forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    filterBtns.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const filter = btn.getAttribute("data-filter");
+    galleryItems.forEach(item=>{
+      if(filter==="all" || item.getAttribute("data-category")===filter){ item.classList.remove("hidden"); }
+      else{ item.classList.add("hidden"); }
+    });
+  });
+});
+
+/* ===== LIGHTBOX ===== */
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightboxImg");
+let lightboxIndex = 0, visibleItems = [];
+function updateVisibleItems(){ visibleItems = Array.from(galleryItems).filter(item=>!item.classList.contains("hidden")); }
+galleryItems.forEach(item=>{
+  item.addEventListener("click", ()=>{
+    updateVisibleItems();
+    lightboxIndex = visibleItems.indexOf(item);
+    lightboxImg.src = item.querySelector("img").src;
+    lightbox.classList.add("open");
+    document.body.style.overflow = "hidden";
+  });
+});
+document.getElementById("lightboxClose").addEventListener("click", closeLightbox);
+lightbox.addEventListener("click", (e)=>{ if(e.target===lightbox) closeLightbox(); });
+function closeLightbox(){ lightbox.classList.remove("open"); document.body.style.overflow = ""; }
+document.getElementById("lightboxPrev").addEventListener("click", (e)=>{
+  e.stopPropagation();
+  lightboxIndex = (lightboxIndex - 1 + visibleItems.length) % visibleItems.length;
+  lightboxImg.src = visibleItems[lightboxIndex].querySelector("img").src;
+});
+document.getElementById("lightboxNext").addEventListener("click", (e)=>{
+  e.stopPropagation();
+  lightboxIndex = (lightboxIndex + 1) % visibleItems.length;
+  lightboxImg.src = visibleItems[lightboxIndex].querySelector("img").src;
+});
+document.addEventListener("keydown", (e)=>{
+  if(!lightbox.classList.contains("open")) return;
+  if(e.key==="Escape") closeLightbox();
+  if(e.key==="ArrowLeft") document.getElementById("lightboxPrev").click();
+  if(e.key==="ArrowRight") document.getElementById("lightboxNext").click();
+});
+
+/* ===== SCROLL ANIMATIONS ===== */
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{ if(entry.isIntersecting) entry.target.classList.add("visible"); });
+}, { threshold: 0.1 });
+document.querySelectorAll(".fade-in").forEach(el=>observer.observe(el));
+
+/* ===== INIT LANGUAGE ===== */
+const savedLang = localStorage.getItem("skyloft-lang") || (
+  navigator.language.startsWith("ja") ? "ja" :
+  navigator.language.startsWith("ko") ? "ko" :
+  navigator.language.startsWith("zh") ? "zh" :
+  navigator.language.startsWith("fr") ? "fr" :
+  navigator.language.startsWith("es") ? "es" : "en");
+setLanguage(savedLang);
+</script>
+</body>
+</html>
