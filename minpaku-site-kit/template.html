@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ▼【1】タブに出るタイトル。物件名に変えてください -->
+<title>【物件名】 — 公式サイト</title>
+<meta name="description" content="【物件名】の公式サイト。ここに物件の一言紹介を入れます。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   民泊ゲストサイト・白紙テンプレート（コピーして使ってください）
+   --------------------------------------------------------------------
+   変えるところは3つだけ：
+   【A】色   … すぐ下の :root の色コード（#xxxxxx）
+   【B】文章 … 最下部 <script> の i18nData（ja＝日本語 / en＝英語）
+   【C】写真 … <img data-ph="..."> を <img src="写真ファイル名"> に差し替え
+   ===================================================================== */
+
+/* ===== 【A】配色（ここを変えると全体の色が変わります） ===== */
+:root{
+  --primary:#3A3A3A;          /* メインの濃い色（見出し・ヘッダー） */
+  --accent:#A8895C;           /* 差し色（ボタン・線）。物件の雰囲気の色に */
+  --bg:#FAFAF8;               /* ページの背景色 */
+  --surface:#FFFFFF;          /* カードの背景色 */
+  --text:#2C2C2C;             /* 本文の文字色 */
+  --text-dim:#777777;         /* 補助の文字色 */
+  --line:rgba(0,0,0,.08);
+  --font-heading:'Cormorant Garamond','Noto Serif JP',serif;  /* 見出しフォント */
+  --font-body:'Inter','Noto Sans JP',sans-serif;              /* 本文フォント */
+}
+
+/* ===== ここから下のデザインは基本そのままでOK ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--text);background:var(--bg);line-height:1.7;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{font-family:var(--font-heading);font-weight:600;line-height:1.3}
+.section-title{font-size:clamp(1.8rem,4vw,2.8rem);text-align:center;margin-bottom:.4em;color:var(--primary)}
+.section-title::after{content:"";display:block;width:48px;height:3px;background:var(--accent);margin:.5em auto 0;border-radius:2px}
+.section-subtitle{text-align:center;max-width:680px;margin:0 auto 2.5em;color:var(--text-dim);font-size:.95rem}
+.fade-in{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+header{position:fixed;top:0;left:0;width:100%;z-index:1000;padding:1.1rem 2rem;display:flex;align-items:center;justify-content:space-between;transition:background .3s,box-shadow .3s,padding .3s}
+header.scrolled{background:rgba(58,58,58,.97);box-shadow:0 2px 20px rgba(0,0,0,.15);padding:.7rem 2rem}
+.logo{font-family:var(--font-heading);font-size:1.5rem;font-weight:700;color:#fff;letter-spacing:.06em}
+nav{display:flex;align-items:center;gap:1.5rem}
+nav a{color:rgba(255,255,255,.85);font-size:.85rem;font-weight:500;transition:color .2s}
+nav a:hover{color:var(--accent)}
+.lang-select{background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff;padding:.3rem .5rem;border-radius:4px;font-size:.8rem;cursor:pointer}
+.lang-select option{color:#333;background:#fff}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:5px}
+.hamburger span{width:24px;height:2px;background:#fff;transition:transform .3s,opacity .3s}
+.hamburger.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.active span:nth-child(2){opacity:0}
+.hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+@media(max-width:768px){
+  nav{position:fixed;top:0;right:-100%;width:72%;height:100vh;background:var(--primary);flex-direction:column;justify-content:center;gap:2rem;transition:right .3s}
+  nav.open{right:0}
+  nav a{font-size:1.1rem}
+  .hamburger{display:flex;z-index:1100}
+  .lang-select{position:absolute;bottom:2rem}
+}
+
+.hero{position:relative;height:100vh;overflow:hidden;background:#ddd}
+.hero-slides{position:absolute;inset:0}
+.hero-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease}
+.hero-slide.active{opacity:1}
+.hero-slide img{width:100%;height:100%;object-fit:cover}
+.hero-overlay{position:absolute;inset:0;z-index:3;background:linear-gradient(to bottom,rgba(0,0,0,.25),rgba(0,0,0,.5));display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem}
+.hero-overlay h1{font-size:clamp(2.5rem,7vw,5rem);color:#fff;letter-spacing:.08em;margin-bottom:.2em;text-shadow:0 2px 30px rgba(0,0,0,.4)}
+.hero-overlay p{font-size:clamp(1rem,2.5vw,1.4rem);color:rgba(255,255,255,.92);font-family:var(--font-heading);font-style:italic;margin-bottom:2rem;letter-spacing:.05em}
+.hero-cta{display:inline-block;padding:.9rem 2.5rem;background:var(--accent);color:#fff;font-weight:600;font-size:1rem;border-radius:2px;letter-spacing:.05em;transition:background .3s,transform .2s}
+.hero-cta:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.hero-dots{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:4}
+.hero-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer;transition:background .3s,transform .3s}
+.hero-dot.active{background:#fff;transform:scale(1.3)}
+
+.about{padding:6rem 2rem;max-width:1100px;margin:0 auto}
+.about-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem;margin-top:2rem}
+.about-card{text-align:center;padding:2rem 1rem;background:var(--surface);border:1px solid var(--line);border-radius:12px;transition:transform .3s,box-shadow .3s}
+.about-card:hover{transform:translateY(-5px);box-shadow:0 8px 25px rgba(0,0,0,.08)}
+.about-card .icon{font-size:2.4rem;margin-bottom:.7rem}
+.about-card h3{font-size:1rem;color:var(--primary);margin-bottom:.3rem}
+@media(max-width:600px){.about-cards{grid-template-columns:repeat(2,1fr)}}
+
+.gallery{padding:6rem 2rem;background:var(--surface)}
+.gallery-inner{max-width:1200px;margin:0 auto}
+.gallery-filters{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-bottom:2rem}
+.gallery-filters button{padding:.5rem 1.2rem;border:1px solid var(--line);background:transparent;color:var(--text);font-family:var(--font-body);font-size:.85rem;cursor:pointer;border-radius:30px;transition:all .2s}
+.gallery-filters button.active,.gallery-filters button:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.gallery-item{overflow:hidden;border-radius:8px;cursor:pointer;position:relative;aspect-ratio:4/3;background:#eee}
+.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.gallery-item:hover img{transform:scale(1.05)}
+.gallery-item.hidden{display:none}
+
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox img{max-width:90vw;max-height:85vh;object-fit:contain;border-radius:6px}
+.lightbox-close{position:absolute;top:1.5rem;right:2rem;color:#fff;font-size:2rem;cursor:pointer;z-index:10;width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+.lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);color:#fff;font-size:2.5rem;cursor:pointer;padding:1rem;user-select:none}
+.lightbox-prev{left:1rem}.lightbox-next{right:1rem}
+
+.amenities{padding:6rem 2rem;max-width:1100px;margin:0 auto}
+.amenities-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2rem}
+.amenity-card{display:flex;align-items:center;gap:1rem;padding:1.2rem 1.4rem;background:var(--surface);border:1px solid var(--line);border-radius:10px;transition:transform .2s}
+.amenity-card:hover{transform:translateY(-3px)}
+.amenity-card .icon{font-size:1.7rem;flex-shrink:0}
+.amenity-card span{font-size:.9rem;font-weight:500}
+@media(max-width:768px){.amenities-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.amenities-grid{grid-template-columns:1fr}}
+
+.location{padding:6rem 2rem;background:var(--surface)}
+.location-inner{max-width:1100px;margin:0 auto}
+.location-content{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-top:2rem}
+.location-map{border-radius:12px;overflow:hidden;min-height:350px;border:1px solid var(--line)}
+.location-map iframe{width:100%;height:100%;border:0;min-height:350px}
+.location-info{display:flex;flex-direction:column;gap:1.2rem}
+.access-item{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--bg);border-radius:10px}
+.access-item .icon{font-size:1.5rem}
+.access-item span{font-size:.9rem}
+.nearby-spots{margin-top:1rem}
+.nearby-spots h3{font-size:1.1rem;color:var(--primary);margin-bottom:.8rem}
+.nearby-spots ul{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.nearby-spots li{padding-left:1.2rem;position:relative;font-size:.9rem;color:var(--text-dim)}
+.nearby-spots li::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;background:var(--accent);border-radius:50%}
+@media(max-width:768px){.location-content{grid-template-columns:1fr}}
+
+.book{padding:6rem 2rem;background:var(--primary);color:#fff;text-align:center}
+.book .section-title{color:#fff}
+.book p{color:rgba(255,255,255,.85);max-width:600px;margin:0 auto 2rem;font-size:.95rem}
+.book-buttons{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+.book-btn{padding:.9rem 2.2rem;border-radius:2px;font-weight:600;font-size:.95rem;transition:all .3s;display:inline-block}
+.book-btn.primary{background:var(--accent);color:#fff}
+.book-btn.primary:hover{filter:brightness(1.08);transform:translateY(-2px)}
+.book-btn.secondary{background:transparent;border:1px solid rgba(255,255,255,.5);color:#fff}
+.book-btn.secondary:hover{border-color:#fff;background:rgba(255,255,255,.1)}
+.book-contact{margin-top:1.5rem}
+.book-contact a{color:var(--accent);font-weight:500}
+
+footer{padding:3rem 2rem;background:#222;color:rgba(255,255,255,.6);text-align:center;font-size:.85rem}
+footer .footer-inner{max-width:800px;margin:0 auto}
+footer .footer-brand{font-family:var(--font-heading);font-size:1.3rem;color:#fff;margin-bottom:.5rem}
+footer .footer-social{display:flex;justify-content:center;gap:1.5rem;margin:1rem 0}
+footer .footer-social a{color:rgba(255,255,255,.5);font-size:1.2rem;transition:color .2s}
+footer .footer-social a:hover{color:var(--accent)}
+
+.mobile-book{display:none;position:fixed;bottom:0;left:0;width:100%;padding:.8rem;background:var(--primary);z-index:999;text-align:center}
+.mobile-book a{display:block;padding:.8rem;background:var(--accent);color:#fff;font-weight:600;border-radius:4px;font-size:.95rem}
+@media(max-width:768px){.mobile-book{display:block}footer{padding-bottom:5rem}}
+</style>
+</head>
+<body>
+
+<!-- ========================= ヘッダー ========================= -->
+<header id="header">
+  <a href="#" class="logo" data-i18n="brand">【物件名】</a>
+  <div class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></div>
+  <nav id="nav">
+    <a href="#about" data-i18n="nav_about">お部屋について</a>
+    <a href="#gallery" data-i18n="nav_gallery">ギャラリー</a>
+    <a href="#amenities" data-i18n="nav_amenities">設備</a>
+    <a href="#location" data-i18n="nav_location">アクセス</a>
+    <a href="#book" data-i18n="nav_book">予約する</a>
+    <!-- 言語を増やすときは option を追加し、下の i18nData にも同じ言語コードを足す -->
+    <select class="lang-select" id="langSelect" aria-label="Language">
+      <option value="ja">JA</option>
+      <option value="en">EN</option>
+    </select>
+  </nav>
+</header>
+
+<!-- ========================= ヒーロー（最初の大きな写真） ========================= -->
+<!-- 写真を入れるとき：data-ph="..." を消して src="写真ファイル名.jpg" にする -->
+<section class="hero" id="hero">
+  <div class="hero-slides">
+    <div class="hero-slide active"><img data-ph="&#x1F4F7;|メイン写真 1" alt=""></div>
+    <div class="hero-slide"><img data-ph="&#x1F4F7;|メイン写真 2" alt=""></div>
+    <div class="hero-slide"><img data-ph="&#x1F4F7;|メイン写真 3" alt=""></div>
+  </div>
+  <div class="hero-overlay">
+    <h1 data-i18n="hero_title">【物件名】</h1>
+    <p data-i18n="hero_subtitle">【ここにキャッチコピー（例：海を望む、静かな一軒家）】</p>
+    <a href="#book" class="hero-cta" data-i18n="hero_cta">予約する</a>
+  </div>
+  <div class="hero-dots"></div>
+</section>
+
+<!-- ========================= お部屋について ========================= -->
+<section class="about" id="about">
+  <div class="fade-in">
+    <h2 class="section-title" data-i18n="about_title">【物件名】へようこそ</h2>
+    <p class="section-subtitle" data-i18n="about_desc">【ここに物件の紹介文を3〜4行で。立地・広さ・雰囲気・どんな滞在に向くか、を書くと魅力が伝わります。】</p>
+  </div>
+  <div class="about-cards fade-in">
+    <div class="about-card"><div class="icon">&#x1F465;</div><h3 data-i18n="about_p1">【最大◯名】</h3></div>
+    <div class="about-card"><div class="icon">&#x1F6CF;</div><h3 data-i18n="about_p2">【寝室◯室】</h3></div>
+    <div class="about-card"><div class="icon">&#x2728;</div><h3 data-i18n="about_p3">【特徴1】</h3></div>
+    <div class="about-card"><div class="icon">&#x1F687;</div><h3 data-i18n="about_p4">【特徴2】</h3></div>
+  </div>
+</section>
+
+<!-- ========================= ギャラリー ========================= -->
+<section class="gallery" id="gallery">
+  <div class="gallery-inner">
+    <h2 class="section-title fade-in" data-i18n="gallery_title">ギャラリー</h2>
+    <div class="gallery-filters fade-in">
+      <button class="active" data-filter="all" data-i18n="gallery_all">すべて</button>
+      <button data-filter="room" data-i18n="gallery_room">室内</button>
+      <button data-filter="exterior" data-i18n="gallery_exterior">外観・庭</button>
+      <button data-filter="area" data-i18n="gallery_area">周辺</button>
+    </div>
+    <!-- 写真を入れるとき：data-ph="..." を消して src="写真ファイル名.jpg" にする -->
+    <div class="gallery-grid" id="galleryGrid">
+      <div class="gallery-item" data-category="room"><img data-ph="&#x1F6CB;|リビング" alt="リビング"></div>
+      <div class="gallery-item" data-category="room"><img data-ph="&#x1F6CF;|寝室" alt="寝室"></div>
+      <div class="gallery-item" data-category="room"><img data-ph="&#x1F373;|キッチン" alt="キッチン"></div>
+      <div class="gallery-item" data-category="room"><img data-ph="&#x1F6C1;|お風呂・洗面" alt="お風呂"></div>
+      <div class="gallery-item" data-category="exterior"><img data-ph="&#x1F3E1;|外観" alt="外観"></div>
+      <div class="gallery-item" data-category="exterior"><img data-ph="&#x1F333;|庭・テラス" alt="庭"></div>
+      <div class="gallery-item" data-category="area"><img data-ph="&#x1F305;|周辺の景色" alt="周辺"></div>
+      <div class="gallery-item" data-category="area"><img data-ph="&#x1F687;|最寄り駅" alt="駅"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================= ライトボックス（写真の拡大表示・触らなくてOK） ========================= -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-close" id="lightboxClose">&#x2715;</div>
+  <div class="lightbox-nav lightbox-prev" id="lightboxPrev">&#x276E;</div>
+  <div class="lightbox-nav lightbox-next" id="lightboxNext">&#x276F;</div>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- ========================= 設備・アメニティ ========================= -->
+<section class="amenities" id="amenities">
+  <h2 class="section-title fade-in" data-i18n="amenities_title">設備・アメニティ</h2>
+  <div class="amenities-grid fade-in">
+    <div class="amenity-card"><div class="icon">&#x1F4F6;</div><span data-i18n="am1">【設備1】</span></div>
+    <div class="amenity-card"><div class="icon">&#x1F373;</div><span data-i18n="am2">【設備2】</span></div>
+    <div class="amenity-card"><div class="icon">&#x1F510;</div><span data-i18n="am3">【設備3】</span></div>
+    <div class="amenity-card"><div class="icon">&#x2744;</div><span data-i18n="am4">【設備4】</span></div>
+    <div class="amenity-card"><div class="icon">&#x1F9FA;</div><span data-i18n="am5">【設備5】</span></div>
+    <div class="amenity-card"><div class="icon">&#x1F697;</div><span data-i18n="am6">【設備6】</span></div>
+    <div class="amenity-card"><div class="icon">&#x1F4FA;</div><span data-i18n="am7">【設備7】</span></div>
+    <div class="amenity-card"><div class="icon">&#x1F6BF;</div><span data-i18n="am8">【設備8】</span></div>
+  </div>
+</section>
+
+<!-- ========================= アクセス・周辺 ========================= -->
+<section class="location" id="location">
+  <div class="location-inner">
+    <h2 class="section-title fade-in" data-i18n="location_title">アクセス・周辺情報</h2>
+    <div class="location-content fade-in">
+      <div class="location-map">
+        <!-- Googleマップで物件を検索 →「共有」→「地図を埋め込む」→ src の中身をここに貼る -->
+        <iframe src="https://www.google.com/maps?q=Tokyo+Station&hl=ja&z=15&output=embed" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="地図"></iframe>
+      </div>
+      <div class="location-info">
+        <div class="access-item"><div class="icon">&#x1F687;</div><span data-i18n="loc1">【最寄り駅 — 徒歩◯分】</span></div>
+        <div class="access-item"><div class="icon">&#x1F68C;</div><span data-i18n="loc2">【主要駅・空港まで◯分】</span></div>
+        <div class="access-item"><div class="icon">&#x1F697;</div><span data-i18n="loc3">【駐車場やアクセス補足】</span></div>
+        <div class="nearby-spots">
+          <h3 data-i18n="nearby_title">周辺のおすすめスポット</h3>
+          <ul>
+            <li data-i18n="near1">【観光スポット1】</li>
+            <li data-i18n="near2">【観光スポット2】</li>
+            <li data-i18n="near3">【飲食店・買い物】</li>
+            <li data-i18n="near4">【自然・ビーチなど】</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========================= 予約 ========================= -->
+<section class="book" id="book">
+  <h2 class="section-title" data-i18n="book_title">【物件名】で特別なひとときを</h2>
+  <p class="fade-in" data-i18n="book_desc">予約サイトからご予約いただくか、お気軽にお問い合わせください。</p>
+  <div class="book-buttons fade-in">
+    <!-- href="#" を自分の予約ページURLに変える -->
+    <a href="【Airbnbのご予約ページURL】" class="book-btn primary" data-i18n="book_airbnb">Airbnbで予約</a>
+    <a href="【Booking.comのご予約ページURL】" class="book-btn secondary" data-i18n="book_booking">Booking.comで予約</a>
+  </div>
+  <div class="book-contact fade-in">
+    <a href="mailto:【メールアドレス】" data-i18n="book_contact">お問い合わせ</a>
+  </div>
+</section>
+
+<!-- ========================= フッター ========================= -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand" data-i18n="brand">【物件名】</div>
+    <p data-i18n="footer_address">【住所（市区町村まででOK）】</p>
+    <div class="footer-social">
+      <a href="#" aria-label="Instagram">&#x1F4F7;</a>
+      <a href="#" aria-label="Web">&#x1F3E0;</a>
+    </div>
+    <p data-i18n="footer_copyright">&copy; 2026 【物件名】. All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="mobile-book"><a href="#book" data-i18n="nav_book">予約する</a></div>
+
+<script>
+/* =====================================================================
+   【B】文章データ：ja＝日本語 / en＝英語
+   各行の "..." の中だけを書き換えてください（キー名は変えない）
+   言語を増やすとき：ja{...} を丸ごとコピーして fr:{...} のように足す
+   ===================================================================== */
+const i18nData = {
+  ja: {
+    brand:"【物件名】",
+    nav_about:"お部屋について",nav_gallery:"ギャラリー",nav_amenities:"設備",nav_location:"アクセス",nav_book:"予約する",
+    hero_title:"【物件名】",hero_subtitle:"【ここにキャッチコピー（例：海を望む、静かな一軒家）】",hero_cta:"予約する",
+    about_title:"【物件名】へようこそ",
+    about_desc:"【ここに物件の紹介文を3〜4行で。立地・広さ・雰囲気・どんな滞在に向くか、を書くと魅力が伝わります。】",
+    about_p1:"【最大◯名】",about_p2:"【寝室◯室】",about_p3:"【特徴1】",about_p4:"【特徴2】",
+    gallery_title:"ギャラリー",gallery_all:"すべて",gallery_room:"室内",gallery_exterior:"外観・庭",gallery_area:"周辺",
+    amenities_title:"設備・アメニティ",am1:"【設備1】",am2:"【設備2】",am3:"【設備3】",am4:"【設備4】",am5:"【設備5】",am6:"【設備6】",am7:"【設備7】",am8:"【設備8】",
+    location_title:"アクセス・周辺情報",loc1:"【最寄り駅 — 徒歩◯分】",loc2:"【主要駅・空港まで◯分】",loc3:"【駐車場やアクセス補足】",
+    nearby_title:"周辺のおすすめスポット",near1:"【観光スポット1】",near2:"【観光スポット2】",near3:"【飲食店・買い物】",near4:"【自然・ビーチなど】",
+    book_title:"【物件名】で特別なひとときを",book_desc:"予約サイトからご予約いただくか、お気軽にお問い合わせください。",book_airbnb:"Airbnbで予約",book_booking:"Booking.comで予約",book_contact:"お問い合わせ",
+    footer_address:"【住所（市区町村まででOK）】",footer_copyright:"© 2026 【物件名】. All rights reserved."
+  },
+  en: {
+    brand:"[Property Name]",
+    nav_about:"About",nav_gallery:"Gallery",nav_amenities:"Amenities",nav_location:"Location",nav_book:"Book Now",
+    hero_title:"[Property Name]",hero_subtitle:"[Your tagline here, e.g. A quiet house facing the sea]",hero_cta:"Book Your Stay",
+    about_title:"Welcome to [Property Name]",
+    about_desc:"[Write a 3-4 line introduction: location, size, atmosphere, and what kind of stay it's perfect for.]",
+    about_p1:"[Up to X Guests]",about_p2:"[X Bedrooms]",about_p3:"[Feature 1]",about_p4:"[Feature 2]",
+    gallery_title:"Gallery",gallery_all:"All",gallery_room:"Interior",gallery_exterior:"Exterior",gallery_area:"Area",
+    amenities_title:"Amenities & Features",am1:"[Amenity 1]",am2:"[Amenity 2]",am3:"[Amenity 3]",am4:"[Amenity 4]",am5:"[Amenity 5]",am6:"[Amenity 6]",am7:"[Amenity 7]",am8:"[Amenity 8]",
+    location_title:"Location & Access",loc1:"[Nearest station — X min walk]",loc2:"[X min to major hub / airport]",loc3:"[Parking / access notes]",
+    nearby_title:"Nearby Attractions",near1:"[Attraction 1]",near2:"[Attraction 2]",near3:"[Dining / Shopping]",near4:"[Nature / Beach]",
+    book_title:"Ready for a Special Stay?",book_desc:"Book through our partner sites, or contact us directly for any inquiries.",book_airbnb:"Book on Airbnb",book_booking:"Book on Booking.com",book_contact:"Contact Us",
+    footer_address:"[City, Region]",footer_copyright:"© 2026 [Property Name]. All rights reserved."
+  }
+};
+
+/* ===== 写真プレースホルダー（写真を入れる前の仮画像） ===== */
+function makePlaceholder(icon,label){
+  const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  icon = esc(icon); label = esc(label);
+  const svg =
+    "<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'>"+
+    "<defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>"+
+    "<stop offset='0' stop-color='#9a9aa2'/><stop offset='1' stop-color='#c2c2c9'/></linearGradient></defs>"+
+    "<rect width='800' height='600' fill='url(#g)'/>"+
+    "<text x='400' y='300' font-size='150' text-anchor='middle' dominant-baseline='central'>"+icon+"</text>"+
+    "<text x='400' y='470' font-size='32' fill='rgba(255,255,255,.9)' text-anchor='middle' font-family='sans-serif'>"+label+"</text>"+
+    "<rect x='8' y='8' width='784' height='584' fill='none' stroke='rgba(255,255,255,.5)' stroke-width='2' stroke-dasharray='10 8' rx='10'/>"+
+    "</svg>";
+  return "data:image/svg+xml;utf8,"+encodeURIComponent(svg);
+}
+document.querySelectorAll("img[data-ph]").forEach(img=>{
+  const raw = img.getAttribute("data-ph");
+  const sep = raw.indexOf("|");
+  img.src = makePlaceholder(raw.slice(0,sep), raw.slice(sep+1));
+});
+
+/* ===== ここから下の機能は基本そのままでOK ===== */
+function setLanguage(lang){
+  const data = i18nData[lang];
+  if(!data) return;
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const key = el.getAttribute("data-i18n");
+    if(data[key]) el.textContent = data[key];
+  });
+  localStorage.setItem("site-lang", lang);
+  document.getElementById("langSelect").value = lang;
+}
+document.getElementById("langSelect").addEventListener("change", function(){ setLanguage(this.value); });
+
+const header = document.getElementById("header");
+window.addEventListener("scroll", ()=>{ header.classList.toggle("scrolled", window.scrollY > 50); });
+
+const hamburger = document.getElementById("hamburger");
+const nav = document.getElementById("nav");
+hamburger.addEventListener("click", ()=>{ hamburger.classList.toggle("active"); nav.classList.toggle("open"); });
+nav.querySelectorAll("a").forEach(link=>{ link.addEventListener("click", ()=>{ hamburger.classList.remove("active"); nav.classList.remove("open"); }); });
+
+const slides = document.querySelectorAll(".hero-slide");
+const dotsContainer = document.querySelector(".hero-dots");
+let currentSlide = 0, slideInterval;
+slides.forEach((_,i)=>{
+  const dot = document.createElement("div");
+  dot.classList.add("hero-dot");
+  if(i===0) dot.classList.add("active");
+  dot.addEventListener("click", ()=>goToSlide(i));
+  dotsContainer.appendChild(dot);
+});
+function goToSlide(n){
+  slides[currentSlide].classList.remove("active");
+  dotsContainer.children[currentSlide].classList.remove("active");
+  currentSlide = n;
+  slides[currentSlide].classList.add("active");
+  dotsContainer.children[currentSlide].classList.add("active");
+  resetInterval();
+}
+function nextSlide(){ goToSlide((currentSlide+1) % slides.length); }
+function resetInterval(){ clearInterval(slideInterval); slideInterval = setInterval(nextSlide, 6000); }
+resetInterval();
+
+const filterBtns = document.querySelectorAll(".gallery-filters button");
+const galleryItems = document.querySelectorAll(".gallery-item");
+filterBtns.forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    filterBtns.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const filter = btn.getAttribute("data-filter");
+    galleryItems.forEach(item=>{
+      if(filter==="all" || item.getAttribute("data-category")===filter){ item.classList.remove("hidden"); }
+      else{ item.classList.add("hidden"); }
+    });
+  });
+});
+
+const lightbox = document.getElementById("lightbox");
+const lightboxImg = document.getElementById("lightboxImg");
+let lightboxIndex = 0, visibleItems = [];
+function updateVisibleItems(){ visibleItems = Array.from(galleryItems).filter(item=>!item.classList.contains("hidden")); }
+galleryItems.forEach(item=>{
+  item.addEventListener("click", ()=>{
+    updateVisibleItems();
+    lightboxIndex = visibleItems.indexOf(item);
+    lightboxImg.src = item.querySelector("img").src;
+    lightbox.classList.add("open");
+    document.body.style.overflow = "hidden";
+  });
+});
+document.getElementById("lightboxClose").addEventListener("click", closeLightbox);
+lightbox.addEventListener("click", (e)=>{ if(e.target===lightbox) closeLightbox(); });
+function closeLightbox(){ lightbox.classList.remove("open"); document.body.style.overflow = ""; }
+document.getElementById("lightboxPrev").addEventListener("click", (e)=>{ e.stopPropagation(); lightboxIndex = (lightboxIndex - 1 + visibleItems.length) % visibleItems.length; lightboxImg.src = visibleItems[lightboxIndex].querySelector("img").src; });
+document.getElementById("lightboxNext").addEventListener("click", (e)=>{ e.stopPropagation(); lightboxIndex = (lightboxIndex + 1) % visibleItems.length; lightboxImg.src = visibleItems[lightboxIndex].querySelector("img").src; });
+document.addEventListener("keydown", (e)=>{
+  if(!lightbox.classList.contains("open")) return;
+  if(e.key==="Escape") closeLightbox();
+  if(e.key==="ArrowLeft") document.getElementById("lightboxPrev").click();
+  if(e.key==="ArrowRight") document.getElementById("lightboxNext").click();
+});
+
+const observer = new IntersectionObserver((entries)=>{ entries.forEach(entry=>{ if(entry.isIntersecting) entry.target.classList.add("visible"); }); }, { threshold: 0.1 });
+document.querySelectorAll(".fade-in").forEach(el=>observer.observe(el));
+
+const savedLang = localStorage.getItem("site-lang") || (navigator.language.startsWith("ja") ? "ja" : "en");
+setLanguage(savedLang);
+</script>
+</body>
+</html>
