@@ -15,6 +15,7 @@ export function adminNav(active: string, isMaster: boolean, email: string): HE {
     ${raw(link("/admin", "予約一覧", "list"))}
     ${raw(link("/admin/reservations", "予約・売上管理", "res"))}
     ${raw(link("/admin/metrics", "指標", "metrics"))}
+    ${raw(link("/admin/purge-log", "削除履歴", "purge"))}
     ${raw(isMaster ? link("/admin/admins", "管理者の管理", "admins") : "")}
     <span style="margin-left:auto"></span>
     ${raw(`<a href="/admin/logout" style="color:var(--muted);text-decoration:none">ログアウト（${esc(email)}）</a>`)}

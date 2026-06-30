@@ -835,6 +835,39 @@ app.get("/admin/metrics", async (c) => {
   return c.html(layout({ title: "指標", lang: "ja", path: "/admin/metrics", showLangs: false, body: metricsPage({ nav: navFor(c, "metrics"), m: metrics, ym: cur, prevYm: shiftYm(y, m, -1), nextYm: shiftYm(y, m, 1) }) }));
 });
 
+// 自動削除の履歴（PIIなしの要約のみ。audit_logsから data_purge / image_purge を表示）
+app.get("/admin/purge-log", async (c) => {
+  const rows = (await c.env.DB.prepare(
+    "SELECT created_at, reservation_id, action, detail FROM audit_logs WHERE action IN ('data_purge','image_purge') ORDER BY created_at DESC LIMIT 300"
+  ).all<{ created_at: string; reservation_id: string | null; action: string; detail: string | null }>()).results ?? [];
+  const yen = (n: number) => "¥" + Number(n).toLocaleString("en-US");
+  const body = rows.map((r) => {
+    let d: any = {};
+    try { d = r.detail ? JSON.parse(r.detail) : {}; } catch { d = {}; }
+    const when = escHtml((r.created_at || "").replace("T", " ").slice(0, 16));
+    if (r.action === "data_purge") {
+      const code = escHtml(String(d.code ?? (r.reservation_id ?? "").slice(0, 10)));
+      const meta = `${d.nights ?? "?"}泊・${escHtml(String(d.channel ?? ""))}${d.source ? "/" + escHtml(String(d.source)) : ""}`;
+      const stay = `${escHtml(String(d.check_in ?? ""))}〜${escHtml(String(d.check_out ?? ""))}`;
+      const amt = d.total_amount != null ? yen(d.total_amount) : "—";
+      return `<tr><td>${when}</td><td>名簿削除</td><td>${code}<br><span class="muted">${meta}</span></td><td>${stay}</td><td>${d.guests ?? "?"}名</td><td>${amt}</td></tr>`;
+    }
+    return `<tr><td>${when}</td><td>画像削除</td><td>${escHtml(String((r.reservation_id ?? "").slice(0, 10)))}</td><td>—</td><td>—</td><td>—</td></tr>`;
+  }).join("");
+  return c.html(layout({
+    title: "削除履歴", lang: "ja", path: "/admin/purge-log", showLangs: false,
+    body: html`<div class="card">
+      ${navFor(c, "purge")}
+      <h1>自動削除の履歴</h1>
+      <p class="muted">保存期限切れ(5年)・未提出の自己申告(30日)などで自動削除した予約・画像の記録です。氏名・旅券番号・住所などの個人情報は含みません（削除済み）。</p>
+      <div style="overflow:auto">
+      <table><thead><tr><th>日時</th><th>種別</th><th>予約/コード</th><th>日程</th><th>人数</th><th>売上</th></tr></thead>
+      <tbody>${raw(body || '<tr><td colspan="6" class="muted">まだ削除履歴はありません。</td></tr>')}</tbody></table>
+      </div>
+    </div>`,
+  }));
+});
+
 // iCal取込のコア（手動ボタンとCronで共用）。actorEmail=null はCron実行。
 async function importIcalReservations(env: Env, actorEmail: string | null): Promise<{ imported: number; updated: number }> {
   let imported = 0, updated = 0;
@@ -1065,8 +1098,8 @@ async function purgeExpiredData(env: Env): Promise<{ imagesPurged: number; reser
 
   // フェーズA: 画像のみ保存期限切れ（img_purge_at <= now）→ KVから画像を消しメタをクリア
   const imgRows = await env.DB.prepare(
-    "SELECT id, passport_img_key FROM guests WHERE passport_img_key IS NOT NULL AND img_purge_at IS NOT NULL AND img_purge_at <= ?"
-  ).bind(now).all<{ id: string; passport_img_key: string }>();
+    "SELECT id, reservation_id, passport_img_key FROM guests WHERE passport_img_key IS NOT NULL AND img_purge_at IS NOT NULL AND img_purge_at <= ?"
+  ).bind(now).all<{ id: string; reservation_id: string; passport_img_key: string }>();
   for (const g of imgRows.results ?? []) {
     // KV削除が成功したときだけDBメタをクリア。失敗時はキーを残し次回cronで再試行する。
     // （先にDBを消すと「KVに画像が残ったまま参照キーを失う」＝削除したつもりのPII残存になるため）
@@ -1076,13 +1109,16 @@ async function purgeExpiredData(env: Env): Promise<{ imagesPurged: number; reser
     await env.DB.prepare(
       "UPDATE guests SET passport_img_key=NULL, passport_img_mime=NULL, passport_img_size=NULL, updated_at=? WHERE id=?"
     ).bind(now, g.id).run();
+    // 画像の自動削除も履歴に残す（内部IDのみ・PIIなし）
+    await appendAudit(env, { reservationId: g.reservation_id, guestId: g.id, actorType: "system", action: "image_purge", detail: { reason: "image_retention_expired" } });
     imagesPurged++;
   }
 
   // フェーズB: 名簿本体の保存期限切れ（data_purge_at <= now）→ 予約と全子テーブルを完全削除
+  // 管理側が「何がいつ消えたか」を把握できるよう、削除前にPIIを含まない要約を取得して履歴に残す。
   const resRows = await env.DB.prepare(
-    "SELECT id FROM reservations WHERE data_purge_at IS NOT NULL AND data_purge_at <= ?"
-  ).bind(now).all<{ id: string }>();
+    "SELECT id, airbnb_reservation_code, check_in_date, check_out_date, nights, channel, source, review_status, total_amount, cleaning_fee FROM reservations WHERE data_purge_at IS NOT NULL AND data_purge_at <= ?"
+  ).bind(now).all<{ id: string; airbnb_reservation_code: string | null; check_in_date: string; check_out_date: string; nights: number; channel: string; source: string; review_status: string; total_amount: number | null; cleaning_fee: number | null }>();
   for (const r of resRows.results ?? []) {
     // 配下guestの画像をKVから先に削除。1つでも失敗したらこの予約のDB削除は見送り次回再試行する。
     // （DBを先に消すとKV画像が孤児として永久残存＝削除したつもりのPII残存になるため）
@@ -1092,8 +1128,18 @@ async function purgeExpiredData(env: Env): Promise<{ imagesPurged: number; reser
     let kvAllOk = true;
     for (const g of gs.results ?? []) { try { await env.KV.delete(g.passport_img_key); } catch { kvAllOk = false; } }
     if (!kvAllOk) { console.error("[purge] KV delete failed (resB), skip & retry next run:", r.id); continue; }
-    // 削除前に監査記録（reservation_idを残す。PIIは含めない。audit_logsはFK無しで残存）
-    await appendAudit(env, { reservationId: r.id, actorType: "system", action: "data_purge", detail: { reason: "retention_expired" } });
+    // 削除前に履歴記録：氏名/旅券/住所等のPIIは含めず、予約コード・日程・人数・チャネル・金額の要約のみ。
+    // audit_logsはFK無しの追記専用なので予約削除後も「削除した事実と概要」が永続的に残る。
+    const gc = await env.DB.prepare("SELECT COUNT(*) AS c FROM guests WHERE reservation_id=?").bind(r.id).first<{ c: number }>();
+    await appendAudit(env, {
+      reservationId: r.id, actorType: "system", action: "data_purge",
+      detail: {
+        reason: "retention_expired",
+        code: r.airbnb_reservation_code, check_in: r.check_in_date, check_out: r.check_out_date,
+        nights: r.nights, channel: r.channel, source: r.source, review_status: r.review_status,
+        guests: gc?.c ?? 0, total_amount: r.total_amount, cleaning_fee: r.cleaning_fee,
+      },
+    });
     // 子テーブル→親の順に明示削除（D1のFK/CASCADE設定に依存せず確実に全消去）。batchでアトミック実行。
     await env.DB.batch([
       env.DB.prepare("DELETE FROM guest_tokens WHERE guest_id IN (SELECT id FROM guests WHERE reservation_id=?)").bind(r.id),
