@@ -741,13 +741,17 @@ async function importIcalReservations(env: Env, actorEmail: string | null): Prom
   for (const ev of events) {
     const n = nights(ev.start, ev.end);
     if (n <= 0) continue;
-    const existing = await env.DB.prepare("SELECT id FROM reservations WHERE ical_uid=?").bind(ev.uid).first<{ id: string }>();
+    const existing = await env.DB.prepare("SELECT id, created_at FROM reservations WHERE ical_uid=?").bind(ev.uid).first<{ id: string; created_at: string }>();
+    const retention = parseInt(env.DATA_RETENTION_YEARS || "5", 10);
     if (existing) {
-      await env.DB.prepare("UPDATE reservations SET check_in_date=?, check_out_date=?, nights=?, airbnb_reservation_code=COALESCE(airbnb_reservation_code, ?), updated_at=? WHERE id=?").bind(ev.start, ev.end, n, ev.code ?? null, now, existing.id).run();
+      // チェックアウト変更に追従して保持期限(data_purge_at/img_purge_at)を再計算（早すぎる削除/過剰保持を防止）
+      const purge = addYears(laterIso(existing.created_at, ev.end + "T00:00:00Z"), retention);
+      await env.DB.prepare("UPDATE reservations SET check_in_date=?, check_out_date=?, nights=?, airbnb_reservation_code=COALESCE(airbnb_reservation_code, ?), data_purge_at=?, updated_at=? WHERE id=?").bind(ev.start, ev.end, n, ev.code ?? null, purge, now, existing.id).run();
+      await env.DB.prepare("UPDATE guests SET img_purge_at=?, updated_at=? WHERE reservation_id=?").bind(addYears(ev.end + "T00:00:00Z", retention), now, existing.id).run();
       updated++;
     } else {
       const id = newId("r_");
-      const purge = addYears(laterIso(now, ev.end + "T00:00:00Z"), parseInt(env.DATA_RETENTION_YEARS || "5", 10));
+      const purge = addYears(laterIso(now, ev.end + "T00:00:00Z"), retention);
       await env.DB.prepare(
         `INSERT INTO reservations (id, airbnb_reservation_code, property_name, check_in_date, check_out_date, nights, expected_guests, preferred_lang, ical_uid, status, review_status, currency, channel, source, created_at, updated_at, data_purge_at)
          VALUES (?,?,?,?,?,?,0,'ja',?, 'open','pending','JPY','airbnb','ical',?,?,?)`
@@ -922,7 +926,7 @@ app.get("/pin/:token", async (c) => {
   return c.html(layout({ title: "Hilltop Zushi", lang: "ja", path: "/pin", body: messagePage("ja", { title: "チェックイン情報", message: "（ここに暗証番号が表示されます。MVPでは番号管理は未実装）", kind: "ok" }) }));
 });
 
-// 保存期限切れデータの自動削除。画像=KVから削除、名簿本体=予約ごとD1から完全削除（CASCADE）。
+// 保存期限切れデータの自動削除。画像=KVから削除、名簿本体=予約と全子テーブルを明示削除。
 // 監査ログ(audit_logs)はFK無しの追記専用なので削除後も証跡として残る。冪等（再実行で対象0件）。
 async function purgeExpiredData(env: Env): Promise<{ imagesPurged: number; reservationsPurged: number }> {
   const now = nowIso();
@@ -933,26 +937,43 @@ async function purgeExpiredData(env: Env): Promise<{ imagesPurged: number; reser
     "SELECT id, passport_img_key FROM guests WHERE passport_img_key IS NOT NULL AND img_purge_at IS NOT NULL AND img_purge_at <= ?"
   ).bind(now).all<{ id: string; passport_img_key: string }>();
   for (const g of imgRows.results ?? []) {
-    try { await env.KV.delete(g.passport_img_key); } catch { /* KV不在は無視 */ }
+    // KV削除が成功したときだけDBメタをクリア。失敗時はキーを残し次回cronで再試行する。
+    // （先にDBを消すと「KVに画像が残ったまま参照キーを失う」＝削除したつもりのPII残存になるため）
+    let kvOk = true;
+    try { await env.KV.delete(g.passport_img_key); } catch { kvOk = false; }
+    if (!kvOk) { console.error("[purge] KV delete failed (imgA), retry next run:", g.id); continue; }
     await env.DB.prepare(
       "UPDATE guests SET passport_img_key=NULL, passport_img_mime=NULL, passport_img_size=NULL, updated_at=? WHERE id=?"
     ).bind(now, g.id).run();
     imagesPurged++;
   }
 
-  // フェーズB: 名簿本体の保存期限切れ（data_purge_at <= now）→ 予約ごと完全削除
+  // フェーズB: 名簿本体の保存期限切れ（data_purge_at <= now）→ 予約と全子テーブルを完全削除
   const resRows = await env.DB.prepare(
     "SELECT id FROM reservations WHERE data_purge_at IS NOT NULL AND data_purge_at <= ?"
   ).bind(now).all<{ id: string }>();
   for (const r of resRows.results ?? []) {
-    // 残存画像をKVから掃除（フェーズAで消えていない分の保険）
+    // 配下guestの画像をKVから先に削除。1つでも失敗したらこの予約のDB削除は見送り次回再試行する。
+    // （DBを先に消すとKV画像が孤児として永久残存＝削除したつもりのPII残存になるため）
     const gs = await env.DB.prepare(
       "SELECT passport_img_key FROM guests WHERE reservation_id=? AND passport_img_key IS NOT NULL"
     ).bind(r.id).all<{ passport_img_key: string }>();
-    for (const g of gs.results ?? []) { try { await env.KV.delete(g.passport_img_key); } catch { /* 無視 */ } }
-    // 削除前に監査記録（reservation_idを残す。PIIは含めない）
+    let kvAllOk = true;
+    for (const g of gs.results ?? []) { try { await env.KV.delete(g.passport_img_key); } catch { kvAllOk = false; } }
+    if (!kvAllOk) { console.error("[purge] KV delete failed (resB), skip & retry next run:", r.id); continue; }
+    // 削除前に監査記録（reservation_idを残す。PIIは含めない。audit_logsはFK無しで残存）
     await appendAudit(env, { reservationId: r.id, actorType: "system", action: "data_purge", detail: { reason: "retention_expired" } });
-    await env.DB.prepare("DELETE FROM reservations WHERE id=?").bind(r.id).run(); // CASCADEでguests/tokens等も削除
+    // 子テーブル→親の順に明示削除（D1のFK/CASCADE設定に依存せず確実に全消去）。batchでアトミック実行。
+    await env.DB.batch([
+      env.DB.prepare("DELETE FROM guest_tokens WHERE guest_id IN (SELECT id FROM guests WHERE reservation_id=?)").bind(r.id),
+      env.DB.prepare("DELETE FROM guests WHERE reservation_id=?").bind(r.id),
+      env.DB.prepare("DELETE FROM group_tokens WHERE reservation_id=?").bind(r.id),
+      env.DB.prepare("DELETE FROM pin_view_tokens WHERE reservation_id=?").bind(r.id),
+      env.DB.prepare("DELETE FROM blacklist_hits WHERE reservation_id=?").bind(r.id),
+      env.DB.prepare("DELETE FROM reminders WHERE reservation_id=?").bind(r.id),
+      env.DB.prepare("DELETE FROM keybox_codes WHERE reservation_id=?").bind(r.id),
+      env.DB.prepare("DELETE FROM reservations WHERE id=?").bind(r.id),
+    ]);
     reservationsPurged++;
   }
   return { imagesPurged, reservationsPurged };
