@@ -21,6 +21,55 @@ export const T: Dict = {
   verify_failed: { ja: "予約が見つかりませんでした。入力をご確認ください。", en: "Booking not found. Please check your input.", "zh-CN": "未找到预订，请检查输入。", "zh-TW": "找不到預訂，請檢查輸入。" },
   too_many: { ja: "試行回数が多すぎます。しばらくしてからお試しください。", en: "Too many attempts. Please try again later.", "zh-CN": "尝试次数过多，请稍后再试。", "zh-TW": "嘗試次數過多，請稍後再試。" },
 
+  // 予約元の選択（直予約 / OTA）
+  choose_channel_title: { ja: "ご予約はどちらからですか？", en: "Where did you book?", "zh-CN": "您从哪里预订的？", "zh-TW": "您從哪裡預訂的？" },
+  choose_channel_desc: {
+    ja: "ご予約の経路を選んでください。経路に合わせてご案内します。",
+    en: "Please choose how you booked. The next step depends on it.",
+    "zh-CN": "请选择您的预订渠道，后续步骤会据此调整。",
+    "zh-TW": "請選擇您的預訂管道，後續步驟會據此調整。",
+  },
+  channel_direct: { ja: "直接予約（公式サイト・電話など）", en: "Direct (official site / phone)", "zh-CN": "直接预订（官网 / 电话）", "zh-TW": "直接預訂（官網 / 電話）" },
+  channel_airbnb: { ja: "Airbnb で予約", en: "Booked on Airbnb", "zh-CN": "通过 Airbnb（爱彼迎）预订", "zh-TW": "透過 Airbnb 預訂" },
+  channel_booking: { ja: "Booking.com で予約", en: "Booked on Booking.com", "zh-CN": "通过 Booking.com（缤客）预订", "zh-TW": "透過 Booking.com 預訂" },
+  back: { ja: "戻る", en: "Back", "zh-CN": "返回", "zh-TW": "返回" },
+  continue: { ja: "この内容で進む", en: "Continue", "zh-CN": "继续", "zh-TW": "繼續" },
+
+  // OTA（Airbnb / Booking.com）入口
+  ota_title: { ja: "予約コードの確認", en: "Confirm your reservation code", "zh-CN": "确认您的预订号", "zh-TW": "確認您的預訂號碼" },
+  ota_desc: {
+    ja: "予約コードは、予約サイトから届いた確認メール／メッセージに記載されています（例: HMAPDB2SSB）。ご確認のうえご入力ください。照合は行わず、このまま登録に進めます。",
+    en: "Your reservation code is in the confirmation email/message from the booking site (e.g. HMAPDB2SSB). Enter it to continue — no verification required.",
+    "zh-CN": "预订号显示在预订网站发来的确认邮件/消息中（例如 HMAPDB2SSB）。输入后即可继续，无需核对。",
+    "zh-TW": "預訂號顯示在預訂網站寄來的確認郵件/訊息中（例如 HMAPDB2SSB）。輸入後即可繼續，無需核對。",
+  },
+  check_in: { ja: "チェックイン日", en: "Check-in date", "zh-CN": "入住日期", "zh-TW": "入住日期" },
+  check_out: { ja: "チェックアウト日", en: "Check-out date", "zh-CN": "退房日期", "zh-TW": "退房日期" },
+  ota_next_note: {
+    ja: "次の画面で人数を入力し、代表者のメールアドレス（連絡先）をお伺いします。",
+    en: "Next, you'll enter the number of guests and the lead guest's email (contact).",
+    "zh-CN": "下一步将填写人数，并询问代表的电子邮箱（联系方式）。",
+    "zh-TW": "下一步將填寫人數，並詢問代表的電子郵件（聯絡方式）。",
+  },
+  email_rep_req_note: {
+    ja: "OTA（Airbnb/Booking.com）予約は連絡先確保のため、代表者のメールは必須です。",
+    en: "For OTA (Airbnb/Booking.com) bookings, the lead guest's email is required so we can reach you.",
+    "zh-CN": "OTA（Airbnb/Booking.com）预订需填写代表邮箱以便联系。",
+    "zh-TW": "OTA（Airbnb/Booking.com）預訂需填寫代表電子郵件以便聯絡。",
+  },
+  err_code_format: {
+    ja: "予約コードの形式が正しくありません（英数字とハイフン・6〜20文字）。",
+    en: "Invalid reservation code (letters, digits, hyphen; 6–20 characters).",
+    "zh-CN": "预订号格式不正确（字母、数字、连字符；6–20位）。",
+    "zh-TW": "預訂號格式不正確（字母、數字、連字號；6–20位）。",
+  },
+  err_dates: {
+    ja: "宿泊日が正しくありません（泊数1〜30・直近の日程でご入力ください）。",
+    en: "Invalid stay dates (1–30 nights, near-term dates only).",
+    "zh-CN": "住宿日期不正确（1–30晚，且需为近期日期）。",
+    "zh-TW": "住宿日期不正確（1–30晚，且需為近期日期）。",
+  },
+
   // 人数申告
   declare_title: { ja: "宿泊人数の申告（代表者）", en: "Number of guests (lead)", "zh-CN": "住宿人数（代表）", "zh-TW": "住宿人數（代表）" },
   declare_desc: {

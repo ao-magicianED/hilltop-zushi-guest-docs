@@ -8,6 +8,8 @@ export type ResForMetrics = {
   cleaning_fee: number | null;
   channel: string;
   status: string;
+  review_status: string;
+  source: string;
 };
 
 function days(dateStr: string): number {
@@ -54,6 +56,8 @@ export function computeMonthly(reservations: ResForMetrics[], year: number, mont
 
   for (const r of reservations) {
     if (r.status === "cancelled") continue;
+    // 未承認の自己申告（OTA突合なし）は売上・稼働の実績に混ぜない（承認で実績へ昇格）
+    if (r.source === "guest_selfreport" && r.review_status !== "approved") continue;
     const totalNights = days(r.check_out_date) - days(r.check_in_date);
     if (totalNights <= 0) continue;
     const nin = overlapNights(r.check_in_date, r.check_out_date, mStart, mEnd);

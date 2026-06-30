@@ -34,12 +34,14 @@ export function reservationsPage(opts: {
       const amt = r.total_amount != null ? yen(r.total_amount) : "—";
       const prog = `${r.done}/${r.expected_guests || "?"}`;
       const st = r.status === "cancelled" ? "取消" : r.status;
+      const rv = r.review_status === "approved" ? "承認済" : "未確認";
+      const selfBadge = r.source === "guest_selfreport" ? '<br><span class="badge pending">自己申告</span>' : "";
       return `<tr>
         <td><a href="/admin/reservations/${r.id}">${code}</a><br><span class="muted">${nm}</span></td>
         <td>${r.check_in_date}〜${r.check_out_date}<br><span class="muted">${r.nights}泊・${esc(r.channel)}</span></td>
         <td>${prog}</td>
         <td>${amt}</td>
-        <td>${st}</td>
+        <td>${st}<br><span class="muted">${rv}</span>${selfBadge}</td>
       </tr>`;
     })
     .join("");
@@ -96,7 +98,7 @@ export function reservationForm(opts: { nav: HE; res?: Reservation; error?: stri
       <label>言語</label>
       <select name="preferred_lang">${raw(langOpt("ja", "日本語") + langOpt("en", "English") + langOpt("zh-CN", "简体中文") + langOpt("zh-TW", "繁體中文"))}</select>
       <label>チャネル</label>
-      <select name="channel">${raw(chOpt("airbnb", "Airbnb") + chOpt("direct", "直販") + chOpt("other", "その他"))}</select>
+      <select name="channel">${raw(chOpt("airbnb", "Airbnb") + chOpt("booking", "Booking.com") + chOpt("direct", "直販") + chOpt("other", "その他"))}</select>
       <label>総額（円・税送料込みの受取額）</label>
       <input type="number" name="total_amount" min="0" value="${v(r?.total_amount)}">
       <label>清掃料（円・ADRは総額−清掃料で算出）</label>

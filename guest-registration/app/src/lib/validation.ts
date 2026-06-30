@@ -24,7 +24,13 @@ export function isForeignerNeedingPassport(input: GuestInput): boolean {
   return input.has_jp_address === "0" && input.nationality !== "JP";
 }
 
-export function validateGuest(input: GuestInput): { ok: boolean; errors: FieldErrors } {
+// メール形式の最小チェック（厳密RFCではなく実用十分）
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function validateGuest(
+  input: GuestInput,
+  opts: { requireEmail?: boolean } = {}
+): { ok: boolean; errors: FieldErrors } {
   const e: FieldErrors = {};
   if (!input.full_name.trim()) e.full_name = true;
   if (input.has_jp_address !== "0" && input.has_jp_address !== "1") e.has_jp_address = true;
@@ -44,6 +50,11 @@ export function validateGuest(input: GuestInput): { ok: boolean; errors: FieldEr
 
   // 代表者は当日連絡先（電話）必須
   if (input.member_role === "representative" && !input.phone.trim()) e.phone = true;
+
+  // OTA経由（予約者情報が無い）の代表者はメール必須。値があれば形式も検証。
+  const isRep = input.member_role === "representative";
+  if (opts.requireEmail && isRep && !input.email.trim()) e.email = true;
+  if (input.email.trim() && !EMAIL_RE.test(input.email.trim())) e.email = true;
 
   return { ok: Object.keys(e).length === 0, errors: e };
 }

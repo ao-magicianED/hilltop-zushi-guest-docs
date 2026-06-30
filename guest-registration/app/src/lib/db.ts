@@ -87,6 +87,89 @@ export function checkoutExpiry(checkout: string): string {
 export function normalizeName(s: string): string {
   return s.normalize("NFKC").toLowerCase().replace(/\s+/g, "");
 }
+/** 日付に日数を加算（YYYY-MM-DD or ISO 入力に対応） */
+export function addDays(dateStr: string, days: number): string {
+  const d = new Date(dateStr + (dateStr.length === 10 ? "T00:00:00Z" : ""));
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString();
+}
+/** YYYY-MM-DD を「1970-01-01からの通算日」に。範囲計算用。 */
+export function daysFromYmd(ymd: string): number {
+  return Math.floor(Date.parse(ymd + "T00:00:00Z") / 86400000);
+}
+/** JST基準の今日（YYYY-MM-DD）。日付妥当性の起点に使う。 */
+export function jstTodayYmd(): string {
+  return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
+// ---- OTA（Airbnb/Booking.com）自己申告まわり ----
+// pending自己申告の短期purch日数。承認/提出で法定保持(5年)へ昇格する。
+export const PENDING_PURGE_DAYS = 30;
+
+/** OTA予約コードの正規化（NFKC・大文字化・空白除去）。DBキーに任意文字列を入れない。 */
+export function normalizeOtaCode(code: string): string {
+  return code.normalize("NFKC").toUpperCase().replace(/\s+/g, "").trim();
+}
+/** OTA予約コードの形式検証（英数とハイフン・6〜20文字）。例: HMAPDB2SSB */
+export function isValidOtaCode(code: string): boolean {
+  return /^[A-Z0-9-]{6,20}$/.test(code);
+}
+
+export type StayDateCheck = { ok: boolean; nights: number; error?: "format" | "nights" | "range" };
+/** ゲスト自己申告の宿泊日を検証（泊数1〜30・CIは今日-3〜+180日・COは+210日以内）。
+ * 直近予約の実運用に合わせて狭め、遠い未来の架空pending量産・枠汚染の余地を減らす。 */
+export function validateStayDates(ci: string, co: string): StayDateCheck {
+  const re = /^\d{4}-\d{2}-\d{2}$/;
+  if (!re.test(ci) || !re.test(co)) return { ok: false, nights: 0, error: "format" };
+  const ciD = daysFromYmd(ci);
+  const coD = daysFromYmd(co);
+  if (Number.isNaN(ciD) || Number.isNaN(coD)) return { ok: false, nights: 0, error: "format" };
+  const nights = coD - ciD;
+  if (nights < 1 || nights > 30) return { ok: false, nights, error: "nights" };
+  const today = daysFromYmd(jstTodayYmd());
+  if (ciD < today - 3 || ciD > today + 180 || coD > today + 210) return { ok: false, nights, error: "range" };
+  return { ok: true, nights };
+}
+
+/** 同一OTAコードの非取消予約を新しい順で取得（突合せず attach 判定に使う）。 */
+export async function findReservationsByOtaCode(env: Env, code: string): Promise<Reservation[]> {
+  const r = await env.DB.prepare(
+    "SELECT * FROM reservations WHERE airbnb_reservation_code = ? AND status != 'cancelled' ORDER BY created_at DESC"
+  )
+    .bind(code)
+    .all<Reservation>();
+  return r.results ?? [];
+}
+/** 既存予約の日程とゲスト入力が完全一致するか（自動ひも付けの条件）。 */
+export function datesAlign(res: Reservation, ci: string, co: string): boolean {
+  return res.check_in_date === ci && res.check_out_date === co;
+}
+
+/** OTA自己申告の新規予約を作成（pending隔離・短期purch）。突合はしない。 */
+export async function createSelfReportReservation(
+  env: Env,
+  args: { channel: string; code: string; ci: string; co: string; nights: number; lang: string; propertyName: string }
+): Promise<Reservation> {
+  const id = newId("r_");
+  const now = nowIso();
+  const purge = addDays(now, PENDING_PURGE_DAYS); // pendingは短期。提出/承認で昇格。
+  await env.DB.prepare(
+    `INSERT INTO reservations (id, airbnb_reservation_code, property_name, check_in_date, check_out_date, nights, expected_guests, preferred_lang, status, review_status, currency, channel, source, created_at, updated_at, data_purge_at)
+     VALUES (?,?,?,?,?,?,0,?, 'open','pending','JPY',?, 'guest_selfreport', ?, ?, ?)`
+  )
+    .bind(id, args.code, args.propertyName, args.ci, args.co, args.nights, args.lang, args.channel, now, now, purge)
+    .run();
+  return (await getReservation(env, id))!;
+}
+
+/** pending自己申告を法定保持(5年)へ昇格（提出/承認時）。data_purge_atを作成日とCOの遅い方+保持年数に。 */
+export async function promoteSelfReportRetention(env: Env, res: Reservation, retentionYears: number): Promise<void> {
+  if (res.source !== "guest_selfreport") return;
+  const purge = addYears(laterIso(res.created_at, res.check_out_date + "T00:00:00Z"), retentionYears);
+  await env.DB.prepare("UPDATE reservations SET data_purge_at = ?, updated_at = ? WHERE id = ?")
+    .bind(purge, nowIso(), res.id)
+    .run();
+}
 
 // ---- レート制限（KV）----
 export async function rateLimit(env: Env, key: string, limit: number, windowSec: number): Promise<boolean> {
@@ -102,16 +185,38 @@ export async function getReservation(env: Env, id: string): Promise<Reservation 
   return await env.DB.prepare("SELECT * FROM reservations WHERE id = ?").bind(id).first<Reservation>();
 }
 
-/** 入口の二要素マッチ（予約番号＋姓）。設計 E-1 */
+/** 入口の二要素マッチ（予約番号＋姓）。設計 E-1
+ * 自己申告(guest_selfreport)行は match_last_name=NULL のため姓照合が効かない。
+ * これらを直予約導線から引き当てると姓保護をすり抜けて他人の予約へ到達できるため除外する。 */
 export async function verifyReservation(env: Env, code: string, lastName: string): Promise<Reservation | null> {
   const res = await env.DB.prepare(
-    "SELECT * FROM reservations WHERE airbnb_reservation_code = ? AND status != 'cancelled'"
+    "SELECT * FROM reservations WHERE airbnb_reservation_code = ? AND status != 'cancelled' AND source != 'guest_selfreport'"
   )
     .bind(code.trim())
     .first<Reservation>();
   if (!res) return null;
   if (res.match_last_name && res.match_last_name !== normalizeName(lastName)) return null;
   return res;
+}
+
+/** 予約に「提出済み」ゲストが1名でもいるか。OTA自動合流の可否（既存PII露出の防止）に使う。 */
+export async function hasSubmittedGuests(env: Env, reservationId: string): Promise<boolean> {
+  const r = await env.DB.prepare(
+    "SELECT 1 FROM guests WHERE reservation_id = ? AND submit_status = 'submitted' LIMIT 1"
+  )
+    .bind(reservationId)
+    .first<{ 1: number }>();
+  return !!r;
+}
+
+/** 直近の自己申告作成回数（IPハッシュ単位）。KVレート制限のTOCTOUを補うD1ベースの上限判定に使う。 */
+export async function recentSelfReportCount(env: Env, ipHash: string, sinceIso: string): Promise<number> {
+  const r = await env.DB.prepare(
+    "SELECT COUNT(*) AS c FROM audit_logs WHERE ip_hash = ? AND action IN ('ota_selfreport_new','ota_selfreport_mismatch') AND created_at >= ?"
+  )
+    .bind(ipHash, sinceIso)
+    .first<{ c: number }>();
+  return r?.c ?? 0;
 }
 
 // ---- トークン ----
@@ -174,7 +279,8 @@ export async function declareGuests(
 
   const out: { guestId: string; slotNo: number; role: string; token: string }[] = [];
   const now = nowIso();
-  const imgPurge = addYears(res.check_out_date, parseInt(env.DATA_RETENTION_YEARS || "5", 10));
+  // 画像の保持満了も本体(data_purge_at)と同じく「作成日とCOの遅い方」基準に揃える（画像だけ先に消える非対称を防ぐ）
+  const imgPurge = addYears(laterIso(res.created_at, res.check_out_date + "T00:00:00Z"), parseInt(env.DATA_RETENTION_YEARS || "5", 10));
 
   for (let slot = 1; slot <= count; slot++) {
     const guestId = newId("g_");
@@ -197,7 +303,11 @@ export async function declareGuests(
   }
 
   // expected_guests と data_purge_at を更新
-  const dataPurge = addYears(laterIso(res.created_at, res.check_out_date + "T00:00:00Z"), parseInt(env.DATA_RETENTION_YEARS || "5", 10));
+  // 自己申告pendingは「短期purch」を維持（提出/承認で法定保持へ昇格）。濫用での過剰保持を防ぐ。
+  const isPendingSelfReport = res.source === "guest_selfreport" && res.review_status !== "approved";
+  const dataPurge = isPendingSelfReport
+    ? res.data_purge_at ?? addDays(res.created_at, PENDING_PURGE_DAYS)
+    : addYears(laterIso(res.created_at, res.check_out_date + "T00:00:00Z"), parseInt(env.DATA_RETENTION_YEARS || "5", 10));
   await env.DB.prepare(
     "UPDATE reservations SET declared_guests = ?, expected_guests = ?, data_purge_at = ?, updated_at = ? WHERE id = ?"
   )

@@ -4,7 +4,7 @@ import { html, raw } from "hono/html";
 import type { Env, Lang } from "./types";
 import { normalizeLang } from "./types";
 import { layout } from "./views/layout";
-import { startPage, declarePage, progressPage, formPage, messagePage } from "./views/guest";
+import { startPage, channelChooserPage, declarePage, progressPage, formPage, messagePage, type StartChannel } from "./views/guest";
 import {
   verifyReservation,
   createGroupToken,
@@ -19,7 +19,18 @@ import {
   rateLimit,
   nowIso,
   checkoutExpiry,
+  normalizeOtaCode,
+  isValidOtaCode,
+  validateStayDates,
+  findReservationsByOtaCode,
+  datesAlign,
+  createSelfReportReservation,
+  promoteSelfReportRetention,
+  hasSubmittedGuests,
+  recentSelfReportCount,
+  addDays,
   type Guest,
+  type Reservation,
 } from "./lib/db";
 import { encryptField, decryptField, encryptBytes, decryptBytes } from "./lib/crypto";
 import { hashToken, sha256Hex, timingSafeEqual, generateToken, newId } from "./lib/tokens";
@@ -90,35 +101,106 @@ app.use("*", async (c, next) => {
 
 app.get("/", (c) => c.redirect(`/start?lang=${pickLang(c)}`));
 
+function parseChannel(raw: string | undefined | null): StartChannel | null {
+  return raw === "direct" || raw === "airbnb" || raw === "booking" ? raw : null;
+}
+
+// OTA（自己申告 or Airbnb/Booking.com）は予約者情報が無いため、代表者メールを必須にする
+function otaRequiresEmail(res: Reservation | null): boolean {
+  return !!res && (res.source === "guest_selfreport" || res.channel === "airbnb" || res.channel === "booking");
+}
+
+// 予約元の選択 → 各チャネルの入口
 app.get("/start", (c) => {
   const lang = pickLang(c);
-  return c.html(layout({ title: t(lang, "app_title"), lang, path: "/start", body: startPage(lang, {}) }));
+  const channel = parseChannel(c.req.query("channel"));
+  if (!channel) {
+    return c.html(layout({ title: t(lang, "app_title"), lang, path: "/start", body: channelChooserPage(lang) }));
+  }
+  // OTAは言語切替(GET再訪)で入力が消えないよう、クエリから値を復元してプレフィル
+  const code = c.req.query("code") || undefined;
+  const checkIn = c.req.query("check_in") || undefined;
+  const checkOut = c.req.query("check_out") || undefined;
+  const qs = [
+    `channel=${channel}`,
+    code ? `code=${encodeURIComponent(code)}` : "",
+    checkIn ? `check_in=${encodeURIComponent(checkIn)}` : "",
+    checkOut ? `check_out=${encodeURIComponent(checkOut)}` : "",
+  ].filter(Boolean).join("&");
+  return c.html(layout({ title: t(lang, "app_title"), lang, path: `/start?${qs}`, body: startPage(lang, { channel, code, checkIn, checkOut }) }));
 });
 
 app.post("/start", async (c) => {
   const lang = pickLang(c);
-  const ok = await rateLimit(c.env, `start:${await hashToken(ipHashKey(c))}`, 10, 600);
-  if (!ok) {
-    return c.html(
-      layout({ title: t(lang, "app_title"), lang, path: "/start", body: startPage(lang, { error: t(lang, "too_many") }) })
-    );
-  }
   const body = await c.req.parseBody();
-  const code = String(body.code ?? "").trim();
-  const lastName = String(body.last_name ?? "").trim();
-  const res = await verifyReservation(c.env, code, lastName);
-  if (!res) {
-    return c.html(
-      layout({
-        title: t(lang, "app_title"),
-        lang,
-        path: "/start",
-        body: startPage(lang, { error: t(lang, "verify_failed"), code }),
-      })
-    );
+  const channel = parseChannel(String(body.channel ?? "")) ?? "direct";
+  const path = `/start?channel=${channel}`;
+  const ipHash = await hashToken(ipHashKey(c));
+
+  // ハニーポット：見えない罠欄が埋まっていればbotとみなし黙って弾く
+  if (String(body.hp_extra ?? "").trim() !== "") {
+    return c.html(layout({ title: t(lang, "app_title"), lang, path, body: startPage(lang, { channel, error: t(lang, "verify_failed") }) }));
+  }
+  if (!(await rateLimit(c.env, `start:${ipHash}`, 10, 600))) {
+    return c.html(layout({ title: t(lang, "app_title"), lang, path, body: startPage(lang, { channel, error: t(lang, "too_many") }) }));
+  }
+
+  // ---- 直予約：従来どおり 予約番号＋姓で突合 ----
+  if (channel === "direct") {
+    const code = String(body.code ?? "").trim();
+    const lastName = String(body.last_name ?? "").trim();
+    const res = await verifyReservation(c.env, code, lastName);
+    if (!res) {
+      return c.html(layout({ title: t(lang, "app_title"), lang, path, body: startPage(lang, { channel, error: t(lang, "verify_failed"), code }) }));
+    }
+    const token = await createGroupToken(c.env, res.id, checkoutExpiry(res.check_out_date));
+    await appendAudit(c.env, { reservationId: res.id, actorType: "guest", action: "start_verified", detail: { channel }, ipHash });
+    return c.redirect(`/g/${token}?lang=${lang}`);
+  }
+
+  // ---- OTA(Airbnb/Booking.com)：突合なし。コード＋日付を検証し、安全に合流できる場合のみattach、無ければpending新規 ----
+  const rawCode = String(body.code ?? "");
+  const code = normalizeOtaCode(rawCode);
+  const ci = String(body.check_in ?? "").trim();
+  const co = String(body.check_out ?? "").trim();
+  if (!isValidOtaCode(code)) {
+    return c.html(layout({ title: t(lang, "app_title"), lang, path, body: startPage(lang, { channel, error: t(lang, "err_code_format"), code: rawCode, checkIn: ci, checkOut: co }) }));
+  }
+  const dv = validateStayDates(ci, co);
+  if (!dv.ok) {
+    return c.html(layout({ title: t(lang, "app_title"), lang, path, body: startPage(lang, { channel, error: t(lang, "err_dates"), code, checkIn: ci, checkOut: co }) }));
+  }
+
+  // 自動合流の対象は「OTA予約(airbnb/booking) かつ 姓保護(match_last_name)なし かつ まだ誰も提出していない」
+  // 予約だけに限定する。→ 直予約の姓保護バイパス・既存提出者のPII露出（IDOR）を防ぐ。該当外は pending新規。
+  const sameCode = await findReservationsByOtaCode(c.env, code);
+  const aligned = sameCode.filter((r) => datesAlign(r, ci, co));
+  let attachTarget: Reservation | null = null;
+  if (aligned.length === 1) {
+    const cand = aligned[0]!;
+    const isOta = cand.channel === "airbnb" || cand.channel === "booking";
+    if (isOta && !cand.match_last_name && !(await hasSubmittedGuests(c.env, cand.id))) attachTarget = cand;
+  }
+
+  let res: Reservation;
+  let action: string;
+  if (attachTarget) {
+    res = attachTarget; // 正規/未提出のOTA予約に合流（売上・正式日程を継承。ゲスト入力日付は不採用）
+    action = "ota_attach";
+  } else {
+    // 新規作成のみ濫用対策を二重化：KVレート制限(1時間5件)＋D1の日次上限(IP単位20件。KVのTOCTOUを補う)
+    const tooFast = !(await rateLimit(c.env, `selfreport:${ipHash}`, 5, 3600));
+    const overDay = (await recentSelfReportCount(c.env, ipHash, addDays(nowIso(), -1))) >= 20;
+    if (tooFast || overDay) {
+      return c.html(layout({ title: t(lang, "app_title"), lang, path, body: startPage(lang, { channel, error: t(lang, "too_many"), code, checkIn: ci, checkOut: co }) }));
+    }
+    res = await createSelfReportReservation(c.env, {
+      channel, code, ci, co, nights: dv.nights, lang, propertyName: c.env.PROPERTY_NAME || "Hilltop Zushi",
+    });
+    action = sameCode.length > 0 ? "ota_selfreport_mismatch" : "ota_selfreport_new";
   }
   const token = await createGroupToken(c.env, res.id, checkoutExpiry(res.check_out_date));
-  await appendAudit(c.env, { reservationId: res.id, actorType: "guest", action: "start_verified", ipHash: await hashToken(ipHashKey(c)) });
+  await appendAudit(c.env, { reservationId: res.id, actorType: "guest", action, detail: { channel, code_match: sameCode.length, aligned: aligned.length, attached: !!attachTarget }, ipHash });
   return c.redirect(`/g/${token}?lang=${lang}`);
 });
 
@@ -154,6 +236,9 @@ app.post("/g/:token/declare", async (c) => {
   const res = await resolveGroupToken(c.env, token);
   const lang = pickLang(c, res?.preferred_lang);
   if (!res) return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "expired"), kind: "err" }) }));
+  if (!(await rateLimit(c.env, `declare:${await hashToken(ipHashKey(c))}`, 20, 600))) {
+    return c.html(layout({ title: t(lang, "declare_title"), lang, path: `/g/${token}`, body: declarePage(lang, { token, error: t(lang, "too_many") }) }));
+  }
 
   const existing = await getGuestsByReservation(c.env, res.id);
   if (existing.length > 0) return c.redirect(`/g/${token}?lang=${lang}`);
@@ -174,10 +259,15 @@ app.get("/g/:token/reveal", async (c) => {
   const res = await resolveGroupToken(c.env, token);
   const lang = pickLang(c, res?.preferred_lang);
   if (!res) return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "expired"), kind: "err" }) }));
+  if (!(await rateLimit(c.env, `reveal:${await hashToken(ipHashKey(c))}`, 20, 600))) {
+    return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "too_many"), kind: "err" }) }));
+  }
   const guests = await getGuestsByReservation(c.env, res.id);
   const out: { guestId: string; slotNo: number; role: string; token: string }[] = [];
   const exp = checkoutExpiry(res.check_out_date);
   for (const g of guests) {
+    // 提出済みゲストはトークンを再発行しない（再発行リンクで他人のPII閲覧・上書き、正規リンク失効=DoSを防ぐ）
+    if (g.submit_status === "submitted") continue;
     const tk = generateToken();
     const th = await hashToken(tk);
     // 既存トークンを失効させ、新しい個人トークンを発行
@@ -185,6 +275,7 @@ app.get("/g/:token/reveal", async (c) => {
     await c.env.DB.prepare("INSERT INTO guest_tokens (id, guest_id, token_hash, expires_at, created_at) VALUES (?,?,?,?,?)").bind(newId("pt_"), g.id, th, exp, nowIso()).run();
     out.push({ guestId: g.id, slotNo: g.slot_no, role: g.member_role, token: tk });
   }
+  await appendAudit(c.env, { reservationId: res.id, actorType: "guest", action: "reveal_links", detail: { count: out.length }, ipHash: await hashToken(ipHashKey(c)) });
   return c.html(layout({ title: t(lang, "share_links"), lang, path: `/g/${token}/reveal`, body: linksPage(lang, c.env.APP_BASE_URL, token, out) }));
 });
 
@@ -229,7 +320,9 @@ app.get("/p/:token", async (c) => {
     email: guest.email ?? "",
     choose_reason_other: guest.choose_reason_other ?? "",
   };
-  return c.html(layout({ title: t(lang, "form_title"), lang, path: `/p/${token}`, body: formPage(lang, { token, guest, isRep: guest.member_role === "representative", values }) }));
+  const resv = await getReservation(c.env, guest.reservation_id);
+  const requireEmail = otaRequiresEmail(resv);
+  return c.html(layout({ title: t(lang, "form_title"), lang, path: `/p/${token}`, body: formPage(lang, { token, guest, isRep: guest.member_role === "representative", values, requireEmail }) }));
 });
 
 // 個人入力フォーム（POST）
@@ -238,6 +331,11 @@ app.post("/p/:token", async (c) => {
   const guest = await resolveGuestToken(c.env, token);
   const lang = pickLang(c);
   if (!guest) return c.html(layout({ title: t(lang, "app_title"), lang, path: `/p/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "expired"), kind: "err" }) }));
+  if (!(await rateLimit(c.env, `submit:${await hashToken(ipHashKey(c))}`, 40, 600))) {
+    return c.html(layout({ title: t(lang, "app_title"), lang, path: `/p/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "too_many"), kind: "err" }) }));
+  }
+  const resv = await getReservation(c.env, guest.reservation_id);
+  const requireEmail = otaRequiresEmail(resv);
 
   const form = await c.req.formData();
   const get = (k: string) => String(form.get(k) ?? "").trim();
@@ -264,7 +362,7 @@ app.post("/p/:token", async (c) => {
   const consentPrivacy = form.get("consent_privacy") === "1";
   const consentCross = form.get("consent_cross_border") === "1";
 
-  const { ok, errors } = validateGuest(input);
+  const { ok, errors } = validateGuest(input, { requireEmail });
   const consentOk = consentPrivacy && consentCross;
 
   // 画像アップロード処理（あれば）
@@ -276,6 +374,7 @@ app.post("/p/:token", async (c) => {
         prev_stay: get("prev_stay"),
         next_stay: get("next_stay"),
         choose_reason_other: get("choose_reason_other"),
+        requireEmail,
       });
     }
     imgInfo = res.info;
@@ -287,6 +386,7 @@ app.post("/p/:token", async (c) => {
       prev_stay: get("prev_stay"),
       next_stay: get("next_stay"),
       choose_reason_other: get("choose_reason_other"),
+      requireEmail,
     });
   }
 
@@ -354,6 +454,11 @@ app.post("/p/:token", async (c) => {
 
   await appendAudit(c.env, { reservationId: guest.reservation_id, guestId: guest.id, actorType: "guest", action: "guest_submitted", detail: { slot: guest.slot_no, marketing } });
 
+  // 自己申告pendingは「名簿提出済み」になった時点で法定保持(5年)へ昇格（30日短期purchから移行）
+  if (resv && resv.source === "guest_selfreport") {
+    await promoteSelfReportRetention(c.env, resv, parseInt(c.env.DATA_RETENTION_YEARS || "5", 10));
+  }
+
   return c.html(layout({ title: t(lang, "submitted_ok"), lang, path: `/p/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "submitted_ok"), kind: "ok", backHref: `/p/${token}?lang=${lang}`, backLabel: t(lang, "edit_link") }) }));
 });
 
@@ -366,7 +471,7 @@ function renderFormError(
   errors: FieldErrors,
   banner?: string,
   showBanner = true,
-  extra: { prev_stay?: string; next_stay?: string; choose_reason_other?: string } = {}
+  extra: { prev_stay?: string; next_stay?: string; choose_reason_other?: string; requireEmail?: boolean } = {}
 ) {
   const values: Record<string, string> = {
     full_name: input.full_name,
@@ -386,7 +491,7 @@ function renderFormError(
   };
   const body = [
     banner ? html`<div class="card"><div class="notice err">${banner}</div></div>` : html``,
-    formPage(lang, { token, guest, isRep: guest.member_role === "representative", values, errors, showErrorBanner: showBanner }),
+    formPage(lang, { token, guest, isRep: guest.member_role === "representative", values, errors, showErrorBanner: showBanner, requireEmail: extra.requireEmail }),
   ];
   return c.html(layout({ title: t(lang, "form_title"), lang, path: `/p/${token}`, body }));
 }
@@ -647,7 +752,7 @@ app.post("/admin/reservations", async (c) => {
      VALUES (?,?,?,?,?,?,?,?,?, 'open','pending', ?,?, 'JPY', ?, 'manual', ?, ?, ?, ?)`
   ).bind(
     id,
-    String(b.airbnb_reservation_code ?? "").trim() || null,
+    String(b.airbnb_reservation_code ?? "").trim() ? normalizeOtaCode(String(b.airbnb_reservation_code)) : null,
     c.env.PROPERTY_NAME || "Hilltop Zushi",
     ci, co, n, expected, lang,
     String(b.match_last_name ?? "").trim() ? normalizeName(String(b.match_last_name)) : null,
@@ -685,7 +790,7 @@ app.post("/admin/reservations/:id", async (c) => {
   await c.env.DB.prepare(
     `UPDATE reservations SET airbnb_reservation_code=?, match_last_name=?, check_in_date=?, check_out_date=?, nights=?, expected_guests=?, preferred_lang=?, channel=?, total_amount=?, cleaning_fee=?, notes=?, updated_at=? WHERE id=?`
   ).bind(
-    String(b.airbnb_reservation_code ?? "").trim() || null,
+    String(b.airbnb_reservation_code ?? "").trim() ? normalizeOtaCode(String(b.airbnb_reservation_code)) : null,
     String(b.match_last_name ?? "").trim() ? normalizeName(String(b.match_last_name)) : null,
     ci, co, n,
     parseInt(String(b.expected_guests ?? "0"), 10) || 0,
@@ -724,7 +829,7 @@ function shiftYm(y: number, m: number, delta: number): string {
 app.get("/admin/metrics", async (c) => {
   const ym = c.req.query("ym") || "";
   const { y, m } = ymParts(ym);
-  const rs = (await c.env.DB.prepare("SELECT check_in_date, check_out_date, total_amount, cleaning_fee, channel, status FROM reservations").all<ResForMetrics>()).results ?? [];
+  const rs = (await c.env.DB.prepare("SELECT check_in_date, check_out_date, total_amount, cleaning_fee, channel, status, review_status, source FROM reservations").all<ResForMetrics>()).results ?? [];
   const metrics = computeMonthly(rs, y, m);
   const cur = `${y}-${String(m).padStart(2, "0")}`;
   return c.html(layout({ title: "指標", lang: "ja", path: "/admin/metrics", showLangs: false, body: metricsPage({ nav: navFor(c, "metrics"), m: metrics, ym: cur, prevYm: shiftYm(y, m, -1), nextYm: shiftYm(y, m, 1) }) }));
@@ -750,13 +855,36 @@ async function importIcalReservations(env: Env, actorEmail: string | null): Prom
       await env.DB.prepare("UPDATE guests SET img_purge_at=?, updated_at=? WHERE reservation_id=?").bind(addYears(ev.end + "T00:00:00Z", retention), now, existing.id).run();
       updated++;
     } else {
-      const id = newId("r_");
-      const purge = addYears(laterIso(now, ev.end + "T00:00:00Z"), retention);
-      await env.DB.prepare(
-        `INSERT INTO reservations (id, airbnb_reservation_code, property_name, check_in_date, check_out_date, nights, expected_guests, preferred_lang, ical_uid, status, review_status, currency, channel, source, created_at, updated_at, data_purge_at)
-         VALUES (?,?,?,?,?,?,0,'ja',?, 'open','pending','JPY','airbnb','ical',?,?,?)`
-      ).bind(id, ev.code ?? null, env.PROPERTY_NAME || "Hilltop Zushi", ev.start, ev.end, n, ev.uid, now, now, purge).run();
-      imported++;
+      // iCal未取込。先に自己申告pendingが「同コード＆同日程でちょうど1件」あれば正規予約として統合する。
+      // （複数候補・日付不一致は自動統合せず新規作成。重複は管理画面で人が解決＝Codex指摘B）
+      let merged = false;
+      if (ev.code) {
+        const cands = (await env.DB.prepare(
+          "SELECT id, created_at, check_in_date, check_out_date FROM reservations WHERE airbnb_reservation_code=? AND ical_uid IS NULL AND source='guest_selfreport' AND status!='cancelled'"
+        ).bind(ev.code).all<{ id: string; created_at: string; check_in_date: string; check_out_date: string }>()).results ?? [];
+        const aligned = cands.filter((r) => r.check_in_date === ev.start && r.check_out_date === ev.end);
+        if (cands.length === 1 && aligned.length === 1) {
+          const m = aligned[0]!;
+          const purge = addYears(laterIso(m.created_at, ev.end + "T00:00:00Z"), retention);
+          await env.DB.prepare(
+            "UPDATE reservations SET ical_uid=?, source='ical', check_in_date=?, check_out_date=?, nights=?, data_purge_at=?, updated_at=? WHERE id=?"
+          ).bind(ev.uid, ev.start, ev.end, n, purge, now, m.id).run();
+          // 統合先の画像保持も正式日程基準に再計算
+          await env.DB.prepare("UPDATE guests SET img_purge_at=?, updated_at=? WHERE reservation_id=?").bind(addYears(ev.end + "T00:00:00Z", retention), now, m.id).run();
+          await appendAudit(env, { reservationId: m.id, actorType: actorEmail ? "admin" : "system", actorId: actorEmail, action: "ical_merge_selfreport", detail: { uid: ev.uid, code: ev.code } });
+          merged = true;
+          updated++;
+        }
+      }
+      if (!merged) {
+        const id = newId("r_");
+        const purge = addYears(laterIso(now, ev.end + "T00:00:00Z"), retention);
+        await env.DB.prepare(
+          `INSERT INTO reservations (id, airbnb_reservation_code, property_name, check_in_date, check_out_date, nights, expected_guests, preferred_lang, ical_uid, status, review_status, currency, channel, source, created_at, updated_at, data_purge_at)
+           VALUES (?,?,?,?,?,?,0,'ja',?, 'open','pending','JPY','airbnb','ical',?,?,?)`
+        ).bind(id, ev.code ?? null, env.PROPERTY_NAME || "Hilltop Zushi", ev.start, ev.end, n, ev.uid, now, now, purge).run();
+        imported++;
+      }
     }
   }
   await appendAudit(env, { actorType: actorEmail ? "admin" : "system", actorId: actorEmail, action: "ical_import", detail: { imported, updated } });
@@ -868,6 +996,9 @@ app.get("/admin/img/:guestId", async (c) => {
 app.post("/admin/r/:id/approve", async (c) => {
   const id = c.req.param("id");
   await c.env.DB.prepare("UPDATE reservations SET review_status='approved', updated_at=? WHERE id=?").bind(nowIso(), id).run();
+  // 承認＝正式予約として確定。自己申告pendingなら短期purchから法定保持(5年)へ昇格。
+  const res = await getReservation(c.env, id);
+  if (res) await promoteSelfReportRetention(c.env, res, parseInt(c.env.DATA_RETENTION_YEARS || "5", 10));
   await appendAudit(c.env, { reservationId: id, actorType: "admin", actorId: c.get("admin").email, action: "approve_reservation" });
   return c.redirect(`/admin/r/${id}`);
 });

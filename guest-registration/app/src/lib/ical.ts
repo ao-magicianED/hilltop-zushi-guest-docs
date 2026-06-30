@@ -38,7 +38,8 @@ export function parseIcal(text: string): IcalEvent[] {
       cur = {};
     } else if (line.startsWith("END:VEVENT")) {
       if (cur && cur.uid && cur.start && cur.end) {
-        events.push({ uid: cur.uid, start: cur.start, end: cur.end, summary: cur.summary ?? "" });
+        // code（DESCRIPTION由来の予約番号）も保持する。欠落すると予約番号取込・自己申告の統合が機能しない。
+        events.push({ uid: cur.uid, start: cur.start, end: cur.end, summary: cur.summary ?? "", code: cur.code });
       }
       cur = null;
     } else if (cur) {

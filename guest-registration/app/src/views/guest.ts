@@ -13,14 +13,91 @@ function errCls(errors: FieldErrors | undefined, key: string): string {
   return errors && (errors as Record<string, true>)[key] ? "err" : "";
 }
 
-// 入口（予約確認）
-export function startPage(lang: Lang, opts: { error?: string; code?: string }): HE {
+export type StartChannel = "direct" | "airbnb" | "booking";
+const OTA_CHANNELS: StartChannel[] = ["airbnb", "booking"];
+
+// 見えないハニーポット（botがURL/フォーム解析で埋めがちな罠欄。中国でも動く軽量bot対策）
+const HONEYPOT = `<input type="text" name="hp_extra" tabindex="-1" autocomplete="off" aria-hidden="true"
+  style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0">`;
+
+// 言語切替リンク(.langs a)に現在のOTA入力値(code/日付)を反映し、切替で入力が消えないようにする。
+// 外部リソース不要・失敗してもフォームは通常動作（中国対応の最小JS）。
+const OTA_LANG_SYNC_JS = `<script>
+(function(){
+  var form=document.getElementById('otaform'); if(!form) return;
+  function g(n){var e=form.querySelector('[name="'+n+'"]');return e?e.value:'';}
+  function sync(){
+    var c=g('code'),i=g('check_in'),o=g('check_out');
+    var as=document.querySelectorAll('.langs a');
+    for(var k=0;k<as.length;k++){
+      try{
+        var u=new URL(as[k].href, location.origin);
+        c?u.searchParams.set('code',c):u.searchParams.delete('code');
+        i?u.searchParams.set('check_in',i):u.searchParams.delete('check_in');
+        o?u.searchParams.set('check_out',o):u.searchParams.delete('check_out');
+        as[k].setAttribute('href', u.pathname+u.search);
+      }catch(_){}
+    }
+  }
+  form.addEventListener('input', sync); sync();
+})();
+</script>`;
+
+// 入口（予約元の選択）
+export function channelChooserPage(lang: Lang): HE {
+  const item = (ch: StartChannel, key: string) =>
+    `<a class="btn secondary" style="margin-top:10px" href="/start?channel=${ch}&lang=${lang}">${t(lang, key)}</a>`;
   return html`
   <div class="card">
+    <h1>${t(lang, "choose_channel_title")}</h1>
+    <p class="muted">${t(lang, "choose_channel_desc")}</p>
+    ${raw(item("direct", "channel_direct"))}
+    ${raw(item("airbnb", "channel_airbnb"))}
+    ${raw(item("booking", "channel_booking"))}
+  </div>`;
+}
+
+// 入口（予約確認）。channelで直予約=突合 / OTA=突合なし を出し分け。
+export function startPage(
+  lang: Lang,
+  opts: { channel: StartChannel; error?: string; code?: string; checkIn?: string; checkOut?: string }
+): HE {
+  const isOta = OTA_CHANNELS.includes(opts.channel);
+  const backLink = html`<a class="muted" href="/start?lang=${lang}">← ${t(lang, "back")}</a>`;
+  if (isOta) {
+    const chLabel = opts.channel === "airbnb" ? t(lang, "channel_airbnb") : t(lang, "channel_booking");
+    return html`
+    <div class="card">
+      ${backLink}
+      <h1>${t(lang, "ota_title")}</h1>
+      <p class="muted">${chLabel}</p>
+      <p class="muted">${t(lang, "ota_desc")}</p>
+      ${opts.error ? html`<div class="notice err">${opts.error}</div>` : ""}
+      <form method="post" action="/start?lang=${lang}" id="otaform">
+        <input type="hidden" name="channel" value="${esc(opts.channel)}">
+        ${raw(HONEYPOT)}
+        <label>${t(lang, "reservation_code")} <span class="req">*</span></label>
+        <input type="text" name="code" value="${esc(opts.code ?? "")}" required autocomplete="off" autocapitalize="characters" placeholder="HMAPDB2SSB">
+        <label>${t(lang, "check_in")} <span class="req">*</span></label>
+        <input type="date" name="check_in" value="${esc(opts.checkIn ?? "")}" required>
+        <label>${t(lang, "check_out")} <span class="req">*</span></label>
+        <input type="date" name="check_out" value="${esc(opts.checkOut ?? "")}" required>
+        <p class="muted">${t(lang, "ota_next_note")}</p>
+        <button class="btn" type="submit">${t(lang, "continue")}</button>
+      </form>
+    </div>
+    ${raw(OTA_LANG_SYNC_JS)}`;
+  }
+  // 直予約：従来どおり 予約番号＋姓で突合
+  return html`
+  <div class="card">
+    ${backLink}
     <h1>${t(lang, "start_title")}</h1>
     <p class="muted">${t(lang, "start_desc")}</p>
     ${opts.error ? html`<div class="notice err">${opts.error}</div>` : ""}
     <form method="post" action="/start?lang=${lang}">
+      <input type="hidden" name="channel" value="direct">
+      ${raw(HONEYPOT)}
       <label>${t(lang, "reservation_code")} <span class="req">*</span></label>
       <input type="text" name="code" value="${esc(opts.code ?? "")}" required autocomplete="off">
       <label>${t(lang, "last_name")} <span class="req">*</span></label>
@@ -107,6 +184,7 @@ export function formPage(
     errors?: FieldErrors;
     values?: Record<string, string>;
     showErrorBanner?: boolean;
+    requireEmail?: boolean;
   }
 ): HE {
   const v = opts.values ?? {};
@@ -179,8 +257,9 @@ export function formPage(
       <label>${t(lang, "next_stay")} ${raw(optMark)}</label>
       <input type="text" name="next_stay" value="${esc(v.next_stay ?? "")}">
 
-      <label>${t(lang, "email")}</label>
-      <input type="email" name="email" value="${esc(v.email ?? "")}" autocomplete="email">
+      <label>${t(lang, "email")} ${opts.requireEmail && opts.isRep ? raw(reqMark) : raw(optMark)}</label>
+      <input class="${errCls(e, "email")}" type="email" name="email" value="${esc(v.email ?? "")}" autocomplete="email">
+      ${opts.requireEmail && opts.isRep ? html`<p class="muted">${t(lang, "email_rep_req_note")}</p>` : ""}
 
       ${opts.isRep
         ? html`
