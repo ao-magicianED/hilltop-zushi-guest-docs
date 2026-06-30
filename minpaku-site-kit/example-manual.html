@@ -1,0 +1,1994 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>House Guide — Aomine Lodge (Sample)</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F3A34;
+    --primary-light: #2B4A3F;
+    --primary-deep: #14271F;
+    --accent: #C9A56D;
+    --accent-deep: #A8854B;
+    --bg: #F5F3F0;
+    --bg-soft: #FAF8F4;
+    --text: #2C2C2C;
+    --text-light: #6B6B6B;
+    --emergency: #C8242A;
+    --warning: #D67230;
+    --info: #2563A4;
+    --good: #2D7A4F;
+    --todo: #F4B400;
+    --border: #E8E2D5;
+    --sidebar-w: 280px;
+    --jp-font: 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    --serif-font: 'Cormorant Garamond', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 16px; scroll-behavior: smooth; scroll-padding-top: 70px; }
+  body {
+    font-family: 'Inter', var(--jp-font);
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== 言語切替 ===== */
+  body[data-lang="ja"] .l-en, body[data-lang="ja"] .l-zh, body[data-lang="ja"] .l-ko, body[data-lang="ja"] .l-fr { display: none; }
+  body[data-lang="en"] .l-ja, body[data-lang="en"] .l-zh, body[data-lang="en"] .l-ko, body[data-lang="en"] .l-fr { display: none; }
+  body[data-lang="zh"] .l-ja, body[data-lang="zh"] .l-en, body[data-lang="zh"] .l-ko, body[data-lang="zh"] .l-fr { display: none; }
+  body[data-lang="ko"] .l-ja, body[data-lang="ko"] .l-en, body[data-lang="ko"] .l-zh, body[data-lang="ko"] .l-fr { display: none; }
+  body[data-lang="fr"] .l-ja, body[data-lang="fr"] .l-en, body[data-lang="fr"] .l-zh, body[data-lang="fr"] .l-ko { display: none; }
+  body[data-lang="zh"] { font-family: 'Inter', 'Noto Sans SC', sans-serif; }
+  body[data-lang="ko"] { font-family: 'Inter', 'Noto Sans KR', sans-serif; }
+
+  /* ===== トップバー（言語切替 + ハンバーガー） ===== */
+  .top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 200;
+    background: rgba(31,58,52,0.97);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--accent);
+    height: 56px;
+  }
+  .top-bar .brand-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--serif-font);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+  }
+  .hamburger {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: none;
+  }
+  .lang-switcher {
+    display: flex;
+    gap: 4px;
+  }
+  .lang-switcher button {
+    background: transparent;
+    border: 1px solid rgba(201,165,109,0.4);
+    color: rgba(255,255,255,0.7);
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    transition: all 0.2s;
+  }
+  .lang-switcher button:hover { color: #fff; border-color: var(--accent); }
+  .lang-switcher button.active {
+    background: var(--accent);
+    color: var(--primary);
+    border-color: var(--accent);
+  }
+
+  /* ===== サイドバー ===== */
+  .sidebar {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    width: var(--sidebar-w);
+    height: calc(100vh - 56px);
+    background: #fff;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 100;
+    padding: 20px 0;
+  }
+  .sidebar h3 {
+    font-family: var(--serif-font);
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+    padding: 0 20px;
+    margin-bottom: 10px;
+  }
+  .sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.85rem;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+  }
+  .sidebar a:hover { background: var(--bg-soft); border-left-color: var(--accent); }
+  .sidebar a.active { background: var(--bg); border-left-color: var(--primary); color: var(--primary); font-weight: 700; }
+  .sidebar a.critical { color: var(--emergency); }
+  .sidebar a.critical:hover { background: #FFF5F5; border-left-color: var(--emergency); }
+  .sidebar a .num {
+    font-family: var(--serif-font);
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 24px;
+    font-size: 0.85rem;
+  }
+  .sidebar .divider {
+    border-top: 1px solid var(--border);
+    margin: 14px 0;
+  }
+
+  /* ===== メイン ===== */
+  .main {
+    margin-left: var(--sidebar-w);
+    padding-top: 56px;
+  }
+
+  /* ===== ヒーロー ===== */
+  .hero {
+    height: 50vh;
+    min-height: 360px;
+    position: relative;
+    background:
+      linear-gradient(135deg, rgba(31,58,52,0.55) 0%, rgba(20,39,31,0.4) 100%),
+      url('images/hero-lake-view.jpg') center/cover no-repeat,
+      linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px;
+  }
+  .hero .inner { max-width: 800px; }
+  .hero .pre {
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: var(--serif-font);
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+    line-height: 1.15;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  .hero .subtitle {
+    font-family: var(--serif-font);
+    font-style: italic;
+    font-size: 1.2rem;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 20px;
+  }
+  .hero .meta {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    font-size: 0.74rem;
+    background: rgba(0,0,0,0.3);
+    padding: 8px 18px;
+    border-radius: 100px;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ===== 章 ===== */
+  .chapter {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 60px 24px 30px;
+    border-bottom: 1px solid var(--border);
+  }
+  .chapter-header { margin-bottom: 30px; text-align: center; }
+  .chapter-num {
+    font-family: var(--serif-font);
+    font-style: italic;
+    color: var(--accent);
+    font-size: 0.9rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .chapter h2 {
+    font-family: var(--serif-font);
+    font-size: 2.2rem;
+    color: var(--primary);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+  }
+  .chapter .lead {
+    margin-top: 12px;
+    color: var(--text-light);
+    font-size: 0.95rem;
+    line-height: 1.8;
+  }
+
+  /* ===== ブロック ===== */
+  .block {
+    background: #fff;
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .block.critical { border-left: 5px solid var(--emergency); background: #FFF8F8; }
+  .block.warning { border-left: 5px solid var(--warning); background: #FFF7EE; }
+  .block.info { border-left: 5px solid var(--info); background: #F4F8FC; }
+  .block.good { border-left: 5px solid var(--good); background: #EAF5EE; }
+  .block.accent { border-left: 5px solid var(--accent); }
+  .block.todo {
+    border-left: 5px solid var(--todo);
+    background: #FFFBE6;
+    position: relative;
+  }
+  .block h3 {
+    font-family: var(--jp-font);
+    font-size: 1.15rem;
+    color: var(--primary);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .block h3 .ico { font-size: 1.3rem; }
+  .block p { font-size: 0.92rem; line-height: 1.75; margin-bottom: 8px; }
+  .block ul, .block ol { padding-left: 22px; margin-bottom: 10px; }
+  .block li { font-size: 0.9rem; line-height: 1.7; margin-bottom: 5px; }
+  .block strong { background: var(--bg-soft); padding: 1px 6px; border-radius: 3px; color: var(--primary); }
+  .block.critical strong { background: #FFE5E5; color: var(--emergency); }
+  .block.warning strong { background: #FFE5C7; color: var(--warning); }
+  .block a { color: var(--info); text-decoration: underline; }
+  .block a:hover { color: var(--primary); }
+
+  /* TODO バッジ */
+  .badge-todo {
+    background: var(--todo);
+    color: #1A1A1A;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.1em;
+    margin-left: 4px;
+  }
+
+  /* チェックリスト */
+  .checklist { list-style: none; padding-left: 0; }
+  .checklist li {
+    padding: 6px 0 6px 28px;
+    position: relative;
+    border-bottom: 1px dashed var(--border);
+  }
+  .checklist li:before {
+    content: '☐';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+
+  /* 番号付きステップ */
+  .steps { list-style: none; padding-left: 0; counter-reset: n; }
+  .steps li {
+    counter-increment: n;
+    padding: 10px 0 10px 44px;
+    position: relative;
+    border-bottom: 1px dashed var(--border);
+  }
+  .steps li:before {
+    content: counter(n);
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .block.critical .steps li:before { background: var(--emergency); }
+  .block.warning .steps li:before { background: var(--warning); }
+
+  /* 暗証番号バッジ */
+  .pin-badge {
+    background: var(--emergency);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    padding: 12px 30px;
+    border-radius: 10px;
+    display: inline-block;
+    margin: 12px 0;
+    letter-spacing: 0.18em;
+    box-shadow: 0 6px 18px rgba(200,36,42,0.3);
+  }
+
+  /* 大型番号 */
+  .huge-num {
+    display: inline-block;
+    background: var(--emergency);
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 800;
+    padding: 6px 20px;
+    border-radius: 10px;
+    margin-right: 12px;
+    vertical-align: middle;
+  }
+  .huge-num.info { background: var(--info); }
+
+  /* 2カラム */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* リンクボタン */
+  .link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--info);
+    color: #fff !important;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    text-decoration: none !important;
+    margin: 4px 6px 4px 0;
+    font-weight: 600;
+  }
+  .link-btn:hover { background: var(--primary); }
+  .link-btn.maps { background: #4285F4; }
+  .link-btn.web { background: var(--accent-deep); }
+
+  /* 写真プレースホルダ */
+  .photo-todo {
+    background: repeating-linear-gradient(45deg, #FFFBE6, #FFFBE6 10px, #FFF5C2 10px, #FFF5C2 20px);
+    border: 2px dashed var(--todo);
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    color: #8B6914;
+    font-weight: 700;
+    margin: 12px 0;
+  }
+  .photo-todo .ico { font-size: 2rem; display: block; margin-bottom: 8px; }
+
+  /* フッター */
+  footer.guide-footer {
+    background: var(--primary);
+    color: #fff;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  footer.guide-footer .brand {
+    font-family: var(--serif-font);
+    font-size: 1.4rem;
+    letter-spacing: 0.22em;
+    margin-bottom: 8px;
+  }
+  footer.guide-footer .meta {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.1em;
+  }
+
+  /* 印刷 */
+  @media print {
+    @page { size: A4 portrait; margin: 12mm; }
+    .top-bar, .sidebar, .lang-switcher { display: none; }
+    .main { margin-left: 0; padding-top: 0; }
+    .hero { height: auto; page-break-after: always; }
+    .chapter { page-break-before: always; page-break-inside: avoid; max-width: 100%; padding: 20px 0; }
+    .chapter:first-of-type { page-break-before: avoid; }
+    body { background: #fff; }
+    body[data-lang] .l-en, body[data-lang] .l-zh, body[data-lang] .l-ko, body[data-lang] .l-fr { display: block !important; }
+    body[data-lang="ja"] .l-en, body[data-lang="ja"] .l-zh, body[data-lang="ja"] .l-ko, body[data-lang="ja"] .l-fr { display: none !important; }
+  }
+
+  /* モバイル */
+  @media (max-width: 880px) {
+    :root { --sidebar-w: 240px; }
+    .sidebar {
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+    }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .hamburger { display: inline-block; }
+    .hero h1 { font-size: 2.1rem; }
+    .hero .subtitle { font-size: 1rem; }
+    .chapter h2 { font-size: 1.7rem; }
+    .chapter { padding: 40px 18px 20px; }
+    .block { padding: 18px 20px; }
+    .two-col { grid-template-columns: 1fr; }
+    .lang-switcher button { padding: 3px 7px; font-size: 0.6rem; }
+  }
+</style>
+</head>
+<body data-lang="ja">
+
+<!-- トップバー -->
+<nav class="top-bar">
+  <div class="brand-line">
+    <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    <span>AOMINE LODGE</span>
+  </div>
+  <div class="lang-switcher">
+    <button data-lang="ja" class="active" onclick="setLang('ja')">日本語</button>
+    <button data-lang="en" onclick="setLang('en')">EN</button>
+    <button data-lang="zh" onclick="setLang('zh')">中文</button>
+    <button data-lang="ko" onclick="setLang('ko')">한국어</button>
+    <button data-lang="fr" onclick="setLang('fr')">FR</button>
+  </div>
+</nav>
+
+<!-- サイドバー -->
+<aside class="sidebar">
+  <h3 class="l-ja">目次</h3>
+  <h3 class="l-en">Contents</h3>
+  <h3 class="l-zh">目录</h3>
+  <h3 class="l-ko">목차</h3>
+  <h3 class="l-fr">Sommaire</h3>
+
+  <a href="#welcome"><span class="num">01</span><span>🏡</span>
+    <span class="l-ja">ようこそ</span><span class="l-en">Welcome</span><span class="l-zh">欢迎</span><span class="l-ko">환영합니다</span><span class="l-fr">Bienvenue</span></a>
+  <a href="#rules"><span class="num">02</span><span>📋</span>
+    <span class="l-ja">ハウスルール ★最重要</span><span class="l-en">House Rules ★Important</span><span class="l-zh">使用规则 ★最重要</span><span class="l-ko">하우스 룰 ★중요</span><span class="l-fr">Règles ★Important</span></a>
+  <a href="#contact"><span class="num">03</span><span>💬</span>
+    <span class="l-ja">連絡手段</span><span class="l-en">Contact</span><span class="l-zh">联系方式</span><span class="l-ko">연락 방법</span><span class="l-fr">Contact</span></a>
+  <a href="#access"><span class="num">04</span><span>🗺</span>
+    <span class="l-ja">アクセス</span><span class="l-en">Access</span><span class="l-zh">交通</span><span class="l-ko">교통</span><span class="l-fr">Accès</span></a>
+  <a href="#checkin"><span class="num">05</span><span>🔑</span>
+    <span class="l-ja">チェックイン</span><span class="l-en">Check-in</span><span class="l-zh">入住</span><span class="l-ko">체크인</span><span class="l-fr">Arrivée</span></a>
+  <a href="#facilities"><span class="num">06</span><span>🛋</span>
+    <span class="l-ja">設備の使い方</span><span class="l-en">Facilities</span><span class="l-zh">设施使用</span><span class="l-ko">시설 사용</span><span class="l-fr">Équipements</span></a>
+  <a href="#bbq"><span class="num">07</span><span>🔥</span>
+    <span class="l-ja">BBQ</span><span class="l-en">BBQ</span><span class="l-zh">烧烤</span><span class="l-ko">바비큐</span><span class="l-fr">BBQ</span></a>
+  <a href="#fireworks"><span class="num">08</span><span>🎆</span>
+    <span class="l-ja">花火</span><span class="l-en">Fireworks</span><span class="l-zh">烟花</span><span class="l-ko">불꽃놀이</span><span class="l-fr">Feux</span></a>
+  <a href="#trash"><span class="num">09</span><span>♻️</span>
+    <span class="l-ja">ゴミ分別</span><span class="l-en">Trash</span><span class="l-zh">垃圾分类</span><span class="l-ko">쓰레기 분리</span><span class="l-fr">Tri</span></a>
+  <a href="#wifi"><span class="num">10</span><span>📶</span>Wi-Fi</a>
+  <a href="#smoking"><span class="num">11</span><span>🚭</span>
+    <span class="l-ja">喫煙</span><span class="l-en">Smoking</span><span class="l-zh">吸烟</span><span class="l-ko">흡연</span><span class="l-fr">Tabac</span></a>
+  <a href="#nature"><span class="num">12</span><span>🌿</span>
+    <span class="l-ja">自然・虫</span><span class="l-en">Nature</span><span class="l-zh">自然・虫</span><span class="l-ko">자연·벌레</span><span class="l-fr">Nature</span></a>
+  <a href="#danger" class="critical"><span class="num">13</span><span>⚠</span>
+    <span class="l-ja">危険箇所（崖）</span><span class="l-en">Danger</span><span class="l-zh">危险区域</span><span class="l-ko">위험 구역</span><span class="l-fr">Danger</span></a>
+  <a href="#around"><span class="num">14</span><span>🍽</span>
+    <span class="l-ja">周辺案内</span><span class="l-en">Around</span><span class="l-zh">周边</span><span class="l-ko">주변</span><span class="l-fr">Alentours</span></a>
+  <a href="#checkout"><span class="num">15</span><span>🚪</span>
+    <span class="l-ja">チェックアウト</span><span class="l-en">Check-out</span><span class="l-zh">退房</span><span class="l-ko">체크아웃</span><span class="l-fr">Départ</span></a>
+  <a href="#emergency" class="critical"><span class="num">16</span><span>🆘</span>
+    <span class="l-ja">緊急時</span><span class="l-en">Emergency</span><span class="l-zh">紧急</span><span class="l-ko">긴급</span><span class="l-fr">Urgence</span></a>
+  <a href="#floor"><span class="num">17</span><span>📐</span>
+    <span class="l-ja">間取り図</span><span class="l-en">Floor Plan</span><span class="l-zh">户型图</span><span class="l-ko">평면도</span><span class="l-fr">Plan</span></a>
+</aside>
+
+<div class="main">
+
+<!-- ヒーロー -->
+<section class="hero">
+  <div class="inner">
+    <div class="pre">House Guide (Sample) · ハウスガイド</div>
+    <h1>
+      <span class="l-ja">ようこそ Aomine Lodge へ</span>
+      <span class="l-en">Welcome to Aomine Lodge</span>
+      <span class="l-zh">欢迎来到 Aomine Lodge</span>
+      <span class="l-ko">Aomine Lodge에 오신 것을 환영합니다</span>
+      <span class="l-fr">Bienvenue à Aomine Lodge</span>
+    </h1>
+    <div class="subtitle">
+      <span class="l-ja">A Lakeside Mountain Retreat · 湖畔の隠れ家</span>
+      <span class="l-en">A Lakeside Retreat in Aomine Kogen</span>
+      <span class="l-zh">青岭高原的湖畔隐居</span>
+      <span class="l-ko">아오미네 고원의 호숫가 은신처</span>
+      <span class="l-fr">Une retraite au bord du lac d'Aomine</span>
+    </div>
+    <div class="meta">
+      <span>🏡 3 Bedrooms</span>
+      <span>👥 Up to 8</span>
+      <span>🌳 BBQ</span>
+      <span>🐕 Pet OK</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 01. ようこそ ===== -->
+<section class="chapter" id="welcome">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 01</div>
+    <h2>
+      <span class="l-ja">ようこそ Aomine Lodge へ</span>
+      <span class="l-en">Welcome</span>
+      <span class="l-zh">欢迎</span>
+      <span class="l-ko">환영합니다</span>
+      <span class="l-fr">Bienvenue</span>
+    </h2>
+  </div>
+
+  <div class="block good">
+    <h3><span class="ico">🏡</span>
+      <span class="l-ja">物件概要</span><span class="l-en">About this Property</span><span class="l-zh">房屋概要</span><span class="l-ko">숙소 개요</span><span class="l-fr">À propos</span>
+    </h3>
+    <ul>
+      <li class="l-ja"><strong>所在地</strong>: 〒399-0000 長野県青嶺郡青嶺高原村 青嶺湖畔1-2-3（※サンプル）</li>
+      <li class="l-en"><strong>Address</strong>: 1-2-3 Aomine-kohan, Aomine-Kogen, Nagano 399-0000, Japan (SAMPLE)</li>
+      <li class="l-zh"><strong>地址</strong>: 〒399-0000 长野县青岭郡青岭高原村 青岭湖畔1-2-3（※示例）</li>
+      <li class="l-ko"><strong>주소</strong>: 〒399-0000 나가노현 아오미네군 아오미네고원촌 아오미네호반1-2-3 (※샘플)</li>
+      <li class="l-fr"><strong>Adresse</strong>: 1-2-3 Aomine-kohan, Aomine-Kogen, Nagano 399-0000 (EXEMPLE)</li>
+      <li class="l-ja"><strong>最大収容人数</strong>: 8名（3寝室）</li>
+      <li class="l-en"><strong>Max Capacity</strong>: 8 guests (3 bedrooms)</li>
+      <li class="l-zh"><strong>最多容纳</strong>: 8人 (3 间卧室)</li>
+      <li class="l-ko"><strong>최대 수용</strong>: 8명 (침실 3개)</li>
+      <li class="l-fr"><strong>Capacité</strong>: 8 personnes (3 chambres)</li>
+      <li class="l-ja"><strong>ベッド</strong>: クイーン×1 / ダブル×1 / セミダブル×2 / ソファベッド×2</li>
+      <li class="l-en"><strong>Beds</strong>: Queen×1 / Double×1 / Semi-double×2 / Sofa bed×2</li>
+      <li class="l-zh"><strong>床</strong>: 大床×1 / 双人×1 / 小双人×2 / 沙发床×2</li>
+      <li class="l-ko"><strong>침대</strong>: 퀸×1 / 더블×1 / 세미더블×2 / 소파베드×2</li>
+      <li class="l-fr"><strong>Lits</strong>: Queen×1 / Double×1 / Semi-double×2 / Canapé-lit×2</li>
+    </ul>
+  </div>
+
+  <div class="block info">
+    <h3><span class="ico">📖</span>
+      <span class="l-ja">このガイドについて</span><span class="l-en">About this Guide</span><span class="l-zh">关于本指南</span><span class="l-ko">가이드 소개</span><span class="l-fr">À propos du guide</span>
+    </h3>
+    <p class="l-ja">滞在を快適にお過ごしいただくための総合マニュアルです。<strong>次の章「ハウスルール」を最優先でご確認ください</strong>。緊急時は章16へ。</p>
+    <p class="l-en">Comprehensive guide for your stay. <strong>Please read Chapter 2 "House Rules" first</strong>. For emergencies, see Chapter 16.</p>
+    <p class="l-zh">入住综合指南。<strong>请先阅读第2章「使用规则」</strong>。紧急情况请参阅第16章。</p>
+    <p class="l-ko">숙박 종합 가이드입니다. <strong>먼저 2장 "하우스 룰"</strong>을 확인해 주세요. 긴급 시 16장 참조.</p>
+    <p class="l-fr">Guide complet pour votre séjour. <strong>Veuillez lire le chapitre 2 "Règles"</strong> en priorité. Urgences au chapitre 16.</p>
+  </div>
+</section>
+
+<!-- ===== 02. ハウスルール（最上位） ===== -->
+<section class="chapter" id="rules">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 02 ★ MOST IMPORTANT</div>
+    <h2>
+      <span class="l-ja">ハウスルール</span><span class="l-en">House Rules</span><span class="l-zh">使用规则</span><span class="l-ko">하우스 룰</span><span class="l-fr">Règles</span>
+    </h2>
+    <p class="lead l-ja">最重要セクションです。必ずご一読ください。</p>
+    <p class="lead l-en">Most important section. Please read carefully.</p>
+    <p class="lead l-zh">最重要的章节。请务必阅读。</p>
+    <p class="lead l-ko">가장 중요한 섹션입니다. 반드시 읽어 주세요.</p>
+    <p class="lead l-fr">Section la plus importante. Merci de lire attentivement.</p>
+  </div>
+
+  <div class="block critical">
+    <h3><span class="ico">📋</span>
+      <span class="l-ja">基本ルール</span><span class="l-en">Basic Rules</span><span class="l-zh">基本规则</span><span class="l-ko">기본 규칙</span><span class="l-fr">Règles de base</span>
+    </h3>
+    <div class="l-ja">
+      <ul>
+        <li><strong>定員8名</strong> 厳守</li>
+        <li><strong>土足厳禁</strong>（玄関で必ず靴を脱ぐ）</li>
+        <li><strong>室内全面禁煙</strong> / 屋外（庭・テラス）は喫煙可</li>
+        <li><strong>20時以降は静かに</strong>（騒音はご遠慮）/ 大声・音楽は時間問わず配慮</li>
+        <li><strong>ペット可</strong>: リビング・庭のみOK / <strong>全寝室NG</strong> / 追加 ¥3,300（<a href="#bbq">→ 料金の詳細はこちら</a>）</li>
+        <li><strong>BBQ追加料金</strong>: 予約時¥3,300 / 当日¥5,500 / 未申告¥15,000（<a href="#bbq">→ 詳細</a>）</li>
+        <li><strong>鍵紛失時</strong>: 複製代 <strong>¥25,000</strong> を申し受けます</li>
+        <li><strong>窓は基本「閉」</strong>（虫対策・章12参照）</li>
+        <li><strong>2階ベランダ窓は絶対に開けないでください</strong>（章12参照）</li>
+        <li><strong>🛏 リネン・寝具を汚さないでください</strong>: シミ・落ちない汚れがあった場合、特別清掃費を実費請求する場合があります。化粧・飲食は寝具上では避けてください。</li>
+        <li>花火は手持ちのみ・水バケツ必須（章08参照）</li>
+        <li>パノラマテラスの先は崖・立入禁止（章13参照）</li>
+      </ul>
+    </div>
+    <div class="l-en">
+      <ul>
+        <li><strong>Max 8 guests</strong> strictly enforced</li>
+        <li><strong>No shoes inside</strong> (remove at entrance)</li>
+        <li><strong>No smoking indoors</strong> / Outdoor (garden &amp; terrace) OK</li>
+        <li><strong>No loud noise after 20:00</strong> / Loud voices &amp; music: always considerate</li>
+        <li><strong>Pets allowed</strong>: Living area &amp; garden only / <strong>No bedrooms</strong> / +¥3,300 (<a href="#bbq">see fees</a>)</li>
+        <li><strong>BBQ fees</strong>: Booking ¥3,300 / Same-day ¥5,500 / Unauthorized ¥15,000 (<a href="#bbq">details</a>)</li>
+        <li><strong>Lost key</strong>: Replacement fee <strong>¥25,000</strong></li>
+        <li><strong>Keep windows closed</strong> (insect prevention, see Ch.12)</li>
+        <li><strong>NEVER open 2F balcony windows</strong> (see Ch.12)</li>
+        <li><strong>🛏 Do not soil linens / bedding</strong>: Actual cleaning costs may be charged for stains. Avoid makeup &amp; eating on beds.</li>
+        <li>Fireworks: handheld only, water bucket required (Ch.08)</li>
+        <li>Cliff beyond Panorama Terrace = keep out (Ch.13)</li>
+      </ul>
+    </div>
+    <div class="l-zh">
+      <ul>
+        <li><strong>限8人入住</strong></li>
+        <li><strong>室内禁止穿鞋</strong>（请在玄关脱鞋）</li>
+        <li><strong>室内全面禁烟</strong> / 户外（庭院·露台）可吸烟</li>
+        <li><strong>20:00以后请保持安静</strong>（请勿喧哗）/ 大声·音乐请始终注意</li>
+        <li><strong>允许宠物</strong>: 仅限客厅·庭院 / <strong>所有卧室禁止</strong> / 加收¥3,300</li>
+        <li><strong>烧烤费</strong>: 预约时¥3,300 / 当日¥5,500 / 未申报¥15,000</li>
+        <li><strong>钥匙遗失</strong>: 复制费 <strong>¥25,000</strong></li>
+        <li><strong>窗户基本保持关闭</strong>（防虫·第12章）</li>
+        <li><strong>2楼阳台窗户绝对不要打开</strong></li>
+        <li><strong>🛏 请勿弄脏床品·寝具</strong>: 如有污渍，将按实际清洁费用收取。请避免在床上化妆或饮食。</li>
+        <li>烟花: 仅手持烟花，必须备水桶 (第8章)</li>
+        <li>全景露台前方为悬崖，禁止进入 (第13章)</li>
+      </ul>
+    </div>
+    <div class="l-ko">
+      <ul>
+        <li><strong>최대 8명</strong></li>
+        <li><strong>실내 신발 금지</strong> (현관에서 벗기)</li>
+        <li><strong>실내 전면 금연</strong> / 야외(정원·테라스) 흡연 가능</li>
+        <li><strong>20시 이후 정숙</strong> (소음 자제)</li>
+        <li><strong>반려동물 가능</strong>: 거실·정원만 OK / <strong>모든 침실 금지</strong> / +¥3,300</li>
+        <li><strong>BBQ 요금</strong>: 예약 시¥3,300 / 당일¥5,500 / 미신고¥15,000</li>
+        <li><strong>열쇠 분실</strong>: 복제비 <strong>¥25,000</strong></li>
+        <li><strong>창문은 기본 "닫음"</strong> (벌레 대책 · 12장)</li>
+        <li><strong>2층 베란다 창문은 절대 열지 마세요</strong></li>
+        <li><strong>🛏 침구·시트를 더럽히지 마세요</strong>: 얼룩 발생 시 실비 청구. 침대 위에서 화장·음식 자제.</li>
+        <li>불꽃놀이: 손에 드는 것만, 물 양동이 필수 (8장)</li>
+        <li>파노라마 테라스 너머는 절벽, 출입 금지 (13장)</li>
+      </ul>
+    </div>
+    <div class="l-fr">
+      <ul>
+        <li><strong>Max 8 personnes</strong></li>
+        <li><strong>Sans chaussures</strong> à l'intérieur</li>
+        <li><strong>Non-fumeur à l'intérieur</strong> / Extérieur OK</li>
+        <li><strong>Pas de bruit après 20h00</strong></li>
+        <li><strong>Animaux acceptés</strong>: Salon &amp; jardin uniquement / <strong>Toutes les chambres interdites</strong> / +¥3,300</li>
+        <li><strong>BBQ</strong>: Réservation ¥3,300 / Sur place ¥5,500 / Non déclaré ¥15,000</li>
+        <li><strong>Perte de clé</strong>: <strong>¥25,000</strong></li>
+        <li><strong>Fenêtres fermées</strong> (insectes - Ch.12)</li>
+        <li><strong>JAMAIS ouvrir les fenêtres du balcon 2F</strong></li>
+        <li><strong>🛏 Ne salissez pas le linge/literie</strong>: frais de nettoyage réels facturés en cas de taches. Évitez maquillage/repas au lit.</li>
+        <li>Feux d'artifice: à main uniquement, seau d'eau requis (Ch.8)</li>
+        <li>Falaise au-delà de la terrasse: interdit (Ch.13)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 03. 連絡手段 ===== -->
+<section class="chapter" id="contact">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 03</div>
+    <h2>
+      <span class="l-ja">連絡手段</span><span class="l-en">Contact</span><span class="l-zh">联系方式</span><span class="l-ko">연락 방법</span><span class="l-fr">Contact</span>
+    </h2>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">💬</span>
+      <span class="l-ja">ホストへのご連絡</span><span class="l-en">Contact your host</span><span class="l-zh">联系房东</span><span class="l-ko">호스트 연락</span><span class="l-fr">Contactez l'hôte</span>
+    </h3>
+    <p class="l-ja"><strong>Airbnb / Booking.com のメッセージ機能</strong>でご連絡ください。</p>
+    <p class="l-en">Please use the <strong>Airbnb / Booking.com message feature</strong>.</p>
+    <p class="l-zh">请使用 <strong>Airbnb / Booking.com 消息功能</strong>。</p>
+    <p class="l-ko"><strong>Airbnb / Booking.com 메시지</strong>로 연락해 주세요.</p>
+    <p class="l-fr">Veuillez utiliser le <strong>chat Airbnb / Booking.com</strong>.</p>
+    <ul class="l-ja">
+      <li>📱 対応時間: <strong>9:00〜20:00</strong>（随時返信）</li>
+      <li>📞 電話対応は行っておりません</li>
+      <li>⏰ 20:00以降のご連絡は翌朝対応となる場合があります</li>
+    </ul>
+    <ul class="l-en">
+      <li>📱 Response hours: <strong>9:00–20:00</strong></li>
+      <li>📞 No phone support (messages only)</li>
+      <li>⏰ Messages after 20:00 may be replied next morning</li>
+    </ul>
+    <ul class="l-zh">
+      <li>📱 回复时间: <strong>9:00–20:00</strong></li>
+      <li>📞 不提供电话服务</li>
+      <li>⏰ 20:00后的消息可能次日上午回复</li>
+    </ul>
+    <ul class="l-ko">
+      <li>📱 응답 시간: <strong>9:00–20:00</strong></li>
+      <li>📞 전화 응대 불가</li>
+      <li>⏰ 20:00 이후 메시지는 익일 답변</li>
+    </ul>
+    <ul class="l-fr">
+      <li>📱 Horaires: <strong>9h00–20h00</strong></li>
+      <li>📞 Pas de téléphone (messages uniquement)</li>
+      <li>⏰ Après 20h00: réponse le lendemain matin</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 04. アクセス ===== -->
+<section class="chapter" id="access">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 04</div>
+    <h2>
+      <span class="l-ja">アクセス・地図</span><span class="l-en">Access &amp; Map</span><span class="l-zh">交通指南</span><span class="l-ko">교통 안내</span><span class="l-fr">Accès</span>
+    </h2>
+  </div>
+
+  <div class="block good">
+    <h3><span class="ico">📍</span>
+      <span class="l-ja">物件住所</span><span class="l-en">Property</span><span class="l-zh">房屋地址</span><span class="l-ko">숙소 주소</span><span class="l-fr">Adresse</span>
+    </h3>
+    <p style="font-size:1.4rem;font-weight:700;color:var(--primary);"><strong>Aomine Lodge</strong></p>
+    <p style="font-size:1.15rem;font-weight:700;color:var(--primary);">〒399-0000 長野県青嶺郡青嶺高原村 青嶺湖畔1-2-3（※サンプル）</p>
+    <p>1-2-3 Aomine-kohan, Aomine-Kogen, Nagano 399-0000, Japan (SAMPLE)</p>
+    <p style="margin-top:10px;">
+      <a class="link-btn maps" href="https://www.google.com/maps/search/?api=1&query=%E9%9D%92%E5%B6%BA%E9%AB%98%E5%8E%9F" target="_blank">📍 Google Maps で開く / Open in Google Maps</a>
+    </p>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">🚆</span>
+      <span class="l-ja">最寄駅</span><span class="l-en">Nearest Station</span><span class="l-zh">最近车站</span><span class="l-ko">최단 역</span><span class="l-fr">Gare la plus proche</span>
+    </h3>
+    <p><strong>信州高原鉄道 青嶺高原駅</strong></p>
+    <p class="l-ja">駅からタクシー約10分 / 無料送迎あり（要事前予約）</p>
+    <p class="l-en">About 10 min by taxi / Free shuttle available (reservation required)</p>
+    <p class="l-zh">从车站乘出租车约10分钟 / 提供免费接送（需提前预约）</p>
+    <p class="l-ko">역에서 택시 약 10분 / 무료 픽업 가능 (사전 예약 필요)</p>
+    <p class="l-fr">Environ 10 min en taxi / Navette gratuite (sur réservation)</p>
+    <p>
+      <a class="link-btn maps" href="https://www.google.com/maps/search/?api=1&query=%E9%9D%92%E5%B6%BA%E9%AB%98%E5%8E%9F" target="_blank">📍 青嶺高原 Maps</a>
+    </p>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">🏪</span>
+      <span class="l-ja">駅周辺</span><span class="l-en">Around the Station</span><span class="l-zh">车站周边</span><span class="l-ko">역 주변</span><span class="l-fr">Autour de la gare</span>
+    </h3>
+    <p class="l-ja"><strong>コンビニ 青嶺高原店</strong>（※サンプル）（車5分・24時間営業）<br>食材購入・宅配ボックス・ATMあり</p>
+    <p class="l-en"><strong>Convenience Store, Aomine-Kogen</strong> (SAMPLE) (5 min by car · 24h)<br>Groceries · Parcel locker · ATM</p>
+    <p class="l-zh"><strong>便利店 青岭高原店</strong>（※示例）（车程5分钟·24小时）</p>
+    <p class="l-ko"><strong>편의점 아오미네고원점</strong> (※샘플) (차량 5분 · 24h)</p>
+    <p class="l-fr"><strong>Supérette, Aomine-Kogen</strong> (EXEMPLE) (5 min en voiture · 24h)</p>
+    <p>
+      <a class="link-btn maps" href="https://www.google.com/maps/search/?api=1&query=%E9%9D%92%E5%B6%BA%E9%AB%98%E5%8E%9F" target="_blank">📍 青嶺高原 Maps</a>
+    </p>
+  </div>
+
+  <div class="block warning">
+    <h3><span class="ico">⚠</span>
+      <span class="l-ja">山道の運転にご注意</span><span class="l-en">Mountain Road</span><span class="l-zh">注意山路驾驶</span><span class="l-ko">산길 운전 주의</span><span class="l-fr">Route de montagne</span>
+    </h3>
+    <p class="l-ja">湖畔へ向かう道は <strong>幅の狭い山道とカーブ</strong> が続きます。最後の区間は未舗装の砂利道です。<strong>冬季は積雪・凍結</strong> の可能性があるため、運転に不安のある方は <strong>無料送迎</strong> のご利用をおすすめします。</p>
+    <p class="l-en">The road to the lake is a <strong>narrow, winding mountain road</strong>; the final stretch is unpaved gravel. <strong>Snow &amp; ice in winter</strong> — if unsure about driving, we recommend the <strong>free shuttle</strong>.</p>
+    <p class="l-zh">通往湖畔的道路是<strong>狭窄的山路和弯道</strong>，最后一段为未铺装的碎石路。<strong>冬季可能积雪结冰</strong>，不熟悉路况者建议使用<strong>免费接送</strong>。</p>
+    <p class="l-ko">호숫가로 향하는 길은 <strong>좁은 산길과 커브</strong>가 이어지며 마지막 구간은 비포장 자갈길입니다. <strong>겨울철 적설·결빙</strong> 가능성이 있으니 운전이 불안하시면 <strong>무료 픽업</strong>을 권장합니다.</p>
+    <p class="l-fr">La route vers le lac est <strong>étroite et sinueuse</strong>; le dernier tronçon est en gravier. <strong>Neige et verglas en hiver</strong> — en cas de doute, privilégiez la <strong>navette gratuite</strong>.</p>
+  </div>
+</section>
+
+<!-- ===== 05. チェックイン ===== -->
+<section class="chapter" id="checkin">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 05</div>
+    <h2>
+      <span class="l-ja">チェックイン手順</span><span class="l-en">Check-in</span><span class="l-zh">入住手续</span><span class="l-ko">체크인</span><span class="l-fr">Arrivée</span>
+    </h2>
+    <p class="lead l-ja">チェックイン: <strong>16:00以降</strong></p>
+    <p class="lead l-en">Check-in: <strong>from 16:00</strong></p>
+    <p class="lead l-zh">入住: <strong>16:00之后</strong></p>
+    <p class="lead l-ko">체크인: <strong>16:00 이후</strong></p>
+    <p class="lead l-fr">Arrivée: <strong>à partir de 16h00</strong></p>
+  </div>
+
+  <div class="block warning">
+    <h3><span class="ico">⏰</span>
+      <span class="l-ja">早めのチェックインをご希望の場合</span><span class="l-en">Early Check-in</span><span class="l-zh">提前入住</span><span class="l-ko">조기 체크인</span><span class="l-fr">Arrivée anticipée</span>
+    </h3>
+    <p class="l-ja">16時より前にチェックインされたい場合は、<strong>あらかじめメッセージにてご相談</strong>ください。<br>当日のお申し出は対応できない可能性があるため、<strong>前日より前にお早めにご申告</strong>をお願いします。</p>
+    <p class="l-en">For check-in earlier than 16:00, please <strong>message us in advance</strong>. Same-day requests may not be accommodated, so please ask <strong>at least the day before</strong>.</p>
+    <p class="l-zh">如需在16:00之前入住，请<strong>提前留言咨询</strong>。当日申请可能无法处理，请<strong>至少提前一天告知</strong>。</p>
+    <p class="l-ko">16시 이전 체크인 희망 시 <strong>사전 메시지</strong>로 상담해 주세요. 당일은 대응이 어려울 수 있으니 <strong>전날 이전에 미리</strong> 알려 주세요.</p>
+    <p class="l-fr">Pour arriver avant 16h00, <strong>contactez-nous à l'avance</strong>. Les demandes le jour même peuvent ne pas être acceptées.</p>
+  </div>
+
+  <div class="block good">
+    <h3><span class="ico">🔑</span>
+      <span class="l-ja">キーボックスから鍵を取り出す</span><span class="l-en">Get Key from Key Box</span><span class="l-zh">从密码箱取钥匙</span><span class="l-ko">키박스에서 열쇠 꺼내기</span><span class="l-fr">Récupérer la clé</span>
+    </h3>
+    <ol class="steps">
+      <li>
+        <span class="l-ja">玄関ドアに付いている <strong>キーボックス</strong> を見つける</span>
+        <span class="l-en">Locate the <strong>key box</strong> attached to the front door</span>
+        <span class="l-zh">找到玄关门上的<strong>密码箱</strong></span>
+        <span class="l-ko">현관문에 부착된 <strong>키박스</strong> 위치 확인</span>
+        <span class="l-fr">Trouvez la <strong>boîte à clé</strong> fixée sur la porte</span>
+      </li>
+      <li>
+        <span class="l-ja"><strong>暗証番号</strong>を入力（<strong>予約サイトのメッセージに記載</strong>）</span>
+        <span class="l-en">Enter the <strong>access code</strong> (sent via your <strong>booking platform message</strong>)</span>
+        <span class="l-zh">输入<strong>密码</strong>（请查阅<strong>预订平台留言</strong>）</span>
+        <span class="l-ko"><strong>비밀번호</strong> 입력 (<strong>예약 사이트 메시지</strong> 참조)</span>
+        <span class="l-fr">Entrez le <strong>code</strong> (envoyé via le <strong>message de réservation</strong>)</span>
+        <div style="background:#F4F8FC;border-left:3px solid var(--info);padding:10px 14px;border-radius:4px;margin:10px 0;font-size:0.82rem;">
+          <span class="l-ja">📱 暗証番号は <strong>Airbnb / Booking.com の予約メッセージ</strong> に記載しています。届いていない場合はホストへご連絡ください。</span>
+          <span class="l-en">📱 The code is sent via your <strong>Airbnb / Booking.com message</strong>. Contact host if you haven't received it.</span>
+          <span class="l-zh">📱 密码已通过 <strong>Airbnb / Booking.com 留言</strong>发送。如未收到请联系房东。</span>
+          <span class="l-ko">📱 비밀번호는 <strong>Airbnb / Booking.com 메시지</strong>로 발송됩니다. 미수신 시 호스트에 연락.</span>
+          <span class="l-fr">📱 Le code est envoyé via <strong>message Airbnb / Booking.com</strong>. Contactez l'hôte si non reçu.</span>
+        </div>
+      </li>
+      <li>
+        <span class="l-ja">キーボックスを開けて鍵を取り出す</span>
+        <span class="l-en">Open the box, take the key</span>
+        <span class="l-zh">打开箱子取出钥匙</span>
+        <span class="l-ko">박스를 열고 열쇠를 꺼냄</span>
+        <span class="l-fr">Ouvrez et prenez la clé</span>
+      </li>
+      <li>
+        <span class="l-ja">玄関の鍵を開け、入室</span>
+        <span class="l-en">Unlock the front door and enter</span>
+        <span class="l-zh">打开门进入</span>
+        <span class="l-ko">현관을 열고 입실</span>
+        <span class="l-fr">Déverrouillez la porte et entrez</span>
+      </li>
+    </ol>
+  </div>
+
+  <div class="block critical">
+    <h3><span class="ico">🚨</span>
+      <span class="l-ja">鍵の取り扱い</span><span class="l-en">Key Handling</span><span class="l-zh">钥匙保管</span><span class="l-ko">열쇠 관리</span><span class="l-fr">Gestion de la clé</span>
+    </h3>
+    <p class="l-ja">滞在中は <strong>鍵を絶対に紛失しない</strong> ようご注意ください。<br>紛失された場合、<strong>複製代として ¥25,000</strong> を申し受けます。</p>
+    <p class="l-en"><strong>Do NOT lose the key</strong> during your stay. Lost key replacement fee: <strong>¥25,000</strong>.</p>
+    <p class="l-zh">入住期间<strong>切勿遗失钥匙</strong>。遗失复制费用: <strong>¥25,000</strong>。</p>
+    <p class="l-ko">체류 중 <strong>열쇠 분실 금지</strong>. 분실 시 복제비 <strong>¥25,000</strong>.</p>
+    <p class="l-fr">Ne perdez <strong>JAMAIS</strong> la clé. Frais de remplacement: <strong>¥25,000</strong>.</p>
+  </div>
+
+  <div class="block warning">
+    <h3><span class="ico">👟</span>
+      <span class="l-ja">入室時のお願い</span><span class="l-en">When You Enter</span><span class="l-zh">入室时</span><span class="l-ko">입실 시</span><span class="l-fr">À l'entrée</span>
+    </h3>
+    <ul class="l-ja">
+      <li><strong>土足厳禁</strong> — 玄関で必ず靴を脱ぐ</li>
+      <li>スリッパを玄関にご用意しています</li>
+      <li>窓を開ける前に章12「自然・虫」をお読みください</li>
+    </ul>
+    <ul class="l-en">
+      <li><strong>No shoes inside</strong> — remove at entrance</li>
+      <li>Slippers are provided</li>
+      <li>Read Chapter 12 "Nature" before opening windows</li>
+    </ul>
+    <ul class="l-zh">
+      <li><strong>禁止穿鞋入内</strong> — 在玄关脱鞋</li>
+      <li>已备拖鞋</li>
+    </ul>
+    <ul class="l-ko">
+      <li><strong>실내 신발 금지</strong> — 현관에서 벗기</li>
+      <li>슬리퍼 제공</li>
+    </ul>
+    <ul class="l-fr">
+      <li><strong>Sans chaussures</strong> — retirez à l'entrée</li>
+      <li>Chaussons fournis</li>
+    </ul>
+  </div>
+
+  <div class="block info">
+    <h3><span class="ico">🔐</span>
+      <span class="l-ja">セーフティボックス</span><span class="l-en">Safety Box</span><span class="l-zh">保险箱</span><span class="l-ko">금고</span><span class="l-fr">Coffre-fort</span>
+    </h3>
+    <p class="l-ja"><strong>洋室3（収納部屋）</strong> にセーフティボックスがあります。貴重品の保管にご利用ください。</p>
+    <div style="background:#FFF9E6;border-left:4px solid var(--accent);padding:12px 16px;border-radius:4px;margin:12px 0;font-size:0.95rem;">
+      <p class="l-ja" style="margin:0;"><strong>🔢 暗証番号: <span style="font-family:monospace;font-size:1.15rem;letter-spacing:0.1em;">5963#</span></strong>（※サンプル）</p>
+      <p class="l-ja" style="margin:6px 0 0;font-size:0.85rem;color:var(--warning);">⚠ 3回間違えるとしばらくロックされます（しばらく時間をおいてください）</p>
+    </div>
+    <p class="l-ja">万一開かない場合、金庫の<strong>裏面</strong>に予備の鍵をひもで結び付けてあります。退室時は必ず空にして<strong>開錠状態</strong>でお戻しください。</p>
+    <p class="l-en"><strong>Code: <span style="font-family:monospace;">5963#</span></strong> (SAMPLE) (3 wrong attempts → temporary lock). Spare key tied to the <strong>back</strong> of the safe. Empty and unlock before checkout.</p>
+    <p class="l-zh">保险箱在<strong>3号卧室（收纳室）</strong>。密码: <strong>5963#</strong>（示例）（输错3次会暂时锁定）。备用钥匙系在保险箱<strong>背面</strong>。退房前请清空并解锁。</p>
+    <p class="l-ko">금고는 <strong>3호 침실</strong>에 있습니다. 비밀번호: <strong>5963#</strong> (샘플) (3회 오류 시 일시 잠금). 예비 열쇠는 금고 <strong>뒷면</strong>에 끈으로 부착. 체크아웃 전 비우고 잠금 해제.</p>
+    <p class="l-fr">Coffre dans la <strong>Chambre 3</strong>. Code: <strong>5963#</strong> (EXEMPLE) (3 erreurs → verrouillage temporaire). Clé de secours attachée à l'arrière. Videz et déverrouillez avant le départ.</p>
+  </div>
+</section>
+
+<!-- ===== 06. 設備の使い方 ===== -->
+<section class="chapter" id="facilities">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 06</div>
+    <h2>
+      <span class="l-ja">各設備の使い方</span><span class="l-en">Facilities</span><span class="l-zh">设施使用</span><span class="l-ko">시설 사용법</span><span class="l-fr">Équipements</span>
+    </h2>
+  </div>
+
+  <div class="block todo">
+    <h3><span class="ico">❄️</span>
+      <span class="l-ja">エアコン</span><span class="l-en">Air Conditioner</span><span class="l-zh">空调</span><span class="l-ko">에어컨</span><span class="l-fr">Climatisation</span>
+      <span class="badge-todo">要修正</span>
+    </h3>
+    <p class="l-ja">本体・リモコンに <strong>番号ラベル</strong> を貼付予定（4個程度・現在準備中）。対応するリモコンをご使用ください。</p>
+    <p class="l-en">Number labels on units &amp; remotes <strong>being prepared</strong> (~4 units). Use matching remote.</p>
+    <p class="l-zh">空调和遥控器的<strong>编号标签准备中</strong>。请使用对应的遥控器。</p>
+    <p class="l-ko">에어컨과 리모컨에 <strong>번호 라벨 준비 중</strong>. 해당 리모컨 사용.</p>
+    <p class="l-fr">Étiquettes numérotées <strong>en préparation</strong>. Utilisez la télécommande correspondante.</p>
+    <ul class="l-ja">
+      <li>夏: 26-28℃ / 冬: 20-22℃ 推奨</li>
+      <li>退室時は <strong>必ず全室OFF</strong></li>
+    </ul>
+    <ul class="l-en">
+      <li>Summer 26-28°C / Winter 20-22°C recommended</li>
+      <li><strong>All OFF before checkout</strong></li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">🍳</span>
+      <span class="l-ja">キッチン家電</span><span class="l-en">Kitchen</span><span class="l-zh">厨房家电</span><span class="l-ko">주방 가전</span><span class="l-fr">Cuisine</span>
+    </h3>
+    <ul class="l-ja">
+      <li><strong>冷蔵庫</strong>: 自由使用 / 退室時は空に</li>
+      <li><strong>電子レンジ</strong>: 使用後は庫内を空に</li>
+      <li><strong>トースター</strong>: パンくず受け皿注意</li>
+      <li><strong>電気ケトル</strong></li>
+      <li><strong>炊飯器</strong>: 内釜を洗ってお戻し</li>
+      <li><strong>ガスコンロ</strong>: 元栓も含めて必ずOFF</li>
+    </ul>
+    <ul class="l-en">
+      <li><strong>Fridge</strong>: empty on checkout</li>
+      <li><strong>Microwave</strong>: empty interior after use</li>
+      <li><strong>Toaster</strong>: mind the crumb tray</li>
+      <li><strong>Kettle</strong>, <strong>Rice cooker</strong>, <strong>Gas stove</strong> (turn OFF main valve)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">🛁</span>
+      <span class="l-ja">お風呂・給湯器</span><span class="l-en">Bath &amp; Heater</span><span class="l-zh">浴室·热水器</span><span class="l-ko">목욕탕·온수기</span><span class="l-fr">Bain</span>
+    </h3>
+    <ul class="l-ja">
+      <li>給湯器パネルでお湯張り・追い焚き可</li>
+      <li>最後にお湯を抜く</li>
+      <li>使用後は<strong>必ず換気扇</strong>を回す（カビ防止）</li>
+      <li>シャンプー・コンディショナー・ボディソープ備付</li>
+    </ul>
+    <ul class="l-en">
+      <li>Use heater panel for filling &amp; reheating</li>
+      <li>Drain the bath after use</li>
+      <li><strong>Run ventilation fan</strong> after bathing</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">👕</span>
+      <span class="l-ja">洗濯機・乾燥機</span><span class="l-en">Washer &amp; Dryer</span><span class="l-zh">洗衣机·烘干机</span><span class="l-ko">세탁기·건조기</span><span class="l-fr">Lave-linge</span>
+    </h3>
+    <ul class="l-ja">
+      <li>洗剤備付（残量にご注意）</li>
+      <li>乾燥機能あり</li>
+      <li>糸くずフィルターは適宜清掃</li>
+    </ul>
+  </div>
+
+  <div class="block info">
+    <h3><span class="ico">📺</span>
+      <span class="l-ja">TV・リモコン</span><span class="l-en">TV &amp; Remote</span><span class="l-zh">电视</span><span class="l-ko">TV</span><span class="l-fr">TV</span>
+    </h3>
+    <ul class="l-ja">
+      <li>リビング・各寝室にTV設置</li>
+      <li>リモコンの定位置を変えない</li>
+      <li>退室時は電源OFF確認</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 07. BBQ ===== -->
+<section class="chapter" id="bbq">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 07</div>
+    <h2>
+      <span class="l-ja">BBQ の使い方</span><span class="l-en">BBQ Guide</span><span class="l-zh">烧烤指南</span><span class="l-ko">바비큐 가이드</span><span class="l-fr">BBQ</span>
+    </h2>
+    <p class="lead l-ja">利用時間: <strong>10:00 — 20:00</strong>（火気は19:00まで / 音楽は20:00まで）</p>
+    <p class="lead l-en">Hours: <strong>10:00 — 20:00</strong> (Fire until 19:00 / Music until 20:00)</p>
+  </div>
+
+  <div class="block warning">
+    <h3><span class="ico">🔥</span>
+      <span class="l-ja">BBQ ご利用について</span><span class="l-en">About BBQ Service</span><span class="l-zh">关于烧烤</span><span class="l-ko">바비큐 안내</span><span class="l-fr">Service BBQ</span>
+    </h3>
+    <p class="l-ja">BBQは <strong>事前予約制</strong> です。利用ご希望の方は予約時にお申し付けください。当日のお申込みも可能ですが、追加料金が発生します。</p>
+    <p class="l-en">BBQ is <strong>reservation-only</strong>. Please request at booking. Same-day requests OK but with extra fee.</p>
+  </div>
+
+  <div class="block good">
+    <h3><span class="ico">💰</span>
+      <span class="l-ja">BBQ・ペット 追加料金</span><span class="l-en">Optional Fees</span><span class="l-zh">附加费</span><span class="l-ko">추가 요금</span><span class="l-fr">Frais en option</span>
+    </h3>
+    <p class="l-ja">BBQ・ペット同伴は <strong>1予約あたり</strong> の追加料金です。<strong>ペットは1匹まで</strong>。</p>
+    <p class="l-en">BBQ &amp; Pet fees are <strong>per booking</strong>. <strong>Maximum 1 pet</strong>.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0;">
+      <div style="background:#EAF5EE;padding:14px;border-radius:8px;text-align:center;border:1px solid #2D7A4F;">
+        <div style="font-size:0.6rem;letter-spacing:0.16em;color:#2D7A4F;font-weight:700;">ADVANCE</div>
+        <div class="l-ja" style="font-weight:700;font-size:0.85rem;">予約時申告</div>
+        <div class="l-en" style="font-weight:700;font-size:0.85rem;">At booking</div>
+        <div style="font-family:var(--serif-font);font-size:1.7rem;font-weight:700;color:#2D7A4F;">¥3,300</div>
+      </div>
+      <div style="background:#FFF6EE;padding:14px;border-radius:8px;text-align:center;border:1px solid var(--warning);">
+        <div style="font-size:0.6rem;letter-spacing:0.16em;color:var(--warning);font-weight:700;">SAME DAY</div>
+        <div class="l-ja" style="font-weight:700;font-size:0.85rem;">当日追加</div>
+        <div class="l-en" style="font-weight:700;font-size:0.85rem;">Same-day</div>
+        <div style="font-family:var(--serif-font);font-size:1.7rem;font-weight:700;color:var(--warning);">¥5,500</div>
+      </div>
+      <div style="background:#FFF1F0;padding:14px;border-radius:8px;text-align:center;border:1px solid var(--emergency);">
+        <div style="font-size:0.6rem;letter-spacing:0.16em;color:var(--emergency);font-weight:700;">UNAUTHORIZED</div>
+        <div class="l-ja" style="font-weight:700;font-size:0.85rem;">未申告</div>
+        <div class="l-en" style="font-weight:700;font-size:0.85rem;">Unauthorized</div>
+        <div style="font-family:var(--serif-font);font-size:1.7rem;font-weight:700;color:var(--emergency);">¥15,000</div>
+        <div style="font-size:0.55rem;color:var(--text-light);">¥10,000 + 清掃¥5,000</div>
+      </div>
+    </div>
+    <p class="l-ja" style="color:var(--warning);font-weight:700;">⚠ お申込みは Airbnb/Booking メッセージで。<strong>ホストからの確定返信後</strong> にご利用ください。</p>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">🔧</span>
+      <span class="l-ja">BBQ用品の場所</span><span class="l-en">Equipment Location</span><span class="l-zh">用具位置</span><span class="l-ko">용품 위치</span><span class="l-fr">Emplacement</span>
+    </h3>
+    <ul class="l-ja">
+      <li><strong>グリル</strong>: 庭の収納ボックスの<strong>隣</strong>（カバー有）</li>
+      <li><strong>ツール・椅子</strong>: 庭の収納ボックス（570L×2）<strong>内</strong></li>
+      <li><strong>ガスボンベ</strong>: キッチン上にBBQ用 2本を常設</li>
+      <li><strong>炭は使用禁止</strong>（ガスのみ）</li>
+      <li><strong>消火器</strong>: キッチンのゴミ箱の<strong>横</strong> / <strong>救急キット</strong>: キッチン付近のゴミ箱ボックス<strong>内</strong></li>
+    </ul>
+  </div>
+
+  <div class="block critical">
+    <h3><span class="ico">📋</span>
+      <span class="l-ja">BBQ ルール</span><span class="l-en">BBQ Rules</span><span class="l-zh">烧烤规则</span><span class="l-ko">바비큐 규칙</span><span class="l-fr">Règles BBQ</span>
+    </h3>
+    <ol class="steps">
+      <li class="l-ja">利用時間: <strong>10:00〜20:00</strong>（火気19時まで・音楽20時まで）</li>
+      <li class="l-ja"><strong>大声・騒音は時間問わずご遠慮</strong>（静かな湖畔エリア）</li>
+      <li class="l-ja">場所: <strong>パノラマテラス側のみ</strong>（プライベートガーデンは禁止）</li>
+      <li class="l-ja">火気はガスのみ・<strong>炭・薪・焚火は禁止</strong></li>
+      <li class="l-ja">使用後は <strong>備品を清掃して収納ボックスへ</strong></li>
+      <li class="l-ja">ゴミは分別（章09参照）</li>
+      <li class="l-ja">グリル・炭の <strong>屋内への持込禁止</strong></li>
+    </ol>
+  </div>
+
+  <div class="block info">
+    <h3><span class="ico">📹</span>
+      <span class="l-ja">BBQ 使い方動画</span><span class="l-en">How-to Video</span>
+    </h3>
+    <p><a href="#" class="link-btn">▶ YouTube で見る（※サンプル / Sample link）</a></p>
+  </div>
+</section>
+
+<!-- ===== 08. 花火 ===== -->
+<section class="chapter" id="fireworks">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 08</div>
+    <h2>
+      <span class="l-ja">花火ルール</span><span class="l-en">Fireworks</span><span class="l-zh">烟花规则</span><span class="l-ko">불꽃놀이</span><span class="l-fr">Feux d'artifice</span>
+    </h2>
+  </div>
+
+  <div class="block critical">
+    <h3><span class="ico">🚨</span>
+      <span class="l-ja">火事のリスクが非常に高い</span><span class="l-en">High Fire Risk</span><span class="l-zh">火灾风险极高</span><span class="l-ko">화재 위험 큼</span><span class="l-fr">Risque d'incendie élevé</span>
+    </h3>
+    <p class="l-ja">物件周辺は <strong>木が密集</strong> しています。火事が発生した場合、<strong>大災害となり多大な被害・賠償</strong> が生じる可能性があります。火の元には絶対に注意してください。</p>
+    <p class="l-en">The area is densely forested. Fire would cause <strong>disaster-level damage</strong>. Please be extremely careful with flames.</p>
+    <p class="l-zh">本物件周围<strong>树木茂密</strong>。一旦发生火灾将造成<strong>重大灾害和巨额赔偿</strong>。</p>
+    <p class="l-ko">주변에 <strong>나무가 밀집</strong>되어 있어 화재 시 <strong>대재해 및 거액 배상</strong>이 발생할 수 있습니다.</p>
+    <p class="l-fr">Zone très boisée. Un incendie causerait <strong>des dégâts majeurs</strong>.</p>
+  </div>
+
+  <div class="block warning">
+    <h3><span class="ico">🎆</span>
+      <span class="l-ja">花火について</span><span class="l-en">Fireworks Rules</span><span class="l-zh">烟花规则</span><span class="l-ko">불꽃놀이 규칙</span><span class="l-fr">Règles</span>
+    </h3>
+    <ul class="l-ja">
+      <li><strong>手持ち花火のみ可</strong>（打上・ロケット禁止）</li>
+      <li>必ず <strong>水バケツ・水ホース</strong> をご準備</li>
+      <li>使った花火は <strong>必ず水につけて</strong> 置く</li>
+      <li><strong>コンクリート部分のみ</strong> で実施（草地・芝生での使用禁止）</li>
+      <li>花火可能エリア: <strong>パノラマテラスのコンクリート部</strong></li>
+      <li>ビニール袋など <strong>飛ばされやすい物は必ずゴミ袋へ</strong>（風で飛ぶと火種に）</li>
+      <li>20時以降はご遠慮ください</li>
+    </ul>
+    <ul class="l-en">
+      <li><strong>Handheld sparklers only</strong> (no aerial fireworks)</li>
+      <li><strong>Water bucket &amp; hose</strong> required</li>
+      <li><strong>Soak used sparklers in water</strong></li>
+      <li>Use only on <strong>concrete areas</strong> (no grass)</li>
+      <li>Allowed zone: <strong>Panorama Terrace concrete</strong></li>
+      <li>Dispose of plastic bags carefully (can blow away &amp; ignite)</li>
+      <li>Please refrain after 20:00</li>
+    </ul>
+    <ul class="l-zh">
+      <li><strong>仅限手持烟花</strong>（禁止升空·火箭烟花）</li>
+      <li>务必准备 <strong>水桶·水管</strong></li>
+      <li>用过的烟花 <strong>务必浸入水中</strong></li>
+      <li>仅可在 <strong>混凝土区域</strong> 使用（禁止在草地·草坪）</li>
+      <li>可用区域: <strong>全景露台的混凝土部分</strong></li>
+      <li>塑料袋等易被风吹走的物品务必放入垃圾袋（被风吹走会成为火源）</li>
+      <li>20:00以后请勿使用</li>
+    </ul>
+    <ul class="l-ko">
+      <li><strong>손에 드는 불꽃놀이만 가능</strong> (쏘아 올리는·로켓 불꽃 금지)</li>
+      <li>반드시 <strong>물 양동이·호스</strong> 준비</li>
+      <li>사용한 불꽃은 <strong>반드시 물에 담가</strong> 두기</li>
+      <li><strong>콘크리트 부분에서만</strong> 실시 (잔디·풀밭 사용 금지)</li>
+      <li>가능 구역: <strong>파노라마 테라스 콘크리트 부분</strong></li>
+      <li>비닐봉지 등 날아가기 쉬운 물건은 반드시 쓰레기봉투에 (바람에 날리면 불씨가 됨)</li>
+      <li>20시 이후에는 자제해 주세요</li>
+    </ul>
+    <ul class="l-fr">
+      <li><strong>Cierges à main uniquement</strong> (pas de feux aériens ni de fusées)</li>
+      <li><strong>Seau d'eau et tuyau</strong> obligatoires</li>
+      <li><strong>Plongez les cierges usagés dans l'eau</strong></li>
+      <li>Utilisez uniquement sur les <strong>surfaces en béton</strong> (pas sur l'herbe)</li>
+      <li>Zone autorisée : <strong>béton de la terrasse panoramique</strong></li>
+      <li>Jetez les sacs plastiques avec soin (ils peuvent s'envoler et prendre feu)</li>
+      <li>Merci de vous abstenir après 20h00</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 09. ゴミ分別 ===== -->
+<section class="chapter" id="trash">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 09</div>
+    <h2>
+      <span class="l-ja">ゴミ分別</span><span class="l-en">Trash Sorting</span><span class="l-zh">垃圾分类</span><span class="l-ko">쓰레기 분리</span><span class="l-fr">Tri</span>
+    </h2>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">♻️</span>
+      <span class="l-ja">基本ルール</span><span class="l-en">Basic Rule</span>
+    </h3>
+    <p class="l-ja"><strong>室内にあるゴミ箱に入れてください。</strong>分別ルールは室内のゴミ箱付近に掲示してあります。掲示の通りに分別をお願いします。</p>
+    <p class="l-en"><strong>Use the indoor trash bins.</strong> Sorting rules are posted near each bin.</p>
+    <p class="l-zh"><strong>请使用室内的垃圾桶。</strong>分类规则贴在垃圾桶附近。</p>
+    <p class="l-ko"><strong>실내 쓰레기통을 사용해 주세요.</strong> 분리 규칙은 통 근처에 표시.</p>
+    <p class="l-fr"><strong>Utilisez les poubelles intérieures.</strong> Règles affichées près des poubelles.</p>
+  </div>
+
+  <div class="block info">
+    <h3><span class="ico">📦</span>
+      <span class="l-ja">あふれる場合</span><span class="l-en">If Overflowing</span>
+    </h3>
+    <p class="l-ja">室内のゴミ箱に入りきらない場合は、<strong>外の シルバーのゴミ入れボックス（2つ）</strong> をご利用ください。</p>
+    <p class="l-en">If indoor bins are full, use the <strong>silver outdoor bins (×2)</strong>.</p>
+  </div>
+
+  <div class="block todo">
+    <h3>
+      <span class="l-ja">📸 写真</span><span class="l-en">📸 Photos</span>
+      <span class="badge-todo">要追加</span>
+    </h3>
+    <div class="photo-todo">
+      <span class="ico">📷</span>
+      <span class="l-ja">室内ゴミ箱の写真（撮影後ここに掲載予定）</span>
+      <span class="l-en">Indoor trash bin photo (TBD)</span>
+    </div>
+    <div class="photo-todo">
+      <span class="ico">📷</span>
+      <span class="l-ja">屋外シルバーボックスの写真（撮影後ここに掲載予定）</span>
+      <span class="l-en">Outdoor silver bin photo (TBD)</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 10. Wi-Fi ===== -->
+<section class="chapter" id="wifi">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 10</div>
+    <h2>Wi-Fi</h2>
+  </div>
+
+  <div class="block good">
+    <h3><span class="ico">📶</span>Wi-Fi 接続情報
+    </h3>
+    <p class="l-ja">下記は <strong>サンプル表記</strong> です。実際のSSID / パスワードは現地のWi-Fiカードまたは予約サイトのメッセージをご確認ください。</p>
+    <p class="l-en">The values below are <strong>SAMPLES</strong>. Please refer to the on-site Wi-Fi card or your booking message for the actual SSID / Password.</p>
+    <ul class="l-ja">
+      <li><strong>SSID</strong>: <code style="background:#FFF5C2;padding:2px 8px;border-radius:4px;">AomineLodge-Guest</code>（※サンプル）</li>
+      <li><strong>パスワード</strong>: <code style="background:#FFF5C2;padding:2px 8px;border-radius:4px;">welcome2026</code>（※サンプル）</li>
+      <li>全室で利用可能</li>
+      <li>通信トラブル時: ルーター電源を抜いて30秒後に再起動</li>
+    </ul>
+  </div>
+
+  <div class="block warning">
+    <h3><span class="ico">⚡</span>
+      <span class="l-ja">TV近くのコンセントは抜かない</span><span class="l-en">Don't Unplug Outlet Near TV</span><span class="l-zh">勿拔电视附近的插座</span><span class="l-ko">TV 옆 콘센트 빼지 마세요</span><span class="l-fr">Ne débranchez pas</span>
+    </h3>
+    <p class="l-ja">テレビ近くのコンセントは <strong>Wi-Fi ルーターの電源</strong> です。抜くとインターネットが使えなくなりますので、絶対に外さないでください。</p>
+    <p class="l-en">The outlet near the TV powers the <strong>Wi-Fi router</strong>. Do NOT unplug it.</p>
+    <p class="l-zh">电视附近的插座是<strong>Wi-Fi路由器电源</strong>。请勿拔出。</p>
+    <p class="l-ko">TV 옆 콘센트는 <strong>Wi-Fi 라우터 전원</strong>입니다. 빼지 마세요.</p>
+    <p class="l-fr">La prise près de la TV alimente le <strong>routeur Wi-Fi</strong>. Ne pas débrancher.</p>
+  </div>
+</section>
+
+<!-- ===== 11. 喫煙 ===== -->
+<section class="chapter" id="smoking">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 11</div>
+    <h2>
+      <span class="l-ja">喫煙ルール</span><span class="l-en">Smoking</span><span class="l-zh">吸烟</span><span class="l-ko">흡연</span><span class="l-fr">Tabac</span>
+    </h2>
+  </div>
+
+  <div class="block critical">
+    <h3><span class="ico">🚭</span>
+      <span class="l-ja">全館禁煙（屋内）</span><span class="l-en">No Smoking Indoors</span><span class="l-zh">室内全面禁烟</span><span class="l-ko">실내 전면 금연</span><span class="l-fr">Non-fumeur à l'intérieur</span>
+    </h3>
+    <p class="l-ja"><strong>室内はすべて禁煙</strong>です。違反確認時、特殊清掃・消臭・休業相当の実費を請求する場合があります。</p>
+    <p class="l-en"><strong>No smoking inside</strong>. Violation may incur actual cleaning &amp; deodorization costs.</p>
+    <p class="l-zh"><strong>室内全面禁烟</strong>。如确认违规，可能按实际费用收取特殊清洁·除味·停业损失等费用。</p>
+    <p class="l-ko"><strong>실내는 전면 금연</strong>입니다. 위반 확인 시 특수 청소·탈취·영업 손실에 상당하는 실비를 청구할 수 있습니다.</p>
+    <p class="l-fr"><strong>Interdiction de fumer à l'intérieur</strong>. En cas d'infraction, les frais réels de nettoyage spécial, de désodorisation et de fermeture peuvent être facturés.</p>
+  </div>
+
+  <div class="block good">
+    <h3><span class="ico">🌿</span>
+      <span class="l-ja">屋外は喫煙可</span><span class="l-en">Smoking OK Outdoors</span><span class="l-zh">户外可吸烟</span><span class="l-ko">야외 흡연 가능</span><span class="l-fr">Fumer autorisé à l'extérieur</span>
+    </h3>
+    <ul class="l-ja">
+      <li><strong>プライベートガーデン</strong> + <strong>パノラマテラス</strong> 両方OK</li>
+      <li>備付の <strong>灰皿</strong>（屋外2箇所）をご利用</li>
+      <li>吸殻は完全消火してから所定の場所へ</li>
+    </ul>
+    <ul class="l-en">
+      <li>Both the <strong>Private Garden</strong> &amp; <strong>Panorama Terrace</strong> are OK</li>
+      <li>Use the provided <strong>ashtrays</strong> (2 outdoor locations)</li>
+      <li>Fully extinguish butts before placing them in the designated spot</li>
+    </ul>
+    <ul class="l-zh">
+      <li><strong>私人花园</strong> + <strong>全景露台</strong> 均可</li>
+      <li>请使用备好的 <strong>烟灰缸</strong>（户外2处）</li>
+      <li>烟头请完全熄灭后放入指定位置</li>
+    </ul>
+    <ul class="l-ko">
+      <li><strong>프라이빗 가든</strong> + <strong>파노라마 테라스</strong> 모두 가능</li>
+      <li>비치된 <strong>재떨이</strong>(야외 2곳)를 이용</li>
+      <li>꽁초는 완전히 끈 후 지정된 장소에</li>
+    </ul>
+    <ul class="l-fr">
+      <li><strong>Jardin privé</strong> et <strong>terrasse panoramique</strong> autorisés</li>
+      <li>Utilisez les <strong>cendriers</strong> fournis (2 emplacements extérieurs)</li>
+      <li>Éteignez complètement les mégots avant de les déposer à l'endroit prévu</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 12. 自然・虫 ===== -->
+<section class="chapter" id="nature">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 12</div>
+    <h2>
+      <span class="l-ja">自然からのお便り</span><span class="l-en">A Note from Nature</span><span class="l-zh">自然提示</span><span class="l-ko">자연 안내</span><span class="l-fr">Nature</span>
+    </h2>
+  </div>
+
+  <div class="block warning">
+    <h3><span class="ico">🪟</span>
+      <span class="l-ja">窓は基本「閉」</span><span class="l-en">Keep Windows Closed</span><span class="l-zh">窗户基本保持关闭</span><span class="l-ko">창문은 기본 "닫음"</span><span class="l-fr">Fenêtres fermées</span>
+    </h3>
+    <p class="l-ja">緑豊かな立地のため、季節によって虫が室内に入ることがあります。</p>
+    <p class="l-en">Due to the green surroundings, insects may enter depending on the season.</p>
+    <p class="l-zh">由于周围绿意盎然，根据季节不同昆虫可能进入室内。</p>
+    <p class="l-ko">녹음이 우거진 입지로 인해 계절에 따라 벌레가 실내에 들어올 수 있습니다.</p>
+    <p class="l-fr">En raison de l'environnement verdoyant, des insectes peuvent entrer selon la saison.</p>
+    <p class="l-ja" style="font-size:1.1rem;font-weight:700;color:var(--warning);">⚠ <strong>2階ベランダの窓は絶対に開けないでください</strong>（ベッドが目の前で危険・虫も多い）</p>
+    <p class="l-en" style="font-size:1.1rem;font-weight:700;color:var(--warning);">⚠ <strong>NEVER open 2F balcony windows</strong> (bed is right there, dangerous &amp; insects)</p>
+    <p class="l-zh" style="font-size:1.1rem;font-weight:700;color:var(--warning);">⚠ <strong>请绝对不要打开2楼阳台的窗户</strong>（床就在眼前，危险且虫多）</p>
+    <p class="l-ko" style="font-size:1.1rem;font-weight:700;color:var(--warning);">⚠ <strong>2층 베란다 창문은 절대 열지 마세요</strong> (침대가 바로 앞이라 위험하고 벌레도 많음)</p>
+    <p class="l-fr" style="font-size:1.1rem;font-weight:700;color:var(--warning);">⚠ <strong>N'ouvrez JAMAIS les fenêtres du balcon du 2e étage</strong> (le lit est juste devant : danger et insectes)</p>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">🧴</span>
+      <span class="l-ja">殺虫剤・蚊取り</span><span class="l-en">Insect Spray</span>
+    </h3>
+    <p class="l-ja">備付の殺虫剤・蚊取り線香・電気蚊取り器をご利用ください。</p>
+    <ul class="l-ja">
+      <li>場所: <strong>キッチン下の引き出し</strong></li>
+      <li>使用後は元の場所へ</li>
+    </ul>
+    <ul class="l-en">
+      <li>Located in <strong>kitchen drawer</strong></li>
+      <li>Return after use</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 13. 危険箇所（崖） ===== -->
+<section class="chapter" id="danger">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 13</div>
+    <h2>
+      <span class="l-ja">危険箇所のご注意</span><span class="l-en">Danger Zone</span><span class="l-zh">危险区域</span><span class="l-ko">위험 구역</span><span class="l-fr">Zone dangereuse</span>
+    </h2>
+  </div>
+
+  <div class="block critical">
+    <h3><span class="ico">⚠</span>
+      <span class="l-ja">テラスの先は湖へ落ちる急斜面です</span><span class="l-en">Steep Drop to the Lake</span><span class="l-zh">露台前方是通往湖的陡坡</span><span class="l-ko">테라스 너머는 호수로 떨어지는 급경사</span><span class="l-fr">Pente raide vers le lac</span>
+    </h3>
+    <p class="l-ja" style="font-size:1.2rem;font-weight:700;color:var(--emergency);">テラスの先は <strong>湖へ落ちる急斜面（崖）</strong> です。転落・水難事故防止のため <strong>柵の外は立入禁止</strong> です。</p>
+    <p class="l-en" style="font-size:1.2rem;font-weight:700;color:var(--emergency);">Beyond the terrace is a <strong>steep slope (cliff) down to the lake</strong>. <strong>Keep out beyond the fence</strong> to prevent falling &amp; water accidents.</p>
+    <p class="l-zh" style="font-size:1.2rem;font-weight:700;color:var(--emergency);">露台前方是<strong>通往湖的陡坡（悬崖）</strong>。为防止坠落和溺水事故，<strong>请勿越过围栏</strong>。</p>
+    <p class="l-ko" style="font-size:1.2rem;font-weight:700;color:var(--emergency);">테라스 너머는 <strong>호수로 떨어지는 급경사(절벽)</strong>입니다. 추락·수난 사고 방지를 위해 <strong>울타리 밖 출입 금지</strong>입니다.</p>
+    <p class="l-fr" style="font-size:1.2rem;font-weight:700;color:var(--emergency);">Au-delà de la terrasse se trouve une <strong>pente raide (falaise) vers le lac</strong>. <strong>Ne franchissez pas la barrière</strong> pour éviter chutes et noyades.</p>
+    <ul class="l-ja">
+      <li>柵外・立入禁止表示の範囲・湖の岸辺には入らない</li>
+      <li>お子さまは必ず保護者同伴で</li>
+      <li>夜間・雨天・飲酒後は先端部や水際に近づかない</li>
+    </ul>
+    <ul class="l-en">
+      <li>Do not go beyond the fence, into restricted areas, or to the lake shore</li>
+      <li>Children must always be accompanied by an adult</li>
+      <li>Stay away from the edge &amp; waterside at night, in rain, or after drinking</li>
+    </ul>
+    <ul class="l-zh">
+      <li>请勿越过围栏、进入禁止区域或湖岸边</li>
+      <li>儿童必须由成人陪同</li>
+      <li>夜间·雨天·饮酒后请勿靠近边缘和水边</li>
+    </ul>
+    <ul class="l-ko">
+      <li>울타리 밖, 출입 금지 구역, 호숫가에 들어가지 마세요</li>
+      <li>어린이는 반드시 보호자와 동반</li>
+      <li>야간·우천·음주 후에는 끝부분이나 물가에 접근하지 마세요</li>
+    </ul>
+    <ul class="l-fr">
+      <li>Ne franchissez pas la barrière, les zones interdites ni la rive du lac</li>
+      <li>Les enfants doivent toujours être accompagnés d'un adulte</li>
+      <li>Évitez le bord et la berge la nuit, sous la pluie ou après avoir bu</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 14. 周辺案内 ===== -->
+<section class="chapter" id="around">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 14</div>
+    <h2>
+      <span class="l-ja">周辺案内</span><span class="l-en">Around Aomine Lodge</span>
+    </h2>
+  </div>
+
+  <div class="two-col">
+    <div class="block">
+      <h3><span class="ico">🏪</span>
+        <span class="l-ja">買い物</span><span class="l-en">Shopping</span>
+      </h3>
+      <p class="l-ja"><strong>コンビニ 青嶺高原店</strong>（※サンプル）(車5分・24h)</p>
+      <p class="l-en"><strong>Convenience Store, Aomine-Kogen</strong> (SAMPLE) (5 min by car · 24h)</p>
+      <p class="l-zh"><strong>便利店 青岭高原店</strong>（※示例）(车程5分钟·24h)</p>
+      <p class="l-ko"><strong>편의점 아오미네고원점</strong> (※샘플) (차량 5분 · 24h)</p>
+      <p class="l-fr"><strong>Supérette, Aomine-Kogen</strong> (EXEMPLE) (5 min en voiture · 24h)</p>
+      <p><a class="link-btn maps" href="https://www.google.com/maps/search/?api=1&query=%E9%9D%92%E5%B6%BA%E9%AB%98%E5%8E%9F" target="_blank">📍 Maps</a></p>
+      <p style="margin-top:10px;" class="l-ja">他のスーパー: 青嶺高原駅周辺</p>
+      <p style="margin-top:10px;" class="l-en">Other supermarkets: around Aomine-Kogen Station</p>
+      <p style="margin-top:10px;" class="l-zh">其他超市: 青岭高原站周边</p>
+      <p style="margin-top:10px;" class="l-ko">다른 슈퍼마켓: 아오미네고원역 주변</p>
+      <p style="margin-top:10px;" class="l-fr">Autres supermarchés: autour de la gare d'Aomine-Kogen</p>
+    </div>
+
+    <div class="block">
+      <h3><span class="ico">🍽</span>
+        <span class="l-ja">地元レストラン（湖畔）</span><span class="l-en">Local Restaurant</span><span class="l-zh">当地餐厅</span><span class="l-ko">현지 레스토랑</span><span class="l-fr">Restaurant local</span>
+      </h3>
+      <p class="l-ja"><strong>Lakeside Kitchen</strong>（ロッジから車5分）。湖を望む地元食材の人気レストラン。</p>
+      <p class="l-en"><strong>Lakeside Kitchen</strong> (5 min by car). Popular lake-view restaurant with local ingredients.</p>
+      <p class="l-zh"><strong>Lakeside Kitchen</strong>（车程5分钟）。可眺望湖景的人气餐厅，使用当地食材。</p>
+      <p class="l-ko"><strong>Lakeside Kitchen</strong> (차량 5분). 호수가 보이는 현지 식재료 인기 레스토랑.</p>
+      <p class="l-fr"><strong>Lakeside Kitchen</strong> (5 min en voiture). Restaurant prisé avec vue sur le lac.</p>
+      <div style="background:var(--bg-soft);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:0.82rem;">
+        <strong>🕐 <span class="l-ja">営業時間</span><span class="l-en">Hours</span><span class="l-zh">营业时间</span><span class="l-ko">영업시간</span><span class="l-fr">Horaires</span></strong>
+        <div style="margin-top:6px;line-height:1.6;">
+          <span class="l-ja">月・火・水・金・土・日: 11:00〜15:00 / 16:30〜20:30<br><strong style="color:var(--emergency);">木曜定休</strong></span>
+          <span class="l-en">Mon/Tue/Wed/Fri/Sat/Sun: 11:00-15:00, 16:30-20:30<br><strong style="color:var(--emergency);">Closed on Thursdays</strong></span>
+          <span class="l-zh">周一·二·三·五·六·日: 11:00-15:00 / 16:30-20:30<br><strong style="color:var(--emergency);">周四休息</strong></span>
+          <span class="l-ko">월·화·수·금·토·일: 11:00-15:00 / 16:30-20:30<br><strong style="color:var(--emergency);">목요일 정기 휴무</strong></span>
+          <span class="l-fr">Lun/Mar/Mer/Ven/Sam/Dim: 11h-15h, 16h30-20h30<br><strong style="color:var(--emergency);">Fermé le jeudi</strong></span>
+        </div>
+      </div>
+      <p style="font-size:0.78rem;color:var(--warning);">
+        <span class="l-ja">⚠ 不定期にお休みの場合があります。事前に確認をおすすめします。</span>
+        <span class="l-en">⚠ Occasionally closed without notice. Please check before visiting.</span>
+        <span class="l-zh">⚠ 不定期休息。建议事先确认。</span>
+        <span class="l-ko">⚠ 비정기 휴무가 있을 수 있습니다. 사전 확인 권장.</span>
+        <span class="l-fr">⚠ Fermetures occasionnelles. Vérifiez avant de visiter.</span>
+      </p>
+      <p><a class="link-btn maps" href="https://www.google.com/maps/search/?api=1&query=%E9%9D%92%E5%B6%BA%E9%AB%98%E5%8E%9F" target="_blank">📍 Google Maps で見る / Open in Maps</a></p>
+    </div>
+
+    <div class="block">
+      <h3><span class="ico">🚲</span>
+        <span class="l-ja">レンタサイクル（E-bike）</span><span class="l-en">Bicycle Rental (E-bike)</span><span class="l-zh">共享单车</span><span class="l-ko">대여 자전거</span><span class="l-fr">Vélos en libre-service</span>
+      </h3>
+      <p class="l-ja">青嶺高原駅前のシェアサイクル・スマホで簡単レンタル可能。湖畔・白樺の森巡りに便利。</p>
+      <p class="l-en">Smartphone-based bike rental near Aomine-Kogen Station. Great for lakeside &amp; birch-forest trips.</p>
+      <p class="l-zh">青岭高原站前的共享单车，可用智能手机租借。适合湖畔和白桦林游览。</p>
+      <p class="l-ko">아오미네고원역 앞 공유 자전거. 스마트폰으로 간단 대여. 호숫가·자작나무 숲에 편리.</p>
+      <p class="l-fr">Location de vélos via smartphone près de la gare. Idéal pour le lac et la forêt de bouleaux.</p>
+
+      <div style="background:#F4F8FC;border-left:3px solid var(--info);padding:12px 14px;border-radius:6px;margin:10px 0;font-size:0.84rem;">
+        <strong style="color:var(--info);">🌐 <span class="l-ja">海外からのお客様へ</span><span class="l-en">For International Guests</span><span class="l-zh">致海外游客</span><span class="l-ko">해외 게스트께</span><span class="l-fr">Visiteurs internationaux</span></strong>
+        <ul style="margin-top:6px;padding-left:20px;">
+          <li class="l-ja"><strong>アプリは英語・簡体字・繁体字対応</strong>（マップ画面右上メニュー →「言語設定」）</li>
+          <li class="l-ja">自転車本体・ステーション画面も電源ボタンで <strong>英語選択可</strong></li>
+          <li class="l-ja">⚠ 登録時の <strong>日本電話番号 SMS認証</strong> がネック（海外番号は届かないことも）</li>
+          <li class="l-ja"><strong>Alipay / PayPay / LINE 連携</strong>で会員登録スキップ可能な場合あり</li>
+          <li class="l-ja">クレジットカード決済可</li>
+          <li class="l-en">App available in <strong>English / Simplified Chinese / Traditional Chinese</strong> (top-right menu → Language)</li>
+          <li class="l-en">Bike unit &amp; station screen: press power button to <strong>select English</strong></li>
+          <li class="l-en">⚠ Registration requires <strong>Japanese phone SMS</strong> (foreign numbers may not receive)</li>
+          <li class="l-en"><strong>Alipay / PayPay / LINE</strong> linking may skip registration</li>
+          <li class="l-en">Credit card payment OK</li>
+          <li class="l-zh">应用支持<strong>英文/简体/繁体</strong>（地图右上菜单 → 语言设置）</li>
+          <li class="l-zh">⚠ 注册需要<strong>日本电话号码短信验证</strong></li>
+          <li class="l-zh">可通过<strong>支付宝 / PayPay / LINE</strong>跳过注册</li>
+          <li class="l-ko">앱은 <strong>영어/중국어 간체/번체</strong> 지원 (지도 우측 상단 → 언어 설정)</li>
+          <li class="l-ko">⚠ 등록 시 <strong>일본 전화번호 SMS 인증</strong> 필요</li>
+          <li class="l-fr">App en <strong>anglais/chinois simplifié/traditionnel</strong></li>
+          <li class="l-fr">⚠ Inscription nécessite <strong>SMS japonais</strong></li>
+        </ul>
+      </div>
+
+      <p>
+        <a class="link-btn web" href="#">🚲 駅前ポート（※サンプル）</a>
+        <a class="link-btn web" href="#">🌐 公式サイト（※サンプル）</a>
+      </p>
+    </div>
+
+    <div class="block critical">
+      <h3><span class="ico">🏥</span>
+        <span class="l-ja">医療機関</span><span class="l-en">Medical</span>
+      </h3>
+      <ul class="l-ja">
+        <li><strong>青嶺高原診療所</strong>（車10分）<br>☎ 0000-00-0000（※サンプル）<br><span style="color:var(--text-light);font-size:0.78rem;">平日9-17時のみ</span></li>
+        <li>緊急時は <strong>119</strong>（章16）</li>
+        <li>外国語対応は<strong>事前確認推奨</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 観光詳細 -->
+  <h3 style="font-family:var(--serif-font);font-size:1.5rem;color:var(--primary);margin:30px 0 18px;text-align:center;"><span class="l-ja">🗺 観光スポット</span><span class="l-en">🗺 Recommended Spots</span><span class="l-zh">🗺 观光景点</span><span class="l-ko">🗺 추천 관광지</span><span class="l-fr">🗺 Sites touristiques</span></h3>
+
+  <div class="two-col">
+    <div class="block">
+      <h3><span class="ico">🛶</span>
+        <span class="l-ja">青嶺湖（カヌー・SUP）</span><span class="l-en">Lake Aomine (Canoe / SUP)</span>
+      </h3>
+      <p class="l-ja">ロッジ目の前の湖。カヌー・SUP・釣りが楽しめる。早朝は霧が幻想的。</p>
+      <p class="l-en">The lake right in front of the lodge. Canoe, SUP &amp; fishing. Magical morning mist.</p>
+      <p>
+        <a class="link-btn maps" href="https://www.google.com/maps/search/?api=1&query=%E9%9D%92%E5%B6%BA%E9%AB%98%E5%8E%9F" target="_blank">📍 Maps</a>
+      </p>
+    </div>
+    <div class="block">
+      <h3><span class="ico">🌲</span>
+        <span class="l-ja">白樺の森遊歩道</span><span class="l-en">Birch Forest Trail</span>
+      </h3>
+      <p class="l-ja">湖畔から続く白樺林の遊歩道。バードウォッチング・散策に最適。</p>
+      <p class="l-en">A birch-forest walking trail from the lakeside. Great for birdwatching &amp; strolls.</p>
+      <p>
+        <a class="link-btn maps" href="https://www.google.com/maps/search/?api=1&query=%E9%9D%92%E5%B6%BA%E9%AB%98%E5%8E%9F" target="_blank">📍 Maps</a>
+      </p>
+    </div>
+    <div class="block">
+      <h3><span class="ico">♨️</span>
+        <span class="l-ja">青嶺高原温泉</span><span class="l-en">Aomine-Kogen Onsen</span>
+      </h3>
+      <p class="l-ja">源泉かけ流しの日帰り温泉。車10分。露天風呂から山並みを一望。</p>
+      <p class="l-en">A day-use hot spring (10 min by car) with open-air baths and mountain views.</p>
+      <p>
+        <a class="link-btn maps" href="https://www.google.com/maps/search/?api=1&query=%E9%9D%92%E5%B6%BA%E9%AB%98%E5%8E%9F" target="_blank">📍 Maps</a>
+        <a class="link-btn web" href="#">🌐 公式（※サンプル）</a>
+      </p>
+    </div>
+    <div class="block">
+      <h3><span class="ico">✨</span>
+        <span class="l-ja">星空テラス</span><span class="l-en">Stargazing Terrace</span>
+      </h3>
+      <p class="l-ja">光害の少ない高原で満天の星空。ロッジのテラスからも観賞可能。</p>
+      <p class="l-en">Minimal light pollution = a sky full of stars. Also viewable from the lodge terrace.</p>
+      <p>
+        <a class="link-btn maps" href="https://www.google.com/maps/search/?api=1&query=%E9%9D%92%E5%B6%BA%E9%AB%98%E5%8E%9F" target="_blank">📍 Maps</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 15. チェックアウト ===== -->
+<section class="chapter" id="checkout">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 15</div>
+    <h2>
+      <span class="l-ja">チェックアウト手順</span><span class="l-en">Check-out</span>
+    </h2>
+    <p class="lead l-ja">チェックアウト: <strong>10:00まで</strong></p>
+    <p class="lead l-en">Check-out: <strong>by 10:00</strong></p>
+  </div>
+
+  <div class="block critical">
+    <h3>
+      <span class="l-ja">⚠ 最重要のお願い</span><span class="l-en">⚠ Most Important</span>
+    </h3>
+    <p class="l-ja">章02「ハウスルール」と本章のチェックリストの通りに、<strong>必ず</strong>お願いします。</p>
+    <p class="l-en">Please <strong>strictly follow</strong> Chapter 2 "House Rules" and the checklist below.</p>
+  </div>
+
+  <div class="block good">
+    <h3><span class="ico">✅</span>
+      <span class="l-ja">退室前チェックリスト</span><span class="l-en">Departure Checklist</span>
+    </h3>
+    <ul class="checklist">
+      <li class="l-ja">食器を洗って元の場所に戻す</li>
+      <li class="l-ja">ゴミの分別をして所定の場所へ</li>
+      <li class="l-ja">布団・ベッドを多少まとめる</li>
+      <li class="l-ja">忘れ物がないか全部屋確認</li>
+      <li class="l-ja">すべてのエアコン・照明・電気類をOFF</li>
+      <li class="l-ja">すべての窓を閉めて施錠</li>
+      <li class="l-ja">網戸の隙間がないか確認</li>
+      <li class="l-ja"><strong>2階ベランダ窓を施錠</strong></li>
+      <li class="l-ja">勝手口を施錠</li>
+      <li class="l-ja">BBQを使った場合は備品の清掃と収納</li>
+      <li class="l-ja">セーフティボックスは空にして開錠</li>
+      <li class="l-ja">鍵をキーボックスに戻す</li>
+      <li class="l-ja">玄関ドアを最後に施錠</li>
+      <li class="l-en">Wash dishes &amp; return to original places</li>
+      <li class="l-en">Sort &amp; dispose of trash</li>
+      <li class="l-en">Tidy beds slightly</li>
+      <li class="l-en">Check all rooms for lost items</li>
+      <li class="l-en">All AC / lights OFF</li>
+      <li class="l-en">All windows closed &amp; locked</li>
+      <li class="l-en"><strong>Lock 2F balcony</strong></li>
+      <li class="l-en">Lock back door &amp; front door</li>
+      <li class="l-en">Return key to key box</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">📸</span>
+      <span class="l-ja">写真は任意（トラブル時の証拠になります）</span><span class="l-en">Photos Optional (Useful as Evidence)</span>
+    </h3>
+    <p class="l-ja">必須ではありません。退室時に <strong>気が向いたら各部屋を1枚ずつ撮っておく</strong> と、後で紛失物・破損などのトラブルが起きた時の証拠になり、お互いの安心につながります。</p>
+    <p class="l-en">Not required. <strong>If you have a moment, a quick photo of each room</strong> when leaving can serve as useful evidence in case of any later issues — for both of us.</p>
+    <p class="l-zh">非必需。如有时间，<strong>各房间随手拍一张</strong>，万一发生纠纷可作证据。</p>
+    <p class="l-ko">필수 아님. 시간이 있으시면 <strong>각 방을 한 장씩 촬영</strong>해 두시면 분쟁 시 증거로 유용합니다.</p>
+    <p class="l-fr">Pas obligatoire. Si vous avez le temps, <strong>une photo rapide de chaque pièce</strong> peut servir de preuve en cas de litige.</p>
+  </div>
+
+  <div class="block">
+    <h3>
+      <span class="l-ja">📝 破損・忘れ物のご連絡</span><span class="l-en">📝 Damage / Lost Items</span>
+    </h3>
+    <p class="l-ja">破損・汚損があった場合は <strong>写真とともにメッセージ</strong> でご連絡ください。忘れ物は発見次第ご連絡します。郵送可（送料お客様負担）。</p>
+    <p class="l-en">Report damage with photos via message. Lost items will be returned (shipping at your cost).</p>
+  </div>
+</section>
+
+<!-- ===== 16. 緊急時 ===== -->
+<section class="chapter" id="emergency">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 16</div>
+    <h2>
+      <span class="l-ja">緊急時のご案内</span><span class="l-en">In Case of Emergency</span>
+    </h2>
+  </div>
+
+  <!-- 非緊急時医療を最初に -->
+  <h3 style="font-family:var(--serif-font);font-size:1.4rem;color:var(--primary);margin:20px 0 14px;text-align:center;">
+    <span class="l-ja">🩺 まずは非緊急時の医療機関</span><span class="l-en">🩺 Non-Emergency Medical First</span>
+  </h3>
+
+  <div class="two-col">
+    <div class="block">
+      <h3><span class="ico">🏥</span>青嶺高原診療所</h3>
+      <p class="l-ja"><strong>最寄り・車10分</strong></p>
+      <p>📞 0000-00-0000（※サンプル）</p>
+      <p>📍 長野県青嶺郡青嶺高原村（※サンプル）</p>
+      <p>🕐 平日9-17時のみ</p>
+      <p>🏥 内科・小児科</p>
+    </div>
+    <div class="block">
+      <h3><span class="ico">🏥</span>信州青嶺総合病院</h3>
+      <p class="l-ja"><strong>24時間救急 + 英語対応</strong></p>
+      <p>📞 0000-00-0000（※サンプル）</p>
+      <p>📍 車約40分（※サンプル）</p>
+    </div>
+    <div class="block info">
+      <h3><span class="ico">🌐</span>Japan Visitor Hotline</h3>
+      <p class="l-ja">政府運営・観光/災害/緊急</p>
+      <p class="l-en">Government-run · Tourism / Disaster / Emergency</p>
+      <p class="l-zh">政府运营·旅游/灾害/紧急</p>
+      <p class="l-ko">정부 운영·관광/재해/긴급</p>
+      <p class="l-fr">Géré par le gouvernement · Tourisme / Catastrophe / Urgence</p>
+      <p>📞 050-3816-2787</p>
+      <p>🕐 24h365日</p>
+      <p>🗣 EN / 中文 / 한국어</p>
+      <p style="font-size:0.72rem;color:var(--text-light);margin-top:6px;">
+        <span class="l-ja">※全国共通の公的窓口（実在）。最新情報は要確認。</span>
+        <span class="l-en">※ Nationwide public hotline (real). Please verify the latest info.</span>
+        <span class="l-zh">※全国通用的公共窗口（真实存在）。最新信息请确认。</span>
+        <span class="l-ko">※ 전국 공통 공공 창구(실재). 최신 정보는 확인 필요.</span>
+        <span class="l-fr">※ Service public national (réel). Vérifiez les informations à jour.</span>
+      </p>
+    </div>
+    <div class="block info">
+      <h3><span class="ico">🌐</span><span class="l-ja">多言語医療相談</span><span class="l-en">Multilingual Medical Help</span><span class="l-zh">多语言医疗咨询</span><span class="l-ko">다국어 의료 상담</span><span class="l-fr">Aide médicale multilingue</span></h3>
+      <p>📞 0000-00-0000（※サンプル / SAMPLE）</p>
+      <p>🗣 EN / 中文 / 한국어 / ภาษาไทย / Español</p>
+      <p style="font-size:0.72rem;color:var(--text-light);margin-top:6px;">
+        <span class="l-ja">※多言語対応の医療相談窓口は地域により異なります。最新の連絡先は公式サイトでご確認ください。</span>
+        <span class="l-en">※ Multilingual medical consultation services vary by region. Please verify the latest contact on official sources.</span>
+        <span class="l-zh">※多语言医疗咨询窗口因地区而异。最新联系方式请查阅官方网站。</span>
+        <span class="l-ko">※ 다국어 의료 상담 창구는 지역에 따라 다릅니다. 최신 연락처는 공식 사이트에서 확인하세요.</span>
+        <span class="l-fr">※ Les services de consultation médicale multilingue varient selon la région. Vérifiez les coordonnées à jour sur les sites officiels.</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- 緊急時 -->
+  <h3 style="font-family:var(--serif-font);font-size:1.4rem;color:var(--emergency);margin:30px 0 14px;text-align:center;">
+    <span class="l-ja">🚨 緊急時（火事・急病・事故）</span><span class="l-en">🚨 Real Emergency</span><span class="l-zh">🚨 紧急情况（火灾·急病·事故）</span><span class="l-ko">🚨 긴급 상황 (화재·급병·사고)</span><span class="l-fr">🚨 Urgence réelle</span>
+  </h3>
+
+  <div class="block critical">
+    <h3>
+      <span class="l-ja">STEP 1: まず119/110</span><span class="l-en">STEP 1: Dial 119/110 First</span><span class="l-zh">STEP 1: 先拨打119/110</span><span class="l-ko">STEP 1: 먼저 119/110</span><span class="l-fr">STEP 1 : Composez d'abord le 119/110</span>
+    </h3>
+    <div style="text-align:center;padding:14px 0;">
+      <p style="font-size:0.95rem;color:var(--text-light);"><span class="l-ja">救急・消防</span><span class="l-en">Ambulance &amp; Fire</span><span class="l-zh">急救·消防</span><span class="l-ko">구급·소방</span><span class="l-fr">Ambulance &amp; pompiers</span></p>
+      <p><span class="huge-num">119</span></p>
+      <p style="font-size:0.95rem;color:var(--text-light);margin-top:12px;"><span class="l-ja">警察</span><span class="l-en">Police</span><span class="l-zh">警察</span><span class="l-ko">경찰</span><span class="l-fr">Police</span></p>
+      <p><span class="huge-num info">110</span></p>
+    </div>
+  </div>
+
+  <div class="block critical">
+    <h3>
+      <span class="l-ja">STEP 2: 住所を読み上げる</span><span class="l-en">STEP 2: Read Address</span><span class="l-zh">STEP 2: 报出地址</span><span class="l-ko">STEP 2: 주소 읽기</span><span class="l-fr">STEP 2 : Lisez l'adresse</span>
+    </h3>
+    <p style="font-size:1.3rem;font-weight:700;color:var(--emergency);text-align:center;padding:12px 0;">
+      「長野県青嶺郡青嶺高原村 青嶺湖畔1-2-3 Aomine Lodge」（※サンプル）
+    </p>
+    <p style="font-size:0.78rem;color:var(--text-light);text-align:center;">
+      <span class="l-en">(Read the Japanese above aloud as-is)</span>
+      <span class="l-zh">(请直接朗读上方日语)</span>
+      <span class="l-ko">(위 일본어를 그대로 읽어 주세요)</span>
+      <span class="l-fr">(Lisez à voix haute le japonais ci-dessus tel quel)</span>
+    </p>
+  </div>
+
+  <div class="block critical">
+    <h3>
+      <span class="l-ja">STEP 3: 119読み上げ4点</span><span class="l-en">STEP 3: 119 Call Script (4 points)</span><span class="l-zh">STEP 3: 119报警要点（4项）</span><span class="l-ko">STEP 3: 119 신고 4가지</span><span class="l-fr">STEP 3 : Script d'appel 119 (4 points)</span>
+    </h3>
+    <p style="font-size:0.78rem;color:var(--text-light);margin-bottom:8px;">
+      <span class="l-ja">※「」内の日本語をそのまま読み上げてください。</span>
+      <span class="l-en">※ Read the Japanese in quotes aloud as-is.</span>
+      <span class="l-zh">※请直接朗读引号内的日语。</span>
+      <span class="l-ko">※ 따옴표 안의 일본어를 그대로 읽어 주세요.</span>
+      <span class="l-fr">※ Lisez à voix haute le japonais entre guillemets tel quel.</span>
+    </p>
+    <ol class="steps">
+      <li class="l-ja"><strong>何が起きたか</strong>: 「火事です」「急病です」</li>
+      <li class="l-ja"><strong>住所</strong>: 「青嶺高原村 青嶺湖畔1-2-3 Aomine Lodge」（※サンプル）</li>
+      <li class="l-ja"><strong>名前と折返し電話番号</strong></li>
+      <li class="l-ja"><strong>近くの目印</strong>: 「青嶺湖のほとり・青嶺高原駅から車10分」</li>
+      <li class="l-en"><strong>What happened</strong>: 「火事です」(Fire) / 「急病です」(Medical emergency)</li>
+      <li class="l-en"><strong>Address</strong>: 「青嶺高原村 青嶺湖畔1-2-3 Aomine Lodge」(SAMPLE)</li>
+      <li class="l-en"><strong>Your name &amp; callback number</strong></li>
+      <li class="l-en"><strong>Landmark</strong>: 「青嶺湖のほとり・青嶺高原駅から車10分」(By Lake Aomine, 10 min from Aomine-Kogen Station)</li>
+      <li class="l-zh"><strong>发生了什么</strong>: 「火事です」(火灾) / 「急病です」(突发疾病)</li>
+      <li class="l-zh"><strong>地址</strong>: 「青嶺高原村 青嶺湖畔1-2-3 Aomine Lodge」（※示例）</li>
+      <li class="l-zh"><strong>姓名和回拨电话号码</strong></li>
+      <li class="l-zh"><strong>附近的标志物</strong>: 「青嶺湖のほとり・青嶺高原駅から車10分」(青岭湖畔·距青岭高原站车程10分钟)</li>
+      <li class="l-ko"><strong>무슨 일이 일어났는가</strong>: 「火事です」(화재) / 「急病です」(응급 질환)</li>
+      <li class="l-ko"><strong>주소</strong>: 「青嶺高原村 青嶺湖畔1-2-3 Aomine Lodge」(※샘플)</li>
+      <li class="l-ko"><strong>이름과 회신 전화번호</strong></li>
+      <li class="l-ko"><strong>근처 표지물</strong>: 「青嶺湖のほとり・青嶺高原駅から車10分」(아오미네 호숫가·아오미네고원역에서 차로 10분)</li>
+      <li class="l-fr"><strong>Ce qui s'est passé</strong> : 「火事です」(Incendie) / 「急病です」(Urgence médicale)</li>
+      <li class="l-fr"><strong>Adresse</strong> : 「青嶺高原村 青嶺湖畔1-2-3 Aomine Lodge」(EXEMPLE)</li>
+      <li class="l-fr"><strong>Votre nom et numéro de rappel</strong></li>
+      <li class="l-fr"><strong>Point de repère</strong> : 「青嶺湖のほとり・青嶺高原駅から車10分」(Au bord du lac Aomine, à 10 min de la gare d'Aomine-Kogen)</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h3>
+      <span class="l-ja">STEP 4: ホストへ報告</span><span class="l-en">STEP 4: Notify Host</span><span class="l-zh">STEP 4: 通知房东</span><span class="l-ko">STEP 4: 호스트에게 알리기</span><span class="l-fr">STEP 4 : Prévenez l'hôte</span>
+    </h3>
+    <p class="l-ja">119/110対応後、Airbnb/Booking メッセージで状況を報告してください。</p>
+    <p class="l-en">After contacting 119/110, notify host via message.</p>
+    <p class="l-zh">联系119/110后，请通过Airbnb/Booking消息向房东报告情况。</p>
+    <p class="l-ko">119/110에 연락한 후 Airbnb/Booking 메시지로 호스트에게 상황을 알려 주세요.</p>
+    <p class="l-fr">Après avoir contacté le 119/110, prévenez l'hôte par message Airbnb/Booking.</p>
+  </div>
+
+  <!-- 災害 -->
+  <h3 style="font-family:var(--serif-font);font-size:1.4rem;color:var(--primary);margin:30px 0 14px;text-align:center;">
+    <span class="l-ja">🌊 災害時</span><span class="l-en">🌊 Disasters</span><span class="l-zh">🌊 灾害时</span><span class="l-ko">🌊 재해 시</span><span class="l-fr">🌊 Catastrophes</span>
+  </h3>
+
+  <div class="block warning">
+    <h3><span class="ico">🏫</span>
+      <span class="l-ja">青嶺高原村 指定避難場所</span><span class="l-en">Designated Shelters</span><span class="l-zh">青岭高原村 指定避难场所</span><span class="l-ko">아오미네고원촌 지정 대피소</span><span class="l-fr">Abris désignés</span>
+    </h3>
+    <ul>
+      <li><strong>青嶺小学校</strong> (最寄) / Aomine Elementary</li>
+      <li><strong>青嶺村役場</strong> (最寄) / Aomine Village Office</li>
+      <li>青嶺高原村 公民館 / Aomine Community Hall</li>
+      <li>青嶺高原 体育館 / Aomine Gym</li>
+    </ul>
+  </div>
+
+  <div class="two-col">
+    <div class="block">
+      <h3>🔥 <span class="l-ja">火災時</span><span class="l-en">Fire</span><span class="l-zh">火灾时</span><span class="l-ko">화재 시</span><span class="l-fr">Incendie</span></h3>
+      <ol class="steps">
+        <li class="l-ja">119へ通報（上記文章）</li>
+        <li class="l-ja">大声で家中に知らせる</li>
+        <li class="l-ja">煙を避け低姿勢で避難</li>
+        <li class="l-ja">小火なら消火器（<strong>キッチンのゴミ箱横</strong>）</li>
+        <li class="l-ja">屋外集合・全員確認</li>
+        <li class="l-en">Call 119 (use the script above)</li>
+        <li class="l-en">Shout to alert everyone in the house</li>
+        <li class="l-en">Stay low, avoid smoke, evacuate</li>
+        <li class="l-en">For small fires, use the extinguisher (<strong>beside the kitchen trash bin</strong>)</li>
+        <li class="l-en">Gather outside &amp; confirm everyone</li>
+        <li class="l-zh">拨打119报警（使用上方文稿）</li>
+        <li class="l-zh">大声通知屋内所有人</li>
+        <li class="l-zh">避开烟雾，低姿势疏散</li>
+        <li class="l-zh">小火可用灭火器（<strong>厨房垃圾桶旁</strong>）</li>
+        <li class="l-zh">到户外集合·确认全员</li>
+        <li class="l-ko">119에 신고 (위 문장 사용)</li>
+        <li class="l-ko">큰 소리로 집안 전체에 알리기</li>
+        <li class="l-ko">연기를 피해 낮은 자세로 대피</li>
+        <li class="l-ko">작은 불은 소화기 사용 (<strong>주방 쓰레기통 옆</strong>)</li>
+        <li class="l-ko">야외 집합·전원 확인</li>
+        <li class="l-fr">Appelez le 119 (utilisez le script ci-dessus)</li>
+        <li class="l-fr">Criez pour alerter toute la maison</li>
+        <li class="l-fr">Restez bas, évitez la fumée, évacuez</li>
+        <li class="l-fr">Petit feu : extincteur (<strong>à côté de la poubelle de la cuisine</strong>)</li>
+        <li class="l-fr">Rassemblez-vous dehors et comptez tout le monde</li>
+      </ol>
+    </div>
+    <div class="block">
+      <h3>🌍 <span class="l-ja">地震時</span><span class="l-en">Earthquake</span><span class="l-zh">地震时</span><span class="l-ko">지진 시</span><span class="l-fr">Tremblement de terre</span></h3>
+      <ol class="steps">
+        <li class="l-ja">頭を守って机の下へ</li>
+        <li class="l-ja">揺れ後に火の元・ガス確認</li>
+        <li class="l-ja">玄関を開け避難経路確保</li>
+        <li class="l-ja">安全確認後、屋外へ</li>
+        <li class="l-ja">避難場所へ徒歩移動</li>
+        <li class="l-en">Protect your head &amp; get under a table</li>
+        <li class="l-en">After shaking, check flames &amp; gas</li>
+        <li class="l-en">Open the front door to secure an exit</li>
+        <li class="l-en">Once safe, move outside</li>
+        <li class="l-en">Walk to the designated shelter</li>
+        <li class="l-zh">保护头部，躲到桌子下</li>
+        <li class="l-zh">摇晃后确认火源·燃气</li>
+        <li class="l-zh">打开玄关门确保逃生通道</li>
+        <li class="l-zh">确认安全后到户外</li>
+        <li class="l-zh">步行前往避难场所</li>
+        <li class="l-ko">머리를 보호하고 책상 아래로</li>
+        <li class="l-ko">흔들림 후 불씨·가스 확인</li>
+        <li class="l-ko">현관을 열어 대피로 확보</li>
+        <li class="l-ko">안전 확인 후 야외로</li>
+        <li class="l-ko">대피소로 도보 이동</li>
+        <li class="l-fr">Protégez votre tête, mettez-vous sous une table</li>
+        <li class="l-fr">Après la secousse, vérifiez flammes et gaz</li>
+        <li class="l-fr">Ouvrez la porte d'entrée pour sécuriser une sortie</li>
+        <li class="l-fr">Une fois en sécurité, sortez</li>
+        <li class="l-fr">Rejoignez l'abri désigné à pied</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- 停電 -->
+  <h3 style="font-family:var(--serif-font);font-size:1.4rem;color:var(--primary);margin:30px 0 14px;text-align:center;">
+    <span class="l-ja">⚡ 停電時の対処法</span><span class="l-en">⚡ Power Outage</span>
+  </h3>
+
+  <div class="block warning">
+    <h3>
+      <span class="l-ja">STEP 1: まずブレーカーを確認</span><span class="l-en">STEP 1: Check the Breaker First</span>
+    </h3>
+    <p class="l-ja">停電したら、まず <strong>ブレーカーが落ちているか</strong> を確認してください。<br>使用電力が多すぎると落ちることがあります（多くの場合これが原因）。</p>
+    <p class="l-en">If power is out, <strong>check the breaker first</strong>. Most outages are caused by tripped breakers (overuse).</p>
+  </div>
+
+  <div class="block good">
+    <h3><span class="ico">📍</span>
+      <span class="l-ja">ブレーカーの場所</span><span class="l-en">Breaker Location</span>
+    </h3>
+    <p class="l-ja"><strong>冷蔵庫の上</strong> に主ブレーカーがあります。<br>個別ブレーカーはありません（主ブレーカーのみ）。</p>
+    <p class="l-en"><strong>On top of the fridge</strong>. (Main breaker only, no individual ones.)</p>
+    <p class="l-zh"><strong>在冰箱上方</strong>。仅主断路器，无个别断路器。</p>
+    <p class="l-ko"><strong>냉장고 위</strong>에 있습니다. 메인 차단기만.</p>
+    <p class="l-fr"><strong>Au-dessus du réfrigérateur</strong>. Disjoncteur principal uniquement.</p>
+  </div>
+
+  <div class="block">
+    <h3>
+      <span class="l-ja">STEP 2: ブレーカー操作</span><span class="l-en">STEP 2: Reset Breaker</span>
+    </h3>
+    <ol class="steps">
+      <li class="l-ja">使用中の電気製品を <strong>コンセントから抜く</strong>（電子レンジ・ドライヤー等）</li>
+      <li class="l-ja">ブレーカーの全スイッチを <strong>「入」（上）</strong> にする</li>
+      <li class="l-ja">復旧したら必要な電気製品を順次再接続</li>
+      <li class="l-ja">また落ちる場合: 同時使用を減らす</li>
+      <li class="l-en">Unplug high-power appliances (microwave, hair dryer, etc.)</li>
+      <li class="l-en">Switch all breakers to <strong>"On" (up position)</strong></li>
+      <li class="l-en">Reconnect appliances one by one</li>
+      <li class="l-en">If trips again: reduce simultaneous use</li>
+    </ol>
+    <div style="background:#FFFBE6;border-left:3px solid var(--todo);padding:10px 14px;border-radius:4px;margin-top:12px;">
+      <p style="font-size:0.85rem;">
+        <span class="l-ja">💡 <strong>注意</strong>: ブレーカーの「入」マークは <strong>漢字「入」</strong> です。スイッチを上に倒すと「入」（オン）です。</span>
+        <span class="l-en">💡 <strong>Note</strong>: The "ON" mark is the Japanese kanji <strong>「入」</strong>. Flip the switch upward = ON.</span>
+        <span class="l-zh">💡 <strong>注意</strong>: 「入」即「开」。向上拨为开启。</span>
+        <span class="l-ko">💡 <strong>참고</strong>: 「入」는 "켜기". 위로 올리면 켜짐.</span>
+        <span class="l-fr">💡 <strong>Note</strong>: 「入」signifie "Marche". Vers le haut = ON.</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="block info">
+    <h3>
+      <span class="l-ja">📵 近所も停電している場合</span><span class="l-en">📵 If Whole Neighborhood Is Dark</span>
+    </h3>
+    <p class="l-ja">窓から外を見て近所も停電している場合は <strong>地域全体の停電</strong>（台風・落雷など）。Airbnb/Bookingメッセージでホストへ連絡し、しばらくお待ちください。</p>
+    <p class="l-en">If neighbors are also dark, it's an <strong>area-wide outage</strong> (typhoon, lightning etc.). Message host and wait.</p>
+  </div>
+</section>
+
+<!-- ===== 17. 間取り図 ===== -->
+<section class="chapter" id="floor">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 17</div>
+    <h2>
+      <span class="l-ja">間取り図</span><span class="l-en">Floor Plan</span>
+    </h2>
+  </div>
+
+  <div class="block">
+    <h3>🏡 <span class="l-ja">物件構成</span><span class="l-en">Layout</span></h3>
+    <p class="l-ja"><strong>1階</strong>: 玄関・廊下・リビング・ダイニング・キッチン・洋室1〜2・トイレ・洗面・浴室</p>
+    <p class="l-ja"><strong>2階</strong>: 洋室3・ロフト</p>
+    <p class="l-ja"><strong>屋外</strong>: プライベートガーデン / パノラマテラス（湖を望む・BBQ可）</p>
+  </div>
+
+  <div class="block good">
+    <h3>🛏 <span class="l-ja">寝室構成</span><span class="l-en">Bedrooms</span></h3>
+    <ul>
+      <li><strong>洋室1</strong>(1F): クイーン × 1</li>
+      <li><strong>洋室2</strong>(1F): セミダブル × 2</li>
+      <li><strong>洋室3</strong>(2F): ダブル × 1 ・収納・セーフティBOX</li>
+      <li><strong>リビング</strong>(1F): ソファベッド × 2</li>
+    </ul>
+    <div style="background:#FFF7EE;border-left:4px solid var(--warning);padding:12px 16px;border-radius:4px;margin-top:14px;">
+      <p class="l-ja" style="margin:0;font-weight:700;color:var(--warning);">⚠ ペットは <strong>全寝室への入室をご遠慮</strong> ください（リビング・庭はOK）</p>
+      <p class="l-en" style="margin:6px 0 0;font-size:0.9rem;color:var(--warning);">⚠ Pets are <strong>NOT allowed in any bedroom</strong> (living area &amp; garden OK)</p>
+    </div>
+  </div>
+
+  <div class="block todo">
+    <h3>📐 <span class="l-ja">間取り図</span><span class="l-en">Floor Plan Image</span>
+      <span class="badge-todo">要追加</span>
+    </h3>
+    <div class="photo-todo">
+      <span class="ico">📐</span>
+      <span class="l-ja">詳細な間取り図画像（制作中）</span>
+      <span class="l-en">Detailed floor plan (in preparation)</span>
+    </div>
+  </div>
+</section>
+
+<footer class="guide-footer">
+  <div class="brand">AOMINE LODGE</div>
+  <div style="margin-bottom:14px;font-style:italic;color:var(--accent);">Lakeside Retreat · Aomine-Kogen, Nagano (Sample)</div>
+  <div class="meta">House Guide (Sample) · サンプル見本 · 5言語対応 · 架空物件のためのデモ</div>
+</footer>
+
+</div><!-- /main -->
+
+<script>
+  // 言語切替
+  function setLang(lang) {
+    document.body.setAttribute('data-lang', lang);
+    document.querySelectorAll('.lang-switcher button').forEach(b => {
+      b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+    });
+    localStorage.setItem('house_guide_lang', lang);
+    applyLangFallback(lang);
+  }
+  // 選択言語の訳が無いブロックは英語→日本語の順で表示（空白防止）
+  function applyLangFallback(lang) {
+    document.querySelectorAll('[data-l-fb]').forEach(el => { el.style.display = ''; el.removeAttribute('data-l-fb'); });
+    if (lang === 'ja') return;
+    const sel = '.l-' + lang;
+    const parents = new Set();
+    document.querySelectorAll('.l-ja, .l-en, .l-zh, .l-ko, .l-fr').forEach(el => { if (el.parentElement) parents.add(el.parentElement); });
+    parents.forEach(parent => {
+      if (parent.querySelector(':scope > ' + sel)) return;
+      const fb = parent.querySelector(':scope > .l-en') || parent.querySelector(':scope > .l-ja');
+      if (fb) { fb.style.display = 'revert'; fb.setAttribute('data-l-fb', '1'); }
+    });
+  }
+
+  // 初期言語復元（旧キーも一応読む）
+  const savedLang = localStorage.getItem('house_guide_lang') || localStorage.getItem('aomine_lang') || 'ja';
+  setLang(savedLang);
+
+  // サイドバーのアクティブ表示（スクロール連動）
+  const sidebarLinks = document.querySelectorAll('.sidebar a');
+  const chapters = document.querySelectorAll('.chapter, .hero');
+  function updateActive() {
+    let current = '';
+    const scrollY = window.scrollY + 80;
+    chapters.forEach(ch => {
+      if (ch.offsetTop <= scrollY) current = ch.id;
+    });
+    sidebarLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === '#' + current);
+    });
+  }
+  window.addEventListener('scroll', updateActive);
+  updateActive();
+
+  // モバイルでサイドバー閉じる
+  sidebarLinks.forEach(link => link.addEventListener('click', () => {
+    if (window.innerWidth <= 880) document.querySelector('.sidebar').classList.remove('open');
+  }));
+</script>
+
+</body>
+</html>
