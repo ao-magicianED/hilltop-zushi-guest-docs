@@ -181,6 +181,14 @@
       <tr><td><code>/admin/purge-log</code></td><td>自動削除履歴</td></tr>
       <tr><td><code>/admin/admins</code></td><td>管理者の管理(マスターのみ)</td></tr>
     </table>
+    <div class="proj live" style="margin-top:10px;">
+      <strong>メール通知システム(Resend)</strong> <span class="tag ok">稼働中</span><br>
+      送信元は<code>send.bluestage-lcc.com</code>ドメイン(Resend)。APIキーはCloudflare Secret <code>RESEND_API_KEY</code>に設定済み。<br>
+      ・<strong>完了通知</strong>: 全員分の宿泊者情報が提出されると、オーナー(<code>hilltop.zushi@gmail.com</code>)と代表者(bcc:オーナー)の両方へ自動メール。<br>
+      ・<strong>暗証番号(PIN)案内</strong>: 暗証番号はAES-256-GCMで暗号化してD1に保存(以前は「保存しない」方針だったが2026-07-01に変更)。承認時・暗証番号(再)設定時に、代表者メールが判明していれば自動送信。ゲストはメール内リンクを開くと確認ボタンが出て、押すと一度だけ暗証番号が表示される(以後リンクは無効化)。<br>
+      ・<strong>督促リマインド</strong>: チェックイン15〜7日前で未提出の予約に代表者へ督促メール、当日なのに0件の予約はオーナーへ緊急アラート(cronで1日1回)。<br>
+      ・<strong>グループリンクの自動送信</strong>: 予約作成時・編集ページの「グループリンクを発行する」ボタンで、代表者メールが分かっていれば自動送信(bcc:オーナー)。メール以外の経路(Airbnbメッセージ等)用に案内文案もコピー可能。
+    </div>
     <div class="proj" style="margin-top:10px;border-left:3px solid #92400E;">
       <strong>確認待ち事項</strong> <span class="tag warn">要判断</span><br>
       テストデータ削除(<code>HMTEST0715</code>など、予約一覧から確認可能)について、①本番環境のまま削除してよいか、②実行方法(私が実行 or あおさんのターミナルでコマンド実行)、の2点が2026-07-01時点で未確定・確認待ち。
@@ -229,6 +237,10 @@
       <tr>
         <td>2026-07-01</td>
         <td><code>guide-hub/intra/dashboard-x7k2.html</code>を全体見直し(v3→v4)。KV等バインディング非依存の静的HTMLと確認し「⑥ 既知の未対応事項」の未精査項目を解消済みに変更。ダッシュボード側も同日付でホスティング(2アカウント構成)・火災保険(契約確定)・BBQ用品(v4ガス主力化・合計¥319,219)・宿泊者名簿運用SOP(専用Webアプリの実態)を反映し、解決済みTODOを除去。</td>
+      </tr>
+      <tr>
+        <td>2026-07-01</td>
+        <td>宿泊者名簿システムにメール通知(Resend)を追加・本番デプロイ。全員提出完了時のオーナー/代表者への通知、暗証番号の暗号化保存(AES-256-GCM)＋承認時/設定時の代表者への自動案内(一度きり表示)、督促リマインド(15〜7日前)・当日0件アラートのcron自動化、グループリンクの自動送信・コピー機能を追加。Codex+多エージェント敵対的レビューを2巡実施し、完了通知のレース条件・PIN表示の非アトミック性・連打での重複送信等を修正。</td>
       </tr>
     </table>
   </div>
