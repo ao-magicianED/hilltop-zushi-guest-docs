@@ -225,7 +225,7 @@ app.get("/g/:token", async (c) => {
       lang,
       path: `/g/${token}`,
       body: [
-        progressPage(lang, { groupToken: token, guests: guests.map((g) => ({ slot_no: g.slot_no, full_name: g.full_name, submit_status: g.submit_status })), done, total }),
+        progressPage(lang, { groupToken: token, guests: guests.map((g) => ({ slot_no: g.slot_no, full_name: g.full_name, submit_status: g.submit_status, guestId: g.id })), done, total }),
         html`<div class="card"><a class="btn" href="/g/${token}/reveal?lang=${lang}">${t(lang, "share_links")}</a></div>`,
       ],
     })
@@ -280,6 +280,30 @@ app.get("/g/:token/reveal", async (c) => {
   }
   await appendAudit(c.env, { reservationId: res.id, actorType: "guest", action: "reveal_links", detail: { count: out.length }, ipHash: await hashToken(ipHashKey(c)) });
   return c.html(layout({ title: t(lang, "share_links"), lang, path: `/g/${token}/reveal`, body: linksPage(lang, c.env.APP_BASE_URL, token, out) }));
+});
+
+// 進捗ページから未提出ゲスト1名の編集ページへ：クリック時にその場で新しい個人トークンを発行して
+// リダイレクトする（生の個人トークンはハッシュ化保存で復元不可なための設計。revealと同じ考え方だが
+// 対象を1名に絞りオンデマンド発行）。提出済みゲストは対象外（第三者による他人PIIの再オープンを
+// 防ぐ、revealと同じ安全策）。guestIdは必ずこの予約に属するか検証しクロスIDORを防ぐ。
+app.get("/g/:token/edit/:guestId", async (c) => {
+  const token = c.req.param("token");
+  const guestId = c.req.param("guestId");
+  const res = await resolveGroupToken(c.env, token);
+  const lang = pickLang(c, res?.preferred_lang);
+  if (!res) return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "expired"), kind: "err" }) }));
+  if (!(await rateLimit(c.env, `groupedit:${await hashToken(ipHashKey(c))}`, 30, 600))) {
+    return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "too_many"), kind: "err" }) }));
+  }
+  const guest = await getGuest(c.env, guestId);
+  if (!guest || guest.reservation_id !== res.id || guest.submit_status === "submitted") {
+    return c.redirect(`/g/${token}?lang=${lang}`);
+  }
+  const tk = generateToken();
+  const th = await hashToken(tk);
+  await c.env.DB.prepare("INSERT INTO guest_tokens (id, guest_id, token_hash, expires_at, created_at) VALUES (?,?,?,?,?)").bind(newId("pt_"), guest.id, th, checkoutExpiry(res.check_out_date), nowIso()).run();
+  await appendAudit(c.env, { reservationId: res.id, guestId: guest.id, actorType: "guest", action: "edit_link_minted", ipHash: await hashToken(ipHashKey(c)) });
+  return c.redirect(`/p/${tk}?lang=${lang}`);
 });
 
 function linksPage(lang: Lang, base: string, groupToken: string, created: { slotNo: number; role: string; token: string }[]) {

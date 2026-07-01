@@ -131,7 +131,7 @@ export function progressPage(
   lang: Lang,
   opts: {
     groupToken: string;
-    guests: { slot_no: number; full_name: string | null; submit_status: string; editToken?: string }[];
+    guests: { slot_no: number; full_name: string | null; submit_status: string; guestId: string }[];
     done: number;
     total: number;
   }
@@ -144,9 +144,10 @@ export function progressPage(
       const badge = done
         ? `<span class="badge ok">${t(lang, "status_done")}</span>`
         : `<span class="badge pending">${t(lang, "status_pending")}</span>`;
-      const link = g.editToken
-        ? `<a class="muted" href="/p/${g.editToken}?lang=${lang}">${t(lang, "edit_link")}</a>`
-        : "";
+      // 提出済みは編集リンクを出さない（第三者による他人PIIの再オープンを防ぐ、reveal と同じ安全策）
+      const link = done
+        ? ""
+        : `<a class="muted" href="/g/${opts.groupToken}/edit/${g.guestId}?lang=${lang}">${t(lang, "edit_link")}</a>`;
       return `<li><span>${name}</span><span style="display:flex;gap:10px;align-items:center">${link} ${badge}</span></li>`;
     })
     .join("");
