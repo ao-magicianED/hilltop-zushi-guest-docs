@@ -184,7 +184,6 @@ export function formPage(
     errors?: FieldErrors;
     values?: Record<string, string>;
     showErrorBanner?: boolean;
-    requireEmail?: boolean;
     groupBackHref?: string;
     marketingOptin?: boolean;
     savedNotice?: boolean;
@@ -252,8 +251,10 @@ export function formPage(
       <label>${t(lang, "nationality")} ${raw(reqMark)}</label>
       <select class="${errCls(e, "nationality")}" name="nationality">${raw(optionTags(NATIONALITIES, lang, v.nationality ?? ""))}</select>
 
-      <label>${t(lang, "nationality_other")} ${raw(optMark)}</label>
-      <input class="${errCls(e, "nationality_other")}" type="text" name="nationality_other" value="${esc(v.nationality_other ?? "")}">
+      <div id="nationality-other-section" style="display:${(v.nationality ?? "") === "OTHER" ? "block" : "none"}">
+        <label>${t(lang, "nationality_other")} ${raw(optMark)}</label>
+        <input class="${errCls(e, "nationality_other")}" type="text" name="nationality_other" value="${esc(v.nationality_other ?? "")}">
+      </div>
 
       <div id="passport-section" style="display:${showPassport ? "block" : "none"}">
         <label>${t(lang, "passport_img")} ${raw(reqMark)}</label>
@@ -271,18 +272,20 @@ export function formPage(
       <label>${t(lang, "gender")} ${raw(optMark)}</label>
       <select class="${errCls(e, "gender")}" name="gender">${raw(optionTags(GENDERS, lang, v.gender ?? ""))}</select>
 
-      <label>${t(lang, "phone")} ${opts.isRep ? raw(reqMark) : raw(optMark)}</label>
+      <label>${t(lang, "phone")} ${raw(optMark)}</label>
       <input class="${errCls(e, "phone")}" type="tel" name="phone" value="${esc(v.phone ?? "")}">
 
-      <label>${t(lang, "prev_stay")} <span id="prev-stay-mark">${showPassport ? raw(reqMark) : raw(optMark)}</span></label>
-      <input class="${errCls(e, "prev_stay")}" type="text" name="prev_stay" value="${esc(v.prev_stay ?? "")}">
+      <div id="stay-history-section" style="display:${showPassport ? "block" : "none"}">
+        <label>${t(lang, "prev_stay")} ${raw(reqMark)}</label>
+        <input class="${errCls(e, "prev_stay")}" type="text" name="prev_stay" value="${esc(v.prev_stay ?? "")}">
 
-      <label>${t(lang, "next_stay")} ${raw(optMark)}</label>
-      <input type="text" name="next_stay" value="${esc(v.next_stay ?? "")}">
+        <label>${t(lang, "next_stay")} ${raw(optMark)}</label>
+        <input type="text" name="next_stay" value="${esc(v.next_stay ?? "")}">
+      </div>
 
-      <label>${t(lang, "email")} ${opts.requireEmail && opts.isRep ? raw(reqMark) : raw(optMark)}</label>
+      <label>${t(lang, "email")} ${opts.isRep ? raw(reqMark) : html`<span id="email-mark">${opts.marketingOptin ? raw(reqMark) : raw(optMark)}</span>`}</label>
       <input class="${errCls(e, "email")}" type="email" name="email" value="${esc(v.email ?? "")}" autocomplete="email">
-      ${opts.requireEmail && opts.isRep ? html`<p class="muted">${t(lang, "email_rep_req_note")}</p>` : ""}
+      ${opts.isRep ? html`<p class="muted">${t(lang, "email_rep_req_note")}</p>` : html`<p class="muted">${t(lang, "email_coupon_req_note")}</p>`}
 
       ${opts.isRep
         ? html`
@@ -320,13 +323,13 @@ export function formPage(
     </form>
   </div>
   ${raw(IMG_COMPRESS_JS)}
-  ${raw(fieldToggleJs(reqMark, optMark))}`;
+  ${raw(fieldToggleJs(reqMark, optMark, opts.isRep))}`;
 }
 
-// 国籍＋国内住所の選択に応じて、旅券写真欄／利用用途欄の表示と、前泊地の必須/任意表示をその場で
-// 切り替える（独自ルール）。JS未実行時はサーバ側で判定した初期表示のまま（安全側＝旅券欄は表示）。
+// 国籍・国内住所の選択、および「クーポン希望」チェックに応じて、各欄の表示/必須マークをその場で
+// 切り替える（独自ルール）。JS未実行時はサーバ側で判定した初期表示のまま（安全側＝旅券欄等は表示）。
 // reqMark/optMarkは自前のi18n辞書由来の固定文字列（ユーザー入力ではない）のためそのまま埋め込む。
-function fieldToggleJs(reqMarkHtml: string, optMarkHtml: string): string {
+function fieldToggleJs(reqMarkHtml: string, optMarkHtml: string, isRep: boolean): string {
   const esc1 = (s: string) => s.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
   return `<script>
 (function(){
@@ -334,23 +337,32 @@ function fieldToggleJs(reqMarkHtml: string, optMarkHtml: string): string {
   var nat=form.querySelector('[name="nationality"]');
   var addrRadios=form.querySelectorAll('[name="has_jp_address"]');
   var passSec=document.getElementById('passport-section');
+  var stayHistSec=document.getElementById('stay-history-section');
   var purpSec=document.getElementById('purpose-section');
-  var prevMark=document.getElementById('prev-stay-mark');
+  var natOtherSec=document.getElementById('nationality-other-section');
   var REQ='${esc1(reqMarkHtml)}', OPT='${esc1(optMarkHtml)}';
+  function isJapanese(){ return !!nat && nat.value==='JP'; }
   function isDomestic(){
-    if(!nat||nat.value!=='JP') return false;
+    if(!isJapanese()) return false;
     for(var i=0;i<addrRadios.length;i++){ if(addrRadios[i].value==='1'&&addrRadios[i].checked) return true; }
     return false;
   }
   function sync(){
-    var d=isDomestic();
-    if(passSec) passSec.style.display = d ? 'none' : '';
+    var foreign=!isJapanese(), d=isDomestic();
+    if(passSec) passSec.style.display = foreign ? '' : 'none';
+    if(stayHistSec) stayHistSec.style.display = foreign ? '' : 'none';
     if(purpSec) purpSec.style.display = d ? '' : 'none';
-    if(prevMark) prevMark.innerHTML = d ? OPT : REQ;
+    if(natOtherSec) natOtherSec.style.display = (nat && nat.value==='OTHER') ? '' : 'none';
   }
   if(nat) nat.addEventListener('change', sync);
   for(var i=0;i<addrRadios.length;i++){ addrRadios[i].addEventListener('change', sync); }
   sync();
+  ${isRep
+    ? ""
+    : `var mk=document.getElementById('mk'), emailMark=document.getElementById('email-mark');
+  function syncEmail(){ if(emailMark) emailMark.innerHTML = (mk && mk.checked) ? REQ : OPT; }
+  if(mk) mk.addEventListener('change', syncEmail);
+  syncEmail();`}
 })();
 </script>`;
 }

@@ -52,10 +52,16 @@ export const T: Dict = {
     "zh-TW": "下一步將填寫人數，並詢問代表的電子郵件（聯絡方式）。",
   },
   email_rep_req_note: {
-    ja: "OTA（Airbnb/Booking.com）予約は連絡先確保のため、代表者のメールは必須です。",
-    en: "For OTA (Airbnb/Booking.com) bookings, the lead guest's email is required so we can reach you.",
-    "zh-CN": "OTA（Airbnb/Booking.com）预订需填写代表邮箱以便联系。",
-    "zh-TW": "OTA（Airbnb/Booking.com）預訂需填寫代表電子郵件以便聯絡。",
+    ja: "連絡先確保のため、代表者のメールアドレスは必須です。",
+    en: "The lead guest's email is required so we can reach you.",
+    "zh-CN": "为确保能与您联系，代表的电子邮箱为必填项。",
+    "zh-TW": "為確保能與您聯絡，代表的電子郵件為必填項。",
+  },
+  email_coupon_req_note: {
+    ja: "「割引・クーポン情報を受け取る」にチェックした場合、メールアドレスが必須になります。",
+    en: "If you check \"receive discount/coupon info\", an email address is required.",
+    "zh-CN": "如勾选「接收优惠・优惠券信息」，则电子邮箱为必填项。",
+    "zh-TW": "如勾選「接收優惠・優惠券資訊」，則電子郵件為必填項。",
   },
   err_code_format: {
     ja: "予約コードの形式が正しくありません（英数字とハイフン・6〜20文字）。",
@@ -69,6 +75,7 @@ export const T: Dict = {
     "zh-CN": "住宿日期不正确（1–30晚，且需为近期日期）。",
     "zh-TW": "住宿日期不正確（1–30晚，且需為近期日期）。",
   },
+  representative_label: { ja: "代表者", en: "Representative", "zh-CN": "代表", "zh-TW": "代表" },
 
   // 人数申告
   declare_title: { ja: "宿泊人数の申告（代表者）", en: "Number of guests (lead)", "zh-CN": "住宿人数（代表）", "zh-TW": "住宿人數（代表）" },
@@ -134,10 +141,10 @@ export const T: Dict = {
 
   // マーケ同意
   marketing_optin: {
-    ja: "今後 Hilltop Zushi の直販サイト・割引などのご案内をメールで受け取る（任意）",
-    en: "I'd like to receive offers and discounts from Hilltop Zushi by email (optional)",
-    "zh-CN": "愿意通过邮件接收 Hilltop Zushi 的优惠信息（选填）",
-    "zh-TW": "願意透過電子郵件接收 Hilltop Zushi 的優惠資訊（選填）",
+    ja: "今後 Hilltop Zushi の直販サイト・割引クーポンなどのご案内をメールで受け取る（任意）",
+    en: "I'd like to receive offers and discount coupons from Hilltop Zushi by email (optional)",
+    "zh-CN": "愿意通过邮件接收 Hilltop Zushi 的优惠及优惠券信息（选填）",
+    "zh-TW": "願意透過電子郵件接收 Hilltop Zushi 的優惠及優惠券資訊（選填）",
   },
   review_promo: {
     ja: "チェックアウト後、Googleマップにクチコミをご投稿いただいた方へ、お礼として次回10%OFFクーポンをお送りします。",
