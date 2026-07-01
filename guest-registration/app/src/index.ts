@@ -111,15 +111,17 @@ function escHtml(s: string): string {
 }
 
 // CSRF軽減：状態変更POSTは同一オリジンのみ許可（Origin/Refererのホスト一致を確認）
+// /admin配下はCookieセッション認証（=CSRFの実害がある）のため厳格にチェックし、
+// ゲスト向けページ(/g, /p, /pin等)はトークン自体が認可（Cookie不要）でCSRFの実害が小さいため、
+// ブラウザのプライバシー保護で正当に発生するOrigin:"null"を判定不能として許可する
+// （拒否すると同一オリジンの正規フォーム送信まで弾いてしまう。Codexレビューで指摘・実ブラウザで確認済み）。
 app.use("*", async (c, next) => {
   if (c.req.method === "POST") {
     const host = c.req.header("host");
     const origin = c.req.header("origin") ?? c.req.header("referer");
-    // ブラウザは「Referrer-Policyがno-referrer等のページ」からの同一オリジンPOSTでも、
-    // プライバシー保護のためOriginを文字列"null"として送ることがある（実際にどこから来たかの
-    // 情報を持たない値）。これは悪意ある他サイトからの送信を示すものではないため、
-    // 判定不能として許可する（拒否すると同一オリジンの正規フォーム送信まで弾いてしまう）。
-    if (origin && origin !== "null") {
+    const isAdminPath = new URL(c.req.url).pathname.startsWith("/admin");
+    const treatNullAsUnknown = !isAdminPath;
+    if (origin && !(treatNullAsUnknown && origin === "null")) {
       try {
         if (new URL(origin).host !== host) return c.text("Bad origin", 403);
       } catch {
@@ -128,6 +130,15 @@ app.use("*", async (c, next) => {
     }
   }
   await next();
+});
+
+// /p/:token 系は個人の機微情報（住所・電話等）を復号してprefillするページのため、
+// /g/:token・/pin/:token と同じくキャッシュ防止ヘッダーを一括付与する
+// （共有PC・プロキシ・ブラウザの戻る/進むキャッシュへの残留を防ぐ）。
+app.use("/p/*", async (c, next) => {
+  await next();
+  c.header("Cache-Control", "no-store, private, max-age=0");
+  c.header("Referrer-Policy", "same-origin");
 });
 
 // ============ ゲスト動線 ============
