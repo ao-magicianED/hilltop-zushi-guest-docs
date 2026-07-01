@@ -54,6 +54,8 @@ export type Guest = {
   id_verified: number;
   choose_reason: string | null;
   choose_reason_other: string | null;
+  stay_purpose: string | null;
+  stay_purpose_other: string | null;
   marketing_optin: number;
   submit_status: string;
   submitted_at: string | null;

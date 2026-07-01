@@ -35,8 +35,8 @@ import {
 } from "./lib/db";
 import { encryptField, decryptField, encryptBytes, decryptBytes } from "./lib/crypto";
 import { hashToken, sha256Hex, timingSafeEqual, generateToken, newId } from "./lib/tokens";
-import { validateGuest, SUBMIT_RULE_VERSION, type GuestInput, type FieldErrors } from "./lib/validation";
-import { t, optLabel, OCCUPATIONS, NATIONALITIES, GENDERS, CHOOSE_REASONS } from "./lib/i18n";
+import { validateGuest, isDomesticJapanese, needsPassportPhoto, SUBMIT_RULE_VERSION, type GuestInput, type FieldErrors } from "./lib/validation";
+import { t, optLabel, OCCUPATIONS, NATIONALITIES, GENDERS, CHOOSE_REASONS, STAY_PURPOSES } from "./lib/i18n";
 import { getCookie, setCookie, deleteCookie } from "hono/cookie";
 import {
   getAdminByEmail,
@@ -335,7 +335,6 @@ app.get("/p/:token", async (c) => {
     address: (await decryptField(c.env.MASTER_KEY, guest.address_enc)) ?? "",
     nationality: guest.nationality ?? "",
     nationality_other: guest.nationality_other ?? "",
-    passport_no: (await decryptField(c.env.MASTER_KEY, guest.passport_no_enc)) ?? "",
     occupation: guest.occupation ?? "",
     age: guest.age == null ? "" : String(guest.age),
     gender: guest.gender ?? "",
@@ -345,17 +344,22 @@ app.get("/p/:token", async (c) => {
     email: guest.email ?? "",
     choose_reason_other: guest.choose_reason_other ?? "",
     choose_reason: guest.choose_reason ?? "",
+    stay_purpose: guest.stay_purpose ?? "",
+    stay_purpose_other: guest.stay_purpose_other ?? "",
   };
   const resv = await getReservation(c.env, guest.reservation_id);
   const requireEmail = otaRequiresEmail(resv);
   const groupBackHref = `/p/${token}/back-to-group?lang=${lang}`;
   const savedNotice = c.req.query("saved") === "1";
   const imgWarnNotice = c.req.query("imgwarn") === "1";
+  const bucketInput = { nationality: values.nationality ?? "", has_jp_address: values.has_jp_address ?? "" };
+  const showPassport = needsPassportPhoto(bucketInput);
+  const showStayPurpose = isDomesticJapanese(bucketInput);
   return c.html(layout({
     title: t(lang, "form_title"), lang, path: `/p/${token}`,
     body: formPage(lang, {
       token, guest, isRep: guest.member_role === "representative", values, requireEmail, groupBackHref,
-      marketingOptin: !!guest.marketing_optin, savedNotice, imgWarnNotice,
+      marketingOptin: !!guest.marketing_optin, savedNotice, imgWarnNotice, showPassport, showStayPurpose,
     }),
   }));
 });
@@ -384,13 +388,15 @@ app.post("/p/:token", async (c) => {
     address: get("address"),
     nationality: get("nationality"),
     nationality_other: get("nationality_other"),
-    passport_no: get("passport_no"),
     has_passport_img: Boolean(guest.passport_img_key) || !!(file && file.size > 0),
     occupation: get("occupation"),
     age: get("age"),
     gender: get("gender"),
     phone: get("phone"),
     email: get("email"),
+    prev_stay: get("prev_stay"),
+    stay_purpose: get("stay_purpose"),
+    stay_purpose_other: get("stay_purpose_other"),
   };
 
   // 同意（必須）チェック
@@ -406,7 +412,6 @@ app.post("/p/:token", async (c) => {
     const res = await handlePassportUpload(c.env, guest.id, file);
     if (!res.ok) {
       return renderFormError(c, lang, token, guest, input, errors, res.error, true, {
-        prev_stay: get("prev_stay"),
         next_stay: get("next_stay"),
         choose_reason_other: get("choose_reason_other"),
         requireEmail,
@@ -418,7 +423,6 @@ app.post("/p/:token", async (c) => {
   if (!ok || !consentOk) {
     const banner = !consentOk ? t(lang, "consent_required") : undefined;
     return renderFormError(c, lang, token, guest, input, errors, banner, true, {
-      prev_stay: get("prev_stay"),
       next_stay: get("next_stay"),
       choose_reason_other: get("choose_reason_other"),
       requireEmail,
@@ -428,7 +432,6 @@ app.post("/p/:token", async (c) => {
   // 暗号化して保存
   const now = nowIso();
   const addressEnc = await encryptField(c.env.MASTER_KEY, input.address);
-  const passportEnc = await encryptField(c.env.MASTER_KEY, input.passport_no);
   const phoneEnc = await encryptField(c.env.MASTER_KEY, input.phone);
   // choose_reason は許可リストに含まれる値だけを保存（不正値を排除）
   const allowedReasons = new Set(CHOOSE_REASONS.map((r) => r.code));
@@ -436,6 +439,11 @@ app.post("/p/:token", async (c) => {
   const isRep = guest.member_role === "representative";
   const chooseReasonJson = isRep && chooseReasons.length ? JSON.stringify(chooseReasons) : null;
   const chooseReasonOther = isRep ? get("choose_reason_other") || null : null;
+  // 利用用途はchoose_reasonと同じ「代表者のみのグループ設問」。許可リストで不正値を排除しつつ、
+  // 同行者トークンからの直接POSTで書き込まれないようchoose_reasonと同様にisRepでガードする。
+  const allowedPurposes = new Set(STAY_PURPOSES.map((p) => p.code));
+  const stayPurpose = isRep && allowedPurposes.has(input.stay_purpose) ? input.stay_purpose : null;
+  const stayPurposeOther = stayPurpose === "other" ? input.stay_purpose_other || null : null;
   const marketing = form.get("marketing_optin") === "1" ? 1 : 0;
 
   // 画像カラムは「新規アップロードがあれば更新、なければ既存値を維持」（静的SQLでbindズレを防止）
@@ -444,11 +452,13 @@ app.post("/p/:token", async (c) => {
   const imgSize = imgInfo?.size ?? guest.passport_img_size;
   const imgUploadedAt = imgInfo ? now : guest.passport_img_uploaded_at;
 
+  // 旅券番号は独自ルールで収集廃止（passport_no_encはSETから除外＝既存の過去データを再送信で消さない）
   await c.env.DB.prepare(
     `UPDATE guests SET
       full_name=?, has_jp_address=?, address_enc=?, nationality=?, nationality_other=?,
-      passport_no_enc=?, occupation=?, age=?, gender=?, phone_enc=?, prev_stay=?, next_stay=?, email=?,
-      choose_reason=?, choose_reason_other=?, marketing_optin=?, marketing_optin_at=?,
+      occupation=?, age=?, gender=?, phone_enc=?, prev_stay=?, next_stay=?, email=?,
+      choose_reason=?, choose_reason_other=?, stay_purpose=?, stay_purpose_other=?,
+      marketing_optin=?, marketing_optin_at=?,
       passport_img_key=?, passport_img_mime=?, passport_img_size=?, passport_img_uploaded_at=?,
       submit_status='submitted', submitted_at=?, submit_rule_version=?,
       consent_at=?, consent_lang=?, consent_privacy=?, consent_cross_border=?, updated_at=?
@@ -460,16 +470,17 @@ app.post("/p/:token", async (c) => {
       addressEnc,
       input.nationality,
       input.nationality_other || null,
-      passportEnc,
       input.occupation,
-      parseInt(input.age, 10),
-      input.gender,
+      input.age.trim() ? parseInt(input.age, 10) : null,
+      input.gender || null,
       phoneEnc,
-      get("prev_stay") || null,
+      input.prev_stay || null,
       get("next_stay") || null,
       input.email || null,
       chooseReasonJson,
       chooseReasonOther,
+      stayPurpose,
+      stayPurposeOther,
       marketing,
       marketing ? now : null,
       imgKey,
@@ -541,14 +552,20 @@ app.post("/p/:token/draft", async (c) => {
   const chooseReasons = form.getAll("choose_reason").map(String).filter((x) => allowedReasons.has(x));
   const chooseReasonJson = isRep && chooseReasons.length ? JSON.stringify(chooseReasons) : null;
   const chooseReasonOther = isRep ? getOrNull("choose_reason_other") : null;
+  // 利用用途は代表者のみのグループ設問（choose_reasonと同様、同行者からの直接POSTで書き込まれないようガード）
+  const allowedPurposes = new Set(STAY_PURPOSES.map((p) => p.code));
+  const rawPurpose = get("stay_purpose");
+  const stayPurpose = isRep && allowedPurposes.has(rawPurpose) ? rawPurpose : null;
+  const stayPurposeOther = stayPurpose === "other" ? getOrNull("stay_purpose_other") : null;
   const marketing = form.get("marketing_optin") === "1" ? 1 : 0;
   const now = nowIso();
 
+  // 旅券番号は独自ルールで収集廃止（passport_no_encはSETから除外＝既存の過去データを消さない）
   await c.env.DB.prepare(
     `UPDATE guests SET
       full_name=?, has_jp_address=?, address_enc=?, nationality=?, nationality_other=?,
-      passport_no_enc=?, occupation=?, age=?, gender=?, phone_enc=?, prev_stay=?, next_stay=?, email=?,
-      choose_reason=?, choose_reason_other=?, marketing_optin=?,
+      occupation=?, age=?, gender=?, phone_enc=?, prev_stay=?, next_stay=?, email=?,
+      choose_reason=?, choose_reason_other=?, stay_purpose=?, stay_purpose_other=?, marketing_optin=?,
       passport_img_key=?, passport_img_mime=?, passport_img_size=?, passport_img_uploaded_at=?, updated_at=?
      WHERE id=? AND submit_status != 'submitted'`
   )
@@ -558,7 +575,6 @@ app.post("/p/:token/draft", async (c) => {
       await encryptField(c.env.MASTER_KEY, getOrNull("address")),
       getOrNull("nationality"),
       getOrNull("nationality_other"),
-      await encryptField(c.env.MASTER_KEY, getOrNull("passport_no")),
       getOrNull("occupation"),
       getIntOrNull("age"),
       getOrNull("gender"),
@@ -568,6 +584,8 @@ app.post("/p/:token/draft", async (c) => {
       getOrNull("email"),
       chooseReasonJson,
       chooseReasonOther,
+      stayPurpose,
+      stayPurposeOther,
       marketing,
       imgKey,
       imgMime,
@@ -591,7 +609,7 @@ function renderFormError(
   errors: FieldErrors,
   banner?: string,
   showBanner = true,
-  extra: { prev_stay?: string; next_stay?: string; choose_reason_other?: string; requireEmail?: boolean } = {}
+  extra: { next_stay?: string; choose_reason_other?: string; requireEmail?: boolean } = {}
 ) {
   const values: Record<string, string> = {
     full_name: input.full_name,
@@ -599,19 +617,22 @@ function renderFormError(
     address: input.address,
     nationality: input.nationality,
     nationality_other: input.nationality_other,
-    passport_no: input.passport_no,
     occupation: input.occupation,
     age: input.age,
     gender: input.gender,
     phone: input.phone,
     email: input.email,
-    prev_stay: extra.prev_stay ?? "",
+    prev_stay: input.prev_stay,
     next_stay: extra.next_stay ?? "",
     choose_reason_other: extra.choose_reason_other ?? "",
+    stay_purpose: input.stay_purpose,
+    stay_purpose_other: input.stay_purpose_other,
   };
+  const showPassport = needsPassportPhoto({ nationality: input.nationality, has_jp_address: input.has_jp_address });
+  const showStayPurpose = isDomesticJapanese({ nationality: input.nationality, has_jp_address: input.has_jp_address });
   const body = [
     banner ? html`<div class="card"><div class="notice err">${banner}</div></div>` : html``,
-    formPage(lang, { token, guest, isRep: guest.member_role === "representative", values, errors, showErrorBanner: showBanner, requireEmail: extra.requireEmail, groupBackHref: `/p/${token}/back-to-group?lang=${lang}` }),
+    formPage(lang, { token, guest, isRep: guest.member_role === "representative", values, errors, showErrorBanner: showBanner, requireEmail: extra.requireEmail, groupBackHref: `/p/${token}/back-to-group?lang=${lang}`, showPassport, showStayPurpose }),
   ];
   return c.html(layout({ title: t(lang, "form_title"), lang, path: `/p/${token}`, body }));
 }
@@ -1111,6 +1132,7 @@ app.get("/admin/r/:id", async (c) => {
       <td>${escHtml(phone)}</td>
       <td>${escHtml(g.email ?? "")}${g.marketing_optin ? " ✉️" : ""}</td>
       <td>${img}</td>
+      <td>${escHtml(optLabel(STAY_PURPOSES, g.stay_purpose, "ja"))}${g.stay_purpose_other ? "（" + escHtml(g.stay_purpose_other) + "）" : ""}</td>
     </tr>`);
   }
 
@@ -1123,7 +1145,7 @@ app.get("/admin/r/:id", async (c) => {
       <h1>${res.airbnb_reservation_code ?? id.slice(0, 8)}</h1>
       <p>${res.check_in_date}〜${res.check_out_date}／進捗 ${done}/${total}／審査 ${res.review_status}</p>
       <div style="overflow:auto">
-      <table><thead><tr><th>枠</th><th>氏名/状態</th><th>国籍</th><th>旅券</th><th>住所</th><th>職業</th><th>年齢/性別</th><th>電話</th><th>メール</th><th>画像</th></tr></thead>
+      <table><thead><tr><th>枠</th><th>氏名/状態</th><th>国籍</th><th>旅券番号(過去分)</th><th>住所</th><th>職業</th><th>年齢/性別</th><th>電話</th><th>メール</th><th>画像</th><th>利用用途</th></tr></thead>
       <tbody>${raw(rows.join(""))}</tbody></table>
       </div>
       <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
@@ -1173,16 +1195,17 @@ app.get("/admin/r/:id/export.csv", async (c) => {
   const res = await getReservation(c.env, id);
   if (!res) return c.notFound();
   const guests = await getGuestsByReservation(c.env, id);
-  const header = ["slot", "role", "name", "has_jp_address", "address", "nationality", "passport_no", "occupation", "age", "gender", "phone", "email", "check_in", "check_out"];
+  const header = ["slot", "role", "name", "has_jp_address", "address", "nationality", "passport_no_legacy", "occupation", "age", "gender", "phone", "email", "prev_stay", "stay_purpose", "check_in", "check_out"];
   const lines = [header.join(",")];
   for (const g of guests) {
     const address = (await decryptField(c.env.MASTER_KEY, g.address_enc)) ?? "";
     const passport = (await decryptField(c.env.MASTER_KEY, g.passport_no_enc)) ?? "";
     const phone = (await decryptField(c.env.MASTER_KEY, g.phone_enc)) ?? "";
+    const stayPurpose = optLabel(STAY_PURPOSES, g.stay_purpose, "ja") + (g.stay_purpose_other ? `(${g.stay_purpose_other})` : "");
     const cells = [
       g.slot_no, g.member_role, g.full_name ?? "", g.has_jp_address ?? "", address,
       optLabel(NATIONALITIES, g.nationality, "ja") + (g.nationality_other ? `(${g.nationality_other})` : ""),
-      passport, optLabel(OCCUPATIONS, g.occupation, "ja"), g.age ?? "", g.gender ?? "", phone, g.email ?? "", res.check_in_date, res.check_out_date,
+      passport, optLabel(OCCUPATIONS, g.occupation, "ja"), g.age ?? "", g.gender ?? "", phone, g.email ?? "", g.prev_stay ?? "", stayPurpose, res.check_in_date, res.check_out_date,
     ].map((x) => {
       // CSVインジェクション対策：改行除去＋数式起動文字を無効化
       let s = String(x).replace(/[\r\n]+/g, " ");

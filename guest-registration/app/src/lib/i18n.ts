@@ -123,6 +123,14 @@ export const T: Dict = {
   // おまけ（代表者のみ）
   choose_reason: { ja: "当施設を選んだ理由（任意・参考まで）", en: "Why did you choose us? (optional)", "zh-CN": "选择本住宿的理由（选填）", "zh-TW": "選擇本住宿的理由（選填）" },
   choose_reason_other_label: { ja: "その他（自由記入）", en: "Other (free text)", "zh-CN": "其他（自由填写）", "zh-TW": "其他（自由填寫）" },
+  stay_purpose: { ja: "今回のご利用用途", en: "Purpose of this stay", "zh-CN": "本次入住用途", "zh-TW": "本次入住用途" },
+  stay_purpose_other_label: { ja: "その他（自由記入）", en: "Other (free text)", "zh-CN": "其他（自由填写）", "zh-TW": "其他（自由填寫）" },
+  passport_photo_note: {
+    ja: "旅券の顔写真ページの画像をお願いします。",
+    en: "Please upload a photo of your passport's photo page.",
+    "zh-CN": "请上传护照照片页的图片。",
+    "zh-TW": "請上傳護照照片頁的圖片。",
+  },
 
   // マーケ同意
   marketing_optin: {
@@ -252,6 +260,16 @@ export const CHOOSE_REASONS: Opt[] = [
   { code: "errand_nearby", label: { ja: "この近くで用事がある", en: "Errands nearby", "zh-CN": "附近有事", "zh-TW": "附近有事" } },
   { code: "quiet_nature", label: { ja: "静かで自然あふれる場所で落ち着いて過ごしたい", en: "Quiet, nature, relaxation", "zh-CN": "想在安静自然的地方放松", "zh-TW": "想在安靜自然的地方放鬆" } },
   { code: "bbq", label: { ja: "バーベキューをやりたい", en: "Want to BBQ", "zh-CN": "想烧烤", "zh-TW": "想烤肉" } },
+  { code: "other", label: { ja: "その他", en: "Other", "zh-CN": "其他", "zh-TW": "其他" } },
+];
+
+// 今回のご利用用途（独自ルール：日本国籍・国内住所ありの代表者のみ必須）
+export const STAY_PURPOSES: Opt[] = [
+  { code: "family", label: { ja: "家族", en: "Family", "zh-CN": "家人", "zh-TW": "家人" } },
+  { code: "friends_family", label: { ja: "友人家族", en: "Friends & family", "zh-CN": "朋友及家人", "zh-TW": "朋友及家人" } },
+  { code: "company", label: { ja: "会社関係", en: "Company/work related", "zh-CN": "公司相关", "zh-TW": "公司相關" } },
+  { code: "friends", label: { ja: "友人", en: "Friends", "zh-CN": "朋友", "zh-TW": "朋友" } },
+  { code: "couple", label: { ja: "カップル", en: "Couple", "zh-CN": "情侣", "zh-TW": "情侶" } },
   { code: "other", label: { ja: "その他", en: "Other", "zh-CN": "其他", "zh-TW": "其他" } },
 ];
 

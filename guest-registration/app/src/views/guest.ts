@@ -2,7 +2,7 @@
 import { html, raw } from "hono/html";
 import type { Lang } from "../types";
 import type { HE } from "./layout";
-import { t, OCCUPATIONS, NATIONALITIES, GENDERS, CHOOSE_REASONS, optLabel } from "../lib/i18n";
+import { t, OCCUPATIONS, NATIONALITIES, GENDERS, CHOOSE_REASONS, STAY_PURPOSES, optLabel } from "../lib/i18n";
 import type { Guest, Reservation } from "../lib/db";
 import type { FieldErrors } from "../lib/validation";
 
@@ -189,6 +189,8 @@ export function formPage(
     marketingOptin?: boolean;
     savedNotice?: boolean;
     imgWarnNotice?: boolean;
+    showPassport?: boolean;
+    showStayPurpose?: boolean;
   }
 ): HE {
   const v = opts.values ?? {};
@@ -196,6 +198,11 @@ export function formPage(
   const reqMark = `<span class="req">*</span>`;
   const optMark = `<span class="opt">${t(lang, "optional")}</span>`;
   const canSaveDraft = opts.guest.submit_status !== "submitted";
+  // 未判定（初回・nationality/has_jp_address未選択）はデフォルトで表示しておく（安全側）
+  const showPassport = opts.showPassport !== false;
+  const showStayPurpose = !!opts.showStayPurpose;
+
+  const purposeChecks = optionTags(STAY_PURPOSES, lang, v.stay_purpose ?? "");
 
   const selectedReasons: Set<string> = (() => {
     try {
@@ -248,27 +255,27 @@ export function formPage(
       <label>${t(lang, "nationality_other")} ${raw(optMark)}</label>
       <input class="${errCls(e, "nationality_other")}" type="text" name="nationality_other" value="${esc(v.nationality_other ?? "")}">
 
-      <label>${t(lang, "passport_no")}</label>
-      <input class="${errCls(e, "passport_no")}" type="text" name="passport_no" value="${esc(v.passport_no ?? "")}" autocapitalize="characters">
-
-      <label>${t(lang, "passport_img")}</label>
-      <input class="${errCls(e, "has_passport_img")}" type="file" name="passport_img" accept="image/*" id="imgfile">
-      ${opts.guest.passport_img_key ? html`<p class="muted">✓ 画像アップロード済み / uploaded</p>` : ""}
+      <div id="passport-section" style="display:${showPassport ? "block" : "none"}">
+        <label>${t(lang, "passport_img")} ${raw(reqMark)}</label>
+        <p class="muted">${t(lang, "passport_photo_note")}</p>
+        <input class="${errCls(e, "has_passport_img")}" type="file" name="passport_img" accept="image/*" id="imgfile">
+        ${opts.guest.passport_img_key ? html`<p class="muted">✓ 画像アップロード済み / uploaded</p>` : ""}
+      </div>
 
       <label>${t(lang, "occupation")} ${raw(reqMark)}</label>
       <select class="${errCls(e, "occupation")}" name="occupation">${raw(optionTags(OCCUPATIONS, lang, v.occupation ?? ""))}</select>
 
-      <label>${t(lang, "age")} ${raw(reqMark)}</label>
+      <label>${t(lang, "age")} ${raw(optMark)}</label>
       <input class="${errCls(e, "age")}" type="number" name="age" inputmode="numeric" min="0" max="120" value="${esc(v.age ?? "")}">
 
-      <label>${t(lang, "gender")} ${raw(reqMark)}</label>
+      <label>${t(lang, "gender")} ${raw(optMark)}</label>
       <select class="${errCls(e, "gender")}" name="gender">${raw(optionTags(GENDERS, lang, v.gender ?? ""))}</select>
 
       <label>${t(lang, "phone")} ${opts.isRep ? raw(reqMark) : raw(optMark)}</label>
       <input class="${errCls(e, "phone")}" type="tel" name="phone" value="${esc(v.phone ?? "")}">
 
-      <label>${t(lang, "prev_stay")} ${raw(optMark)}</label>
-      <input type="text" name="prev_stay" value="${esc(v.prev_stay ?? "")}">
+      <label>${t(lang, "prev_stay")} <span id="prev-stay-mark">${showPassport ? raw(reqMark) : raw(optMark)}</span></label>
+      <input class="${errCls(e, "prev_stay")}" type="text" name="prev_stay" value="${esc(v.prev_stay ?? "")}">
 
       <label>${t(lang, "next_stay")} ${raw(optMark)}</label>
       <input type="text" name="next_stay" value="${esc(v.next_stay ?? "")}">
@@ -279,6 +286,11 @@ export function formPage(
 
       ${opts.isRep
         ? html`
+      <div id="purpose-section" style="display:${showStayPurpose ? "block" : "none"}">
+        <label>${t(lang, "stay_purpose")} ${raw(reqMark)}</label>
+        <select class="${errCls(e, "stay_purpose")}" name="stay_purpose">${raw(purposeChecks)}</select>
+        <input class="${errCls(e, "stay_purpose_other")}" type="text" name="stay_purpose_other" placeholder="${t(lang, "stay_purpose_other_label")}" value="${esc(v.stay_purpose_other ?? "")}">
+      </div>
       <h2>${t(lang, "choose_reason")}</h2>
       ${raw(reasonChecks)}
       <input type="text" name="choose_reason_other" placeholder="${t(lang, "choose_reason_other_label")}" value="${esc(v.choose_reason_other ?? "")}">
@@ -307,7 +319,40 @@ export function formPage(
         : ""}
     </form>
   </div>
-  ${raw(IMG_COMPRESS_JS)}`;
+  ${raw(IMG_COMPRESS_JS)}
+  ${raw(fieldToggleJs(reqMark, optMark))}`;
+}
+
+// 国籍＋国内住所の選択に応じて、旅券写真欄／利用用途欄の表示と、前泊地の必須/任意表示をその場で
+// 切り替える（独自ルール）。JS未実行時はサーバ側で判定した初期表示のまま（安全側＝旅券欄は表示）。
+// reqMark/optMarkは自前のi18n辞書由来の固定文字列（ユーザー入力ではない）のためそのまま埋め込む。
+function fieldToggleJs(reqMarkHtml: string, optMarkHtml: string): string {
+  const esc1 = (s: string) => s.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  return `<script>
+(function(){
+  var form=document.getElementById('gform'); if(!form) return;
+  var nat=form.querySelector('[name="nationality"]');
+  var addrRadios=form.querySelectorAll('[name="has_jp_address"]');
+  var passSec=document.getElementById('passport-section');
+  var purpSec=document.getElementById('purpose-section');
+  var prevMark=document.getElementById('prev-stay-mark');
+  var REQ='${esc1(reqMarkHtml)}', OPT='${esc1(optMarkHtml)}';
+  function isDomestic(){
+    if(!nat||nat.value!=='JP') return false;
+    for(var i=0;i<addrRadios.length;i++){ if(addrRadios[i].value==='1'&&addrRadios[i].checked) return true; }
+    return false;
+  }
+  function sync(){
+    var d=isDomestic();
+    if(passSec) passSec.style.display = d ? 'none' : '';
+    if(purpSec) purpSec.style.display = d ? '' : 'none';
+    if(prevMark) prevMark.innerHTML = d ? OPT : REQ;
+  }
+  if(nat) nat.addEventListener('change', sync);
+  for(var i=0;i<addrRadios.length;i++){ addrRadios[i].addEventListener('change', sync); }
+  sync();
+})();
+</script>`;
 }
 
 // 画像をクライアントで圧縮（長辺2000px/JPEG）。中国回線対策。失敗時は原本のまま送る。
