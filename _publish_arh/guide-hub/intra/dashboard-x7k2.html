@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Internal Dashboard v3 — Hilltop Zushi</title>
+<title>Internal Dashboard v4 — Hilltop Zushi</title>
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="apple-touch-icon" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -646,7 +646,7 @@ footer.dash-footer {
   <div class="brand">
     <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
     <span class="name">HILLTOP ZUSHI</span>
-    <span class="role">INTRA v3 · 運営者専用</span>
+    <span class="role">INTRA v4 · 運営者専用</span>
   </div>
   <div class="quick-actions">
     <a href="#today" class="urgent">🏠 今日</a>
@@ -1199,14 +1199,16 @@ footer.dash-footer {
         </table>
       </div>
 
-      <div class="card info">
-        <h3>👥 宿泊者名簿 運用SOP（3年保存）</h3>
+      <div class="card good">
+        <h3>👥 宿泊者名簿 運用SOP <span class="badge good">専用Webアプリ稼働中</span></h3>
         <div class="kv">
-          <div class="k">記録項目</div><div class="v">氏名 / 住所 / 職業 / 宿泊日 / 国籍 / 旅券番号（外国人）</div>
-          <div class="k">本人確認</div><div class="v">ICTビデオ通話 or 顔認証ツール</div>
-          <div class="k">パスポートコピー</div><div class="v">外国人は写し保存必須</div>
-          <div class="k">保存期間</div><div class="v"><strong>3年間</strong></div>
-          <div class="k">廃棄方法</div><div class="v todo">⚠ ポリシー要策定</div>
+          <div class="k">運用ツール</div><div class="v">自前のCloudflare Worker「宿泊者名簿システム」（Notion/freee等の選定は不要になった・サイト本体とは意図的に別システムとして構築済）→ <a href="#hosting">ホスティング詳細</a></div>
+          <div class="k">入口</div><div class="v"><a href="https://hilltop-guest-registration.2520000530.workers.dev/start" target="_blank">/start</a>（代表者が人数申告 → 個別リンクを自動発行、多言語対応）</div>
+          <div class="k">記録項目</div><div class="v">氏名 / 住所 / 国籍 / 宿泊日 / 旅券写真（旅券番号は2026-07-01に収集廃止・写真のみ）/ 利用用途</div>
+          <div class="k">本人確認</div><div class="v">OTA予約(Airbnb/Booking)は突合なし自己申告で受付（安全な一致時のみ既存予約へ自動合流・IDOR対策済）/ 直予約は予約コード+姓で突合</div>
+          <div class="k">保存期間</div><div class="v"><strong>5年間</strong>（法定3年以上を満たすオーナー方針）・期限切れは<strong>Cronで毎日自動削除</strong>（削除履歴は管理画面<code>/admin/purge-log</code>で閲覧可）</div>
+          <div class="k">プライバシーポリシー</div><div class="v"><a href="https://hilltop-guest-registration.2520000530.workers.dev/privacy" target="_blank">/privacy</a> 公開済（4言語）</div>
+          <div class="k">未確定事項</div><div class="v todo">⚠ 本番のテストデータ削除の進め方 → <a href="#todo">TODO</a></div>
         </div>
       </div>
 
@@ -1298,17 +1300,21 @@ footer.dash-footer {
 
     <!-- ===== 🛡 火災保険 ===== -->
     <section class="block" id="insurance">
-      <h2>🛡 火災保険・賠償保険 <span class="ja">Insurance</span></h2>
-      <div class="card todo">
-        <h3>⚠ 選定状況</h3>
+      <h2>🛡 火災保険・賠償保険 <span class="ja">Insurance</span> <span class="pri new">契約済</span></h2>
+      <div class="card good">
+        <h3>✅ 契約中: 損保ジャパン「事業活動総合保険」ワイドプラン</h3>
         <div class="kv">
-          <div class="k">フォルダ</div><div class="v"><code>神武寺民泊PJ\保険関係\20260417 保険見積もり\</code></div>
-          <div class="k">プラン数</div><div class="v">4プラン（A〜D）</div>
-          <div class="k">比較資料</div><div class="v"><code>Hilltop_Zushi_保険プラン比較_20260418.pptx</code></div>
-          <div class="k">契約済プラン</div><div class="v todo">⚠ 要確認</div>
-          <div class="k">施設賠償特約</div><div class="v todo">⚠ 崖転落リスク対応か要確認</div>
-          <div class="k">JAPA民泊保険（候補）</div><div class="v">¥32,000/年 候補</div>
+          <div class="k">証券番号</div><div class="v"><code>BM00835814</code></div>
+          <div class="k">契約者</div><div class="v">ブルーステージ合同会社</div>
+          <div class="k">保険期間</div><div class="v"><strong>2026/5/15 〜 2027/5/15</strong>（1年契約・自動更新ではない点に注意）</div>
+          <div class="k">年間保険料</div><div class="v">¥101,360（クレカ一括）</div>
+          <div class="k">主要補償</div><div class="v">施設賠償 1事故1億円 / 物損害 1,000万円 / 受託不動産 5,000万円 / サイバー 100万円</div>
+          <div class="k">施設賠償特約</div><div class="v">✅ 崖転落リスクは施設賠償の対象</div>
+          <div class="k">代理店</div><div class="v">太陽AGネオ野村 <a class="link-btn tel" href="tel:0442100213">044-210-0213</a></div>
+          <div class="k">事故時連絡先</div><div class="v"><a class="link-btn tel" href="tel:0120727110">0120-727-110</a>（24h365d）</div>
+          <div class="k">証券・資料</div><div class="v"><code>神武寺民泊PJ\保険関係\00_現在加入中の保険\</code>（証券PDF・README）</div>
         </div>
+        <p style="font-size:0.78rem;margin-top:8px;color:var(--text-light);">次回満期 2027-05-15 の約1ヶ月前に更新確認を。契約前の見積り比較資料（A〜D 4プラン）は <code>保険関係\20260417 保険見積もり\</code> に保管。</p>
       </div>
     </section>
 
@@ -1535,13 +1541,15 @@ footer.dash-footer {
       </div>
 
       <div class="card warn">
-        <h3>✅ 器具点検チェック（清掃時）</h3>
+        <h3>✅ 器具点検チェック（清掃時）<span class="pri new">v4更新</span></h3>
         <ul class="checkbox-list">
-          <li>Weber 57cm コンパクトケトル 本体破損なし</li>
-          <li>ユニフレーム ファイアグリル 歪み・サビなし</li>
+          <li>Weber Traveler ガスグリル本体・イグナイタ点火・ガス接続部の破損なし</li>
+          <li>Iwatani グリルスター CB-SBG-2（サブ機）火力調整・CB缶残量確認</li>
+          <li><strong>一酸化炭素(CO)警報器 ×2 の電池・作動確認</strong>（<a href="#maintenance">保守カレンダー</a>）</li>
+          <li>七輪（炭オプション用）破損なし・希望ゲストのみ貸出</li>
           <li>火ばさみ・トングの状態</li>
           <li>消火具（水バケツ + 消火器）が手の届く位置にある</li>
-          <li>炭・着火剤 在庫あり（<a href="#par-stock">在庫パー</a>）</li>
+          <li>ガス（CB缶・LPG）在庫あり／炭・着火剤は七輪利用時のみ（<a href="#par-stock">在庫パー</a>）</li>
           <li>耐熱手袋 状態確認</li>
           <li>近隣に煙が直接行かないか配置確認</li>
         </ul>
@@ -1658,14 +1666,22 @@ footer.dash-footer {
     <!-- ===== 📦 備品 ===== -->
     <section class="block" id="equipment">
       <h2>📦 購入備品リスト <span class="ja">Equipment</span></h2>
-      <div class="card">
-        <h3>🔥 BBQ用品（最終版v4）</h3>
+      <div class="card warn">
+        <h3>🔥 BBQ用品（最終版v4・ガス主力化版）<span class="badge new">v3から刷新</span></h3>
         <div class="kv">
-          <div class="k">最新ファイル</div><div class="v"><code>BBQ用品リスト_Hilltop_Zushi_最終版_v4.xlsx</code></div>
-          <div class="k">合計金額（v3参考）</div><div class="v">¥236,839</div>
-          <div class="k">グリル</div><div class="v">Weber 57cm + ユニフレーム ファイアグリル</div>
-          <div class="k">炭</div><div class="v">炭魂 オガ備長炭 10kg</div>
+          <div class="k">最新ファイル</div><div class="v"><code>BBQ用品リスト_Hilltop_Zushi_最終版_v4.xlsx</code>（2026-04-17更新）</div>
+          <div class="k">合計金額</div><div class="v"><strong>¥319,219</strong>（v3 ¥236,839 から +¥82,380）</div>
+          <div class="k">メイングリル</div><div class="v">Weber Traveler ポータブルガスグリル（¥59,990）</div>
+          <div class="k">サブグリル</div><div class="v">Iwatani グリルスター CB-SBG-2（¥28,000・CB缶式2バーナー）</div>
+          <div class="k">廃止</div><div class="v" style="text-decoration:line-through;color:var(--text-light);">Weber 57cmコンパクトケトル／ユニフレーム ファイアグリル（炭火メイン運用を廃止）</div>
+          <div class="k">炭</div><div class="v">希望ゲストのみ・小型七輪での事前申請制オプションに格下げ</div>
+          <div class="k">新規安全対策</div><div class="v"><span class="v critical">一酸化炭素(CO)警報器 ×2 を追加</span>（ガス使用に伴う中毒予防）</div>
+          <div class="k">月次補充目安</div><div class="v">約¥7,497/月（<a href="#par-stock">在庫パー</a>参照）</div>
         </div>
+        <p style="font-size:0.78rem;margin-top:8px;color:var(--text-light);">
+          変更理由（v4シート内メモ）: Airbnb逗子・葉山13物件調査で62%がガス主力／炭禁止明記5件。100V環境での電気BBQは非現実的と判断し、メイン=ガス・炭は希望者限定に転換（Claude×Codex 3方向クロスチェック）。
+        </p>
+        <p style="font-size:0.78rem;color:var(--text-light);">⚠ 未確認: Weber Traveler の国内ガス種（LPG or CB缶アダプタ）接続方式 → <a href="#todo">TODO</a></p>
       </div>
       <div class="card">
         <h3>📊 神武寺民泊 全体備品リスト</h3>
@@ -1817,6 +1833,7 @@ footer.dash-footer {
           <tr><td>SwitchBot電池</td><td>6ヶ月</td><td><span class="v todo">⚠</span></td></tr>
           <tr><td>Tapo microSD</td><td>月1回</td><td><span class="v todo">⚠</span></td></tr>
           <tr><td>BBQグリル清掃</td><td>使用後毎回</td><td>—</td></tr>
+          <tr><td>CO警報器（BBQ用×2）電池・作動確認</td><td>季節毎</td><td><span class="v todo">⚠</span></td></tr>
           <tr><td>庭木剪定</td><td>年2回</td><td><span class="v todo">⚠</span></td></tr>
           <tr><td>崖側フェンス強度</td><td>季節毎</td><td><span class="v todo">⚠</span></td></tr>
           <tr><td>雨樋・屋根</td><td>年1回 + 台風後</td><td><span class="v todo">⚠</span></td></tr>
@@ -2100,14 +2117,39 @@ footer.dash-footer {
 
     <!-- ===== ☁ ホスティング ===== -->
     <section class="block" id="hosting">
-      <h2>☁ ホスティング <span class="ja">Hosting</span></h2>
-      <div class="card">
+      <h2>☁ ホスティング <span class="ja">Hosting</span> <span class="pri">要注意</span></h2>
+      <p class="desc">Cloudflareアカウントが2つ存在し、同名「hilltop-zushi」プロジェクトが両方にあるため混同注意。デプロイ前に必ず <code>npx wrangler whoami</code> でログイン先を確認すること。完全な構成・変更履歴は <a href="../システム構成.html">システム構成メモ</a> を参照。</p>
+
+      <div class="card good">
+        <h3>★ 2520000530@campus.ouj.ac.jp <span class="badge good">本サイト稼働中</span></h3>
         <div class="kv">
-          <div class="k">プロジェクト</div><div class="v"><code>hilltop-zushi</code></div>
+          <div class="k">プロジェクト</div><div class="v"><code>hilltop-zushi</code>（名前は同じだが下記bluestage側とは別実体）</div>
+          <div class="k">本番URL</div><div class="v"><a href="https://hilltop-zushi-arh.pages.dev/" target="_blank">https://hilltop-zushi-arh.pages.dev/</a>（<strong>このダッシュボードもここで配信中</strong>）</div>
+          <div class="k">Account ID</div><div class="v"><code>d1baf436df81893d1f8478a3cda0c082</code></div>
+          <div class="k">内容</div><div class="v">「A Forest Retreat」統合版トップ・360ツアー・空き状況カレンダー・予約リクエストフォーム・<code>/guide-hub/</code>資料室（本ページ含む）</div>
+          <div class="k">デプロイ</div><div class="v"><code>npx wrangler pages deploy . --project-name=hilltop-zushi --branch=main</code>（<code>_publish_arh/</code>フォルダ内で実行）</div>
+          <div class="k">他プロジェクト同居</div><div class="v">宿泊者名簿Worker <code>hilltop-guest-registration</code>／bluestage-internal-report／bluereserve／line-crm-admin 等</div>
+        </div>
+      </div>
+
+      <div class="card warn">
+        <h3>info@bluestage-lcc.com <span class="badge warn">QRガイド専用・凍結</span></h3>
+        <div class="kv">
+          <div class="k">プロジェクト</div><div class="v"><code>hilltop-zushi</code>（上記campus側とは別実体）</div>
           <div class="k">本番URL</div><div class="v"><a href="https://hilltop-zushi.pages.dev/" target="_blank">https://hilltop-zushi.pages.dev/</a></div>
-          <div class="k">アカウント</div><div class="v">info@bluestage-lcc.com</div>
           <div class="k">Account ID</div><div class="v"><code>9ed124d538632a4f936e77031e20c8f5</code></div>
-          <div class="k">デプロイ</div><div class="v"><code>npx wrangler pages deploy _publish --project-name=hilltop-zushi</code></div>
+          <div class="k">用途</div><div class="v"><span class="v critical">物理QRコード設置済みの <code>/ハウスガイド_Hilltop_Zushi_v2#welcome</code> だけをここに残置。独自ドメイン購入まで一字一句変更禁止。</span></div>
+          <div class="k">他プロジェクト同居</div><div class="v">bluestage-corporate（ブルーステージ合同会社HP）／spacehp（レンタルスペース外販）</div>
+        </div>
+      </div>
+
+      <div class="card info">
+        <h3>🗄 宿泊者名簿システム（サイト本体とは別Worker）</h3>
+        <div class="kv">
+          <div class="k">本番URL</div><div class="v"><a href="https://hilltop-guest-registration.2520000530.workers.dev" target="_blank">hilltop-guest-registration.2520000530.workers.dev</a></div>
+          <div class="k">管理画面</div><div class="v"><a href="https://hilltop-guest-registration.2520000530.workers.dev/admin" target="_blank">/admin</a>（初回ログイン時パスワード変更＋TOTP 2段階認証必須／マスター: <code>ao.magician@gmail.com</code>）</div>
+          <div class="k">構成</div><div class="v">Cloudflare Workers + Hono + D1 + KV（campusアカウント）。他物件でも使う想定でサイト本体とは意図的に別システム。</div>
+          <div class="k">未確定事項</div><div class="v todo">⚠ 本番のテストデータ（<code>HMTEST0715</code>等）削除の進め方が未確認 → <a href="#todo">TODO</a></div>
         </div>
       </div>
     </section>
@@ -2151,8 +2193,7 @@ footer.dash-footer {
           <tr><th>項目</th><th>対応</th></tr>
           <tr><td>180日カウンター 累計集計</td><td>Airbnb/Bookingカレンダー</td></tr>
           <tr><td>2か月毎定期報告（6/15 期限・4-5月分）</td><td>minpaku電子提出</td></tr>
-          <tr><td>宿泊者名簿 運用ツール選定</td><td>Notion / freee 比較</td></tr>
-          <tr><td>火災保険の契約済プラン記録</td><td>#insurance 反映</td></tr>
+          <tr><td>宿泊者名簿システムのテストデータ（<code>HMTEST0715</code>等）削除の進め方確認</td><td><a href="#compliance">運用SOP</a> / <a href="#hosting">ホスティング</a></td></tr>
           <tr><td>OTA 2FA 有効化（Airbnb/Booking）</td><td>各アカウント</td></tr>
           <tr><td>Tapo C660 カメラポリシー策定</td><td>設置箇所・録画期間</td></tr>
           <tr><td>SwitchBot PIN ローテーション運用</td><td><a href="#access-log">アクセス台帳</a></td></tr>
@@ -2173,7 +2214,7 @@ footer.dash-footer {
           <tr><td>清掃契約 署名日確認</td><td>PDF直確認</td></tr>
           <tr><td>西崎さん・えりなちゃんの役割明文化</td><td>あおさんに確認</td></tr>
           <tr><td>Airbnb/Booking 掲載URL記録</td><td>—</td></tr>
-          <tr><td>BBQ v4 詳細確定</td><td>xlsx読取り</td></tr>
+          <tr><td>Weber Traveler の国内ガス種（LPG/CB缶アダプタ）接続方式確認</td><td><a href="#equipment">備品</a></td></tr>
           <tr><td>給湯器・エアコン点検記録開始</td><td>#maintenance</td></tr>
           <tr><td>税理士・行政書士の選定</td><td>—</td></tr>
           <tr><td>インボイス登録判断</td><td>消費税判定込</td></tr>
@@ -2207,6 +2248,7 @@ footer.dash-footer {
     <section class="block" id="changelog" style="opacity:0.75;font-size:0.82rem;">
       <h2 style="font-size:1.1rem;">📜 改訂履歴</h2>
       <ul style="padding-left:20px;">
+        <li><strong>2026-07-01 v4</strong> — 全体見直し・stale情報を実地確認して更新: ①ホスティングをCloudflare2アカウント構成（campus=本サイト稼働中 / bluestage=QRガイド専用凍結）+ 宿泊者名簿Workerの実態に合わせ全面書き換え、システム構成メモへリンク追加 ②火災保険を契約済プラン（損保ジャパン ワイド・BM00835814）の内容で確定記入 ③BBQ用品を最終版v4（ガス主力化・合計¥319,219）に更新、器具点検チェック・保守カレンダーにCO警報器を追加 ④宿泊者名簿運用SOPを実際に稼働中の専用Webアプリの内容に置き換え ⑤TODOから解決済み項目を除去・新規未確定事項を追記</li>
         <li><strong>2026-05-26 v3</strong> — Codex セカンドオピニオン反映: 「今日の運用」トップ画面 + 新規10セクション（設備止め方マップ / 災害対応 / ゲスト本人確認 / 近隣クレームSOP / BBQ安全SOP / インシデントログ / 鍵アクセス台帳 / 個人情報運用 / 在庫パー / 救急病院統合）+ 既存セクション改善（誰が・何分以内・通話台本）</li>
         <li><strong>2026-05-26 v2</strong> — ClaudeCodeAgentTeam 3並列で Critical 8項目発掘 / 21セクション</li>
         <li><strong>2026-05-26 v1</strong> — 初版 14セクション</li>
@@ -2217,7 +2259,7 @@ footer.dash-footer {
 </div>
 
 <footer class="dash-footer">
-  HILLTOP ZUSHI · Internal Dashboard v3 · Updated 2026-05-26 · DO NOT SHARE EXTERNALLY
+  HILLTOP ZUSHI · Internal Dashboard v4 · Updated 2026-07-01 · DO NOT SHARE EXTERNALLY
 </footer>
 
 <script>

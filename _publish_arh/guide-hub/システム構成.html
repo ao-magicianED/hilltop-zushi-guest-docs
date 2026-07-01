@@ -109,9 +109,7 @@
       </div>
       <div class="proj live" style="margin-top:8px;">
         <strong>hilltop-guest-registration</strong>(Worker) <span class="tag info">別枠・多物件共用予定</span><br>
-        宿泊者名簿収集アプリ。Hilltop Zushi専用ではなく他の民泊物件でも使う想定のため、意図的にサイト本体とは別システムとして構築。<br>
-        本番: <a class="link" href="https://hilltop-guest-registration.2520000530.workers.dev" target="_blank" rel="noopener">hilltop-guest-registration.2520000530.workers.dev</a><br>
-        ダッシュボード: <a class="link" href="https://dash.cloudflare.com/d1baf436df81893d1f8478a3cda0c082/workers/services/view/hilltop-guest-registration/production" target="_blank" rel="noopener">Cloudflare Workers管理画面</a>
+        宿泊者名簿収集アプリ。Hilltop Zushi専用ではなく他の民泊物件でも使う想定のため、意図的にサイト本体とは別システムとして構築。詳細は<a class="link" href="#guest-registration">④ 宿泊者名簿システム(宿泊台帳)</a>を参照。
       </div>
       <div class="proj" style="margin-top:8px;">他プロジェクトも同居: bluestage-internal-report、bluereserve、line-crm-admin、line-crm-liff、x-harness-aosalon-admin</div>
     </div>
@@ -160,31 +158,61 @@
     </div>
   </div>
 
-  <!-- ④ ソース管理 -->
-  <div class="section">
-    <h2>④ ソースコード管理(デプロイとは別経路)</h2>
-    <div class="proj">
-      <strong>GitHub: ao-magicianED/hilltop-zushi-guest-docs</strong><br>
-      コードの保管用リポジトリ。ここにpushしても本番には反映されない(Cloudflareへは<code>wrangler pages deploy</code>で手動アップロードする方式=Direct Upload)。<br>
-      統合版一式(<code>_publish_arh/</code>フォルダ)は2026-07-01時点でまだこのGitリポジトリにコミットしていない(ローカルのみ)。
+  <!-- ④ 宿泊者名簿システム -->
+  <div class="section" id="guest-registration">
+    <h2>④ 宿泊者名簿システム(宿泊台帳)</h2>
+    <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:14px;">
+      サイト本体(A Forest Retreat)とは独立したCloudflare Worker。①で触れた通り、他の民泊物件でも使う想定のため意図的に別システムにしている。
+    </p>
+    <div class="proj live">
+      <strong>本番</strong>: <a class="link" href="https://hilltop-guest-registration.2520000530.workers.dev" target="_blank" rel="noopener">hilltop-guest-registration.2520000530.workers.dev</a><br>
+      <strong>管理ダッシュボード</strong>: <a class="link" href="https://dash.cloudflare.com/d1baf436df81893d1f8478a3cda0c082/workers/services/view/hilltop-guest-registration/production" target="_blank" rel="noopener">Cloudflare Workers管理画面</a>
+    </div>
+    <div class="proj" style="margin-top:10px;">
+      <strong>管理ページ</strong>: <a class="link" href="https://hilltop-guest-registration.2520000530.workers.dev/admin" target="_blank" rel="noopener">/admin</a><br>
+      初回ログイン時は<strong>パスワード変更＋2段階認証(TOTP、認証アプリでQRコード読取)</strong>の設定が必須。<br>
+      マスターアカウント: <code>ao.magician@gmail.com</code>
+    </div>
+    <table>
+      <tr><th>パス</th><th>内容</th></tr>
+      <tr><td><code>/admin</code></td><td>予約一覧</td></tr>
+      <tr><td><code>/admin/reservations</code></td><td>予約・売上管理(新規予約作成・iCal取込)</td></tr>
+      <tr><td><code>/admin/metrics</code></td><td>指標ダッシュボード(ADR・稼働率など)</td></tr>
+      <tr><td><code>/admin/purge-log</code></td><td>自動削除履歴</td></tr>
+      <tr><td><code>/admin/admins</code></td><td>管理者の管理(マスターのみ)</td></tr>
+    </table>
+    <div class="proj" style="margin-top:10px;border-left:3px solid #92400E;">
+      <strong>確認待ち事項</strong> <span class="tag warn">要判断</span><br>
+      テストデータ削除(<code>HMTEST0715</code>など、予約一覧から確認可能)について、①本番環境のまま削除してよいか、②実行方法(私が実行 or あおさんのターミナルでコマンド実行)、の2点が2026-07-01時点で未確定・確認待ち。
     </div>
   </div>
 
-  <!-- ⑤ 既知の未対応事項 -->
+  <!-- ⑤ ソース管理 -->
   <div class="section">
-    <h2>⑤ 既知の未対応事項</h2>
+    <h2>⑤ ソースコード管理(デプロイとは別経路)</h2>
+    <div class="proj">
+      <strong>GitHub: ao-magicianED/hilltop-zushi-guest-docs</strong><br>
+      コードの保管用リポジトリ。ここにpushしても本番には反映されない(Cloudflareへは<code>wrangler pages deploy</code>で手動アップロードする方式=Direct Upload)。<br>
+      統合版一式(<code>_publish_arh/</code>フォルダ)は2026-07-01にコミット・push済み(<a class="link" href="https://github.com/ao-magicianED/hilltop-zushi-guest-docs/pull/3" target="_blank" rel="noopener">PR #3</a>)。
+    </div>
+  </div>
+
+  <!-- ⑥ 既知の未対応事項 -->
+  <div class="section">
+    <h2>⑥ 既知の未対応事項</h2>
     <ul class="issues">
       <li><span class="tag danger">要修正</span> Googleマップ埋め込みが仮座標のまま(③参照)</li>
       <li><span class="tag warn">任意</span> <code>images/</code>内の未参照ファイル28枚(54枚中)が未整理のまま残っている(実害は軽微)</li>
       <li><span class="tag warn">低優先度</span> 予約リクエストフォームが<code>no-cors</code>のため送信成功をクライアント側で検証できない</li>
-      <li><span class="tag info">未精査</span> <code>guide-hub/intra/dashboard-x7k2.html</code>の用途・KV等の依存有無が未確認</li>
+      <li><span class="tag ok">解消済</span> <code>guide-hub/intra/dashboard-x7k2.html</code>はKV等のバインディング非依存の静的HTML（PIN・一時保存ともsessionStorageのみ）と2026-07-01に確認済み。中身は「運営者用オペレーションダッシュボード」で、ホスティング構成・火災保険・BBQ用品v4・宿泊者名簿運用SOP等の記載をあわせて最新化（v4）。PINが平文でJS内にハードコードされている点は要ローテーション検討（低優先度・Cloudflare Access昇格で根本対応予定）。</li>
       <li><span class="tag warn">低優先度</span> GASのスパム対策にレート制限・LockServiceがない(③参照、実害は現状低い)</li>
+      <li><span class="tag warn">要判断</span> 宿泊者名簿システムのテストデータ削除(④参照、進め方確認待ち)</li>
     </ul>
   </div>
 
-  <!-- ⑥ 変更履歴 -->
+  <!-- ⑦ 変更履歴 -->
   <div class="section">
-    <h2>⑥ 変更履歴</h2>
+    <h2>⑦ 変更履歴</h2>
     <p style="font-size:0.82rem;color:var(--text-light);margin-bottom:10px;">
       <strong>運用ルール:</strong> システム構成(アカウント・連携サービス・デプロイ方法など)に変更があった場合は、このページの該当セクションを更新し、下の表に1行追記すること。
     </p>
@@ -193,6 +221,14 @@
       <tr>
         <td>2026-07-01</td>
         <td>初版作成。「A Forest Retreat」統合版(vibrant-shannon版採用)をcampusアカウント(hilltop-zushi-arh.pages.dev)へデプロイ。Cloudflareアカウント構成・宿泊者名簿Worker・GAS予約フォーム(オーナー/通知先/台帳URL/実コード確認結果)・Googleマップの現状を整理して記載。</td>
+      </tr>
+      <tr>
+        <td>2026-07-01</td>
+        <td>「④ 宿泊者名簿システム(宿泊台帳)」セクションを新設。管理ページURL・初回ログイン手順(パスワード変更+TOTP 2段階認証)・マスターアカウント・管理画面の各ページ一覧・テストデータ削除の確認待ち事項を追記。GitHub同期(PR #3)を反映。</td>
+      </tr>
+      <tr>
+        <td>2026-07-01</td>
+        <td><code>guide-hub/intra/dashboard-x7k2.html</code>を全体見直し(v3→v4)。KV等バインディング非依存の静的HTMLと確認し「⑥ 既知の未対応事項」の未精査項目を解消済みに変更。ダッシュボード側も同日付でホスティング(2アカウント構成)・火災保険(契約確定)・BBQ用品(v4ガス主力化・合計¥319,219)・宿泊者名簿運用SOP(専用Webアプリの実態)を反映し、解決済みTODOを除去。</td>
       </tr>
     </table>
   </div>
