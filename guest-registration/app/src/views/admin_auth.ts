@@ -82,7 +82,11 @@ export function adminsPage(opts: { admins: Admin[]; meEmail: string; flash?: str
           : a.status === "active"
           ? `<form method="post" action="/admin/admins/${a.id}/disable" style="margin:0"><button class="btn secondary" style="width:auto;padding:4px 10px">無効化</button></form>`
           : `<form method="post" action="/admin/admins/${a.id}/enable" style="margin:0"><button class="btn secondary" style="width:auto;padding:4px 10px">有効化</button></form>`;
-      return `<tr><td>${esc(a.email)}</td><td>${role}</td><td>${status}</td><td>2FA:${twofa}</td><td>${last}</td><td>${toggle}</td></tr>`;
+      const reset =
+        a.email === opts.meEmail
+          ? ""
+          : `<form method="post" action="/admin/admins/${a.id}/reset-password" style="margin:0" onsubmit="return confirm('${esc(a.email)} のパスワードをリセットします。現在のパスワードは使えなくなります。よろしいですか？')"><button class="btn secondary" style="width:auto;padding:4px 10px">PWリセット</button></form>`;
+      return `<tr><td>${esc(a.email)}</td><td>${role}</td><td>${status}</td><td>2FA:${twofa}</td><td>${last}</td><td style="display:flex;gap:6px;flex-wrap:wrap">${toggle}${reset}</td></tr>`;
     })
     .join("");
 
@@ -91,10 +95,10 @@ export function adminsPage(opts: { admins: Admin[]; meEmail: string; flash?: str
     <h1>管理者の管理</h1>
     ${opts.flash ? html`<div class="notice ok">${opts.flash}</div>` : ""}
     ${opts.tempCred
-      ? html`<div class="notice warn"><strong>新しい管理者の初期ログイン情報（一度だけ表示）</strong><br>
+      ? html`<div class="notice warn"><strong>ログイン情報（この画面にしか表示されません）</strong><br>
         メール：<code>${esc(opts.tempCred.email)}</code><br>
         仮パスワード：<code>${esc(opts.tempCred.password)}</code><br>
-        本人に安全な方法で渡してください。初回ログイン時にパスワード変更と2段階認証の登録が必要です。</div>`
+        本人に安全な方法（LINE等）で渡してください。次回ログイン時にパスワード変更と2段階認証の登録が必要です。</div>`
       : ""}
     <div style="overflow:auto">
     <table><thead><tr><th>メール</th><th>役割</th><th>状態</th><th>2FA</th><th>最終ログイン</th><th></th></tr></thead>

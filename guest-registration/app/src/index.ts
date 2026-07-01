@@ -927,7 +927,7 @@ app.get("/admin/admins", async (c) => {
   const admins = await listAdmins(c.env);
   const msg = c.req.query("msg");
   const flash =
-    msg === "self" ? "自分自身は無効化できません。" : msg === "lastmaster" ? "最後のマスター管理者は無効化できません。" : undefined;
+    msg === "self" ? "自分自身にはこの操作はできません。" : msg === "lastmaster" ? "最後のマスター管理者は無効化できません。" : undefined;
   return authView(c, "管理者の管理", adminsPage({ admins, meEmail: sess.email, flash }));
 });
 app.post("/admin/admins", async (c) => {
@@ -972,6 +972,19 @@ app.post("/admin/admins/:id/enable", async (c) => {
   await setAdminStatus(c.env, id, "active");
   await appendAudit(c.env, { actorType: "admin", actorId: sess.email, action: "enable_admin", detail: { id } });
   return c.redirect("/admin/admins");
+});
+app.post("/admin/admins/:id/reset-password", async (c) => {
+  const sess = c.get("admin");
+  if (!sess.isMaster) return c.text("権限がありません", 403);
+  const id = c.req.param("id");
+  if (id === sess.adminId) return c.redirect("/admin/admins?msg=self");
+  const target = await getAdminById(c.env, id);
+  if (!target) return c.redirect("/admin/admins");
+  const tempPw = generateToken(12);
+  await setAdminPassword(c.env, id, tempPw, true);
+  await appendAudit(c.env, { actorType: "admin", actorId: sess.email, action: "reset_admin_password", detail: { id, email: target.email } });
+  const admins = await listAdmins(c.env);
+  return authView(c, "管理者の管理", adminsPage({ admins, meEmail: sess.email, flash: "パスワードをリセットしました。", tempCred: { email: target.email, password: tempPw } }));
 });
 
 // ============ 予約・売上管理 ============
