@@ -5,6 +5,7 @@ import type { Env, Lang } from "./types";
 import { normalizeLang } from "./types";
 import { layout } from "./views/layout";
 import { startPage, channelChooserPage, declarePage, progressPage, formPage, messagePage, type StartChannel } from "./views/guest";
+import { privacyPolicyPage } from "./views/privacy";
 import {
   verifyReservation,
   createGroupToken,
@@ -100,6 +101,12 @@ app.use("*", async (c, next) => {
 // ============ ゲスト動線 ============
 
 app.get("/", (c) => c.redirect(`/start?lang=${pickLang(c)}`));
+
+// プライバシーポリシー（認証不要・多言語）
+app.get("/privacy", (c) => {
+  const lang = pickLang(c);
+  return c.html(layout({ title: t(lang, "privacy_title"), lang, path: "/privacy", body: privacyPolicyPage(lang) }));
+});
 
 function parseChannel(raw: string | undefined | null): StartChannel | null {
   return raw === "direct" || raw === "airbnb" || raw === "booking" ? raw : null;
@@ -253,7 +260,10 @@ app.post("/g/:token/declare", async (c) => {
   return c.html(layout({ title: t(lang, "share_links"), lang, path: `/g/${token}`, body: linksPage(lang, c.env.APP_BASE_URL, token, created) }));
 });
 
-// 個人リンクの再表示（未提出ぶんはトークンを再生成）
+// 個人リンクの再表示（未提出ぶんはトークンを再発行）
+// 注意：発行済みの生トークンはハッシュ化されサーバ側に残らないため「同じリンクを再表示」はできない。
+// 過去に共有したリンクを無効化すると、同行者が先に受け取ったリンクが使えなくなる（再共有のたびに壊れる）ため、
+// 既存トークンは失効させず、新しいトークンを追加発行するだけにする（旧リンクも新リンクもチェックアウトまで両方有効）。
 app.get("/g/:token/reveal", async (c) => {
   const token = c.req.param("token");
   const res = await resolveGroupToken(c.env, token);
@@ -266,12 +276,10 @@ app.get("/g/:token/reveal", async (c) => {
   const out: { guestId: string; slotNo: number; role: string; token: string }[] = [];
   const exp = checkoutExpiry(res.check_out_date);
   for (const g of guests) {
-    // 提出済みゲストはトークンを再発行しない（再発行リンクで他人のPII閲覧・上書き、正規リンク失効=DoSを防ぐ）
+    // 提出済みゲストはトークンを発行しない（再発行リンクで他人のPII閲覧・上書きを防ぐ）
     if (g.submit_status === "submitted") continue;
     const tk = generateToken();
     const th = await hashToken(tk);
-    // 既存トークンを失効させ、新しい個人トークンを発行
-    await c.env.DB.prepare("UPDATE guest_tokens SET revoked_at = ? WHERE guest_id = ? AND revoked_at IS NULL").bind(nowIso(), g.id).run();
     await c.env.DB.prepare("INSERT INTO guest_tokens (id, guest_id, token_hash, expires_at, created_at) VALUES (?,?,?,?,?)").bind(newId("pt_"), g.id, th, exp, nowIso()).run();
     out.push({ guestId: g.id, slotNo: g.slot_no, role: g.member_role, token: tk });
   }
@@ -290,11 +298,28 @@ function linksPage(lang: Lang, base: string, groupToken: string, created: { slot
   return html`
   <div class="card">
     <h1>${t(lang, "share_links")}</h1>
-    <p class="muted">${t(lang, "declare_desc")}</p>
+    <p class="muted">${t(lang, "links_note")}</p>
     <ul class="list">${raw(rows)}</ul>
-    <a class="btn secondary" href="/g/${groupToken}?lang=${lang}">${t(lang, "progress_title")}</a>
+    <a class="btn secondary" href="/g/${groupToken}?lang=${lang}">← ${t(lang, "progress_title")}</a>
   </div>`;
 }
+
+// 個人トークンから進捗ページへ戻る導線。生のグループトークンはハッシュ化され保存されていないため
+// 復元できない → その場で新しいグループトークンを発行してリダイレクトする（個人トークンを知っている
+// ＝本人性は既に確認済みなので、追加認証なしで許容。乱発防止に軽くレート制限のみ掛ける）。
+app.get("/p/:token/back-to-group", async (c) => {
+  const token = c.req.param("token");
+  const guest = await resolveGuestToken(c.env, token);
+  const lang = pickLang(c);
+  if (!guest) return c.html(layout({ title: t(lang, "app_title"), lang, path: `/p/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "expired"), kind: "err" }) }));
+  if (!(await rateLimit(c.env, `backgroup:${await hashToken(ipHashKey(c))}`, 30, 600))) {
+    return c.html(layout({ title: t(lang, "app_title"), lang, path: `/p/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "too_many"), kind: "err" }) }));
+  }
+  const res = await getReservation(c.env, guest.reservation_id);
+  if (!res) return c.html(layout({ title: t(lang, "app_title"), lang, path: `/p/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "expired"), kind: "err" }) }));
+  const gtoken = await createGroupToken(c.env, res.id, checkoutExpiry(res.check_out_date));
+  return c.redirect(`/g/${gtoken}?lang=${lang}`);
+});
 
 // 個人入力フォーム（GET）
 app.get("/p/:token", async (c) => {
@@ -319,10 +344,20 @@ app.get("/p/:token", async (c) => {
     next_stay: guest.next_stay ?? "",
     email: guest.email ?? "",
     choose_reason_other: guest.choose_reason_other ?? "",
+    choose_reason: guest.choose_reason ?? "",
   };
   const resv = await getReservation(c.env, guest.reservation_id);
   const requireEmail = otaRequiresEmail(resv);
-  return c.html(layout({ title: t(lang, "form_title"), lang, path: `/p/${token}`, body: formPage(lang, { token, guest, isRep: guest.member_role === "representative", values, requireEmail }) }));
+  const groupBackHref = `/p/${token}/back-to-group?lang=${lang}`;
+  const savedNotice = c.req.query("saved") === "1";
+  const imgWarnNotice = c.req.query("imgwarn") === "1";
+  return c.html(layout({
+    title: t(lang, "form_title"), lang, path: `/p/${token}`,
+    body: formPage(lang, {
+      token, guest, isRep: guest.member_role === "representative", values, requireEmail, groupBackHref,
+      marketingOptin: !!guest.marketing_optin, savedNotice, imgWarnNotice,
+    }),
+  }));
 });
 
 // 個人入力フォーム（POST）
@@ -459,7 +494,92 @@ app.post("/p/:token", async (c) => {
     await promoteSelfReportRetention(c.env, resv, parseInt(c.env.DATA_RETENTION_YEARS || "5", 10));
   }
 
-  return c.html(layout({ title: t(lang, "submitted_ok"), lang, path: `/p/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "submitted_ok"), kind: "ok", backHref: `/p/${token}?lang=${lang}`, backLabel: t(lang, "edit_link") }) }));
+  return c.html(layout({
+    title: t(lang, "submitted_ok"), lang, path: `/p/${token}`,
+    body: messagePage(lang, {
+      title: t(lang, "app_title"), message: t(lang, "submitted_ok"), kind: "ok",
+      backHref: `/p/${token}?lang=${lang}`, backLabel: t(lang, "edit_link"),
+      secondaryHref: `/p/${token}/back-to-group?lang=${lang}`, secondaryLabel: t(lang, "progress_title"),
+    }),
+  }));
+});
+
+// 一時保存（下書き）：必須項目や同意チェックを求めず、入力済みの分だけをそのまま保存する。
+// キャッシュ削除・機種変更・タブを閉じても、次に同じ個人リンクを開けば続きから入力できるようにするため。
+app.post("/p/:token/draft", async (c) => {
+  const token = c.req.param("token");
+  const guest = await resolveGuestToken(c.env, token);
+  const lang = pickLang(c);
+  if (!guest) return c.html(layout({ title: t(lang, "app_title"), lang, path: `/p/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "expired"), kind: "err" }) }));
+  if (!(await rateLimit(c.env, `draft:${await hashToken(ipHashKey(c))}`, 40, 600))) {
+    return c.html(layout({ title: t(lang, "app_title"), lang, path: `/p/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "too_many"), kind: "err" }) }));
+  }
+  // 提出済みは一時保存の対象外（このボタン自体を表示していないが、直POSTされた場合の防御）
+  if (guest.submit_status === "submitted") return c.redirect(`/p/${token}?lang=${lang}`);
+
+  const form = await c.req.formData();
+  const get = (k: string) => String(form.get(k) ?? "").trim();
+  const getOrNull = (k: string) => { const v = get(k); return v ? v : null; };
+  const getIntOrNull = (k: string) => { const n = parseInt(get(k), 10); return Number.isNaN(n) ? null : n; };
+  const fileEntry = form.get("passport_img");
+  const file: File | null = fileEntry && typeof fileEntry !== "string" ? (fileEntry as File) : null;
+
+  // 画像は失敗しても他項目の保存は止めない（下書きは「入力済みの分だけ守る」ための機能のため）
+  let imgInfo: { key: string; mime: string; size: number } | null = null;
+  let imgFailed = false;
+  if (file && file.size > 0) {
+    const res = await handlePassportUpload(c.env, guest.id, file);
+    if (res.ok) imgInfo = res.info; else imgFailed = true;
+  }
+  const imgKey = imgInfo?.key ?? guest.passport_img_key;
+  const imgMime = imgInfo?.mime ?? guest.passport_img_mime;
+  const imgSize = imgInfo?.size ?? guest.passport_img_size;
+  const imgUploadedAt = imgInfo ? nowIso() : guest.passport_img_uploaded_at;
+
+  const isRep = guest.member_role === "representative";
+  const allowedReasons = new Set(CHOOSE_REASONS.map((r) => r.code));
+  const chooseReasons = form.getAll("choose_reason").map(String).filter((x) => allowedReasons.has(x));
+  const chooseReasonJson = isRep && chooseReasons.length ? JSON.stringify(chooseReasons) : null;
+  const chooseReasonOther = isRep ? getOrNull("choose_reason_other") : null;
+  const marketing = form.get("marketing_optin") === "1" ? 1 : 0;
+  const now = nowIso();
+
+  await c.env.DB.prepare(
+    `UPDATE guests SET
+      full_name=?, has_jp_address=?, address_enc=?, nationality=?, nationality_other=?,
+      passport_no_enc=?, occupation=?, age=?, gender=?, phone_enc=?, prev_stay=?, next_stay=?, email=?,
+      choose_reason=?, choose_reason_other=?, marketing_optin=?,
+      passport_img_key=?, passport_img_mime=?, passport_img_size=?, passport_img_uploaded_at=?, updated_at=?
+     WHERE id=? AND submit_status != 'submitted'`
+  )
+    .bind(
+      getOrNull("full_name"),
+      get("has_jp_address") === "1" ? 1 : get("has_jp_address") === "0" ? 0 : null,
+      await encryptField(c.env.MASTER_KEY, getOrNull("address")),
+      getOrNull("nationality"),
+      getOrNull("nationality_other"),
+      await encryptField(c.env.MASTER_KEY, getOrNull("passport_no")),
+      getOrNull("occupation"),
+      getIntOrNull("age"),
+      getOrNull("gender"),
+      await encryptField(c.env.MASTER_KEY, getOrNull("phone")),
+      getOrNull("prev_stay"),
+      getOrNull("next_stay"),
+      getOrNull("email"),
+      chooseReasonJson,
+      chooseReasonOther,
+      marketing,
+      imgKey,
+      imgMime,
+      imgSize,
+      imgUploadedAt,
+      now,
+      guest.id
+    )
+    .run();
+
+  await appendAudit(c.env, { reservationId: guest.reservation_id, guestId: guest.id, actorType: "guest", action: "guest_draft_saved", detail: { slot: guest.slot_no } });
+  return c.redirect(`/p/${token}?lang=${lang}&saved=1${imgFailed ? "&imgwarn=1" : ""}`);
 });
 
 function renderFormError(
@@ -491,7 +611,7 @@ function renderFormError(
   };
   const body = [
     banner ? html`<div class="card"><div class="notice err">${banner}</div></div>` : html``,
-    formPage(lang, { token, guest, isRep: guest.member_role === "representative", values, errors, showErrorBanner: showBanner, requireEmail: extra.requireEmail }),
+    formPage(lang, { token, guest, isRep: guest.member_role === "representative", values, errors, showErrorBanner: showBanner, requireEmail: extra.requireEmail, groupBackHref: `/p/${token}/back-to-group?lang=${lang}` }),
   ];
   return c.html(layout({ title: t(lang, "form_title"), lang, path: `/p/${token}`, body }));
 }

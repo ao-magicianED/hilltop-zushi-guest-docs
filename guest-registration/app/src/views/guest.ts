@@ -185,23 +185,39 @@ export function formPage(
     values?: Record<string, string>;
     showErrorBanner?: boolean;
     requireEmail?: boolean;
+    groupBackHref?: string;
+    marketingOptin?: boolean;
+    savedNotice?: boolean;
+    imgWarnNotice?: boolean;
   }
 ): HE {
   const v = opts.values ?? {};
   const e = opts.errors;
   const reqMark = `<span class="req">*</span>`;
   const optMark = `<span class="opt">${t(lang, "optional")}</span>`;
+  const canSaveDraft = opts.guest.submit_status !== "submitted";
 
+  const selectedReasons: Set<string> = (() => {
+    try {
+      const arr = JSON.parse(v.choose_reason || "[]");
+      return new Set(Array.isArray(arr) ? arr : []);
+    } catch {
+      return new Set();
+    }
+  })();
   const reasonChecks = CHOOSE_REASONS.map(
     (r) =>
-      `<label class="checkrow"><input type="checkbox" name="choose_reason" value="${r.code}"> <span>${esc(
+      `<label class="checkrow"><input type="checkbox" name="choose_reason" value="${r.code}" ${selectedReasons.has(r.code) ? "checked" : ""}> <span>${esc(
         r.label[lang] ?? r.label.ja
       )}</span></label>`
   ).join("");
 
   return html`
   <div class="card">
+    ${opts.groupBackHref ? html`<a class="muted" href="${opts.groupBackHref}">← ${t(lang, "progress_title")}</a>` : ""}
     <h1>${t(lang, "form_title")} ${opts.isRep ? "👑" : ""}</h1>
+    ${opts.savedNotice ? html`<div class="notice ok">${t(lang, "saved")}</div>` : ""}
+    ${opts.imgWarnNotice ? html`<div class="notice warn">${t(lang, "draft_img_warn")}</div>` : ""}
     ${opts.showErrorBanner ? html`<div class="notice err">${t(lang, "fix_errors")}</div>` : ""}
 
     <div class="notice warn">
@@ -270,14 +286,14 @@ export function formPage(
         : ""}
 
       <div class="checkrow">
-        <input type="checkbox" name="marketing_optin" value="1" id="mk">
+        <input type="checkbox" name="marketing_optin" value="1" id="mk" ${opts.marketingOptin ? "checked" : ""}>
         <label for="mk" style="font-weight:400;margin:0">${t(lang, "marketing_optin")}</label>
       </div>
       <p class="muted">${t(lang, "review_promo")}</p>
 
       <div class="checkrow">
         <input type="checkbox" name="consent_privacy" value="1" id="cp" required>
-        <label for="cp" style="font-weight:400;margin:0">${t(lang, "consent_privacy")}</label>
+        <label for="cp" style="font-weight:400;margin:0">${t(lang, "consent_privacy")} <a href="/privacy?lang=${lang}" target="_blank" rel="noopener">（${t(lang, "privacy_link_label")}）</a></label>
       </div>
       <div class="checkrow">
         <input type="checkbox" name="consent_cross_border" value="1" id="cc" required>
@@ -285,6 +301,10 @@ export function formPage(
       </div>
 
       <button class="btn" type="submit">${t(lang, "submit")}</button>
+      ${canSaveDraft
+        ? html`<button class="btn secondary" type="submit" formaction="/p/${opts.token}/draft?lang=${lang}" formnovalidate>${t(lang, "save_draft")}</button>
+      <p class="muted">${t(lang, "save_draft_note")}</p>`
+        : ""}
     </form>
   </div>
   ${raw(IMG_COMPRESS_JS)}`;
@@ -317,13 +337,22 @@ const IMG_COMPRESS_JS = `<script>
 
 export function messagePage(
   lang: Lang,
-  opts: { title: string; message: string; kind: "ok" | "warn" | "err"; backHref?: string; backLabel?: string }
+  opts: {
+    title: string;
+    message: string;
+    kind: "ok" | "warn" | "err";
+    backHref?: string;
+    backLabel?: string;
+    secondaryHref?: string;
+    secondaryLabel?: string;
+  }
 ): HE {
   return html`
   <div class="card">
     <h1>${opts.title}</h1>
     <div class="notice ${opts.kind}">${opts.message}</div>
     ${opts.backHref ? html`<a class="btn secondary" href="${opts.backHref}">${opts.backLabel ?? t(lang, "back_to_progress")}</a>` : ""}
+    ${opts.secondaryHref ? html`<a class="btn secondary" href="${opts.secondaryHref}">${opts.secondaryLabel ?? t(lang, "progress_title")}</a>` : ""}
   </div>`;
 }
 

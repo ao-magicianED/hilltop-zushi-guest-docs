@@ -38,10 +38,10 @@ export const T: Dict = {
   // OTA（Airbnb / Booking.com）入口
   ota_title: { ja: "予約コードの確認", en: "Confirm your reservation code", "zh-CN": "确认您的预订号", "zh-TW": "確認您的預訂號碼" },
   ota_desc: {
-    ja: "予約コードは、予約サイトから届いた確認メール／メッセージに記載されています（例: HMAPDB2SSB）。ご確認のうえご入力ください。照合は行わず、このまま登録に進めます。",
-    en: "Your reservation code is in the confirmation email/message from the booking site (e.g. HMAPDB2SSB). Enter it to continue — no verification required.",
-    "zh-CN": "预订号显示在预订网站发来的确认邮件/消息中（例如 HMAPDB2SSB）。输入后即可继续，无需核对。",
-    "zh-TW": "預訂號顯示在預訂網站寄來的確認郵件/訊息中（例如 HMAPDB2SSB）。輸入後即可繼續，無需核對。",
+    ja: "予約コードは、予約サイトから届いた確認メール／メッセージに記載されています（例: HMAPDB2SSB）。ご確認のうえご入力ください。",
+    en: "Your reservation code is in the confirmation email/message from the booking site (e.g. HMAPDB2SSB). Please enter it below.",
+    "zh-CN": "预订号显示在预订网站发来的确认邮件/消息中（例如 HMAPDB2SSB）。请确认后输入。",
+    "zh-TW": "預訂號顯示在預訂網站寄來的確認郵件/訊息中（例如 HMAPDB2SSB）。請確認後輸入。",
   },
   check_in: { ja: "チェックイン日", en: "Check-in date", "zh-CN": "入住日期", "zh-TW": "入住日期" },
   check_out: { ja: "チェックアウト日", en: "Check-out date", "zh-CN": "退房日期", "zh-TW": "退房日期" },
@@ -77,6 +77,12 @@ export const T: Dict = {
     en: "Enter the number of guests staying this time. We will prepare a slot for each.",
     "zh-CN": "请输入本次入住人数，我们将为每位准备登记。",
     "zh-TW": "請輸入本次入住人數，我們將為每位準備登記。",
+  },
+  links_note: {
+    ja: "以下のリンクを同行者ごとに共有してください。すでに共有したリンクも引き続きお使いいただけます（このページを開くたびにリンクが変わることはありません）。",
+    en: "Share each link with the corresponding companion. Links you've already shared keep working (they don't change each time you open this page).",
+    "zh-CN": "请将以下链接分别分享给同行者。已分享过的链接仍可继续使用（不会因再次打开此页面而失效）。",
+    "zh-TW": "請將以下連結分別分享給同行者。已分享過的連結仍可繼續使用（不會因再次開啟此頁面而失效）。",
   },
   num_guests: { ja: "宿泊人数", en: "Number of guests", "zh-CN": "住宿人数", "zh-TW": "住宿人數" },
   declare_submit: { ja: "この人数で進む", en: "Continue", "zh-CN": "继续", "zh-TW": "繼續" },
@@ -152,6 +158,8 @@ export const T: Dict = {
     "zh-CN": "填写住客名簿是日本住宅住宿事业法规定的义务，必须提供。请全体住客务必配合。",
     "zh-TW": "填寫住客名簿是日本住宅住宿事業法規定的義務，必須提供。請全體住客務必配合。",
   },
+  privacy_title: { ja: "プライバシーポリシー", en: "Privacy Policy", "zh-CN": "隐私政策", "zh-TW": "隱私政策" },
+  privacy_link_label: { ja: "内容を見る", en: "View policy", "zh-CN": "查看内容", "zh-TW": "查看內容" },
   consent_privacy: {
     ja: "プライバシーポリシーに同意します（必須）",
     en: "I agree to the Privacy Policy (required)",
@@ -167,6 +175,18 @@ export const T: Dict = {
   consent_required: { ja: "必須の同意にチェックしてください。", en: "Please check the required consents.", "zh-CN": "请勾选必填的同意项。", "zh-TW": "請勾選必填的同意項。" },
 
   save_draft: { ja: "一時保存", en: "Save draft", "zh-CN": "暂存", "zh-TW": "暫存" },
+  save_draft_note: {
+    ja: "未入力の項目があっても保存できます。続きは同じリンクから入力できます。",
+    en: "You can save even with fields left blank. Continue anytime from the same link.",
+    "zh-CN": "即使有未填写的项目也可以保存。可通过同一链接继续填写。",
+    "zh-TW": "即使有未填寫的項目也可以儲存。可透過同一連結繼續填寫。",
+  },
+  draft_img_warn: {
+    ja: "画像の保存に失敗しました。他の項目は保存済みです。お手数ですが画像だけ再度お試しください。",
+    en: "The photo couldn't be saved, but the rest was saved. Please try uploading the photo again.",
+    "zh-CN": "照片保存失败，其他内容已保存。请重新上传照片。",
+    "zh-TW": "照片儲存失敗，其他內容已儲存。請重新上傳照片。",
+  },
   submit: { ja: "登録する", en: "Submit", "zh-CN": "提交", "zh-TW": "提交" },
   saved: { ja: "保存しました。", en: "Saved.", "zh-CN": "已保存。", "zh-TW": "已儲存。" },
   submitted_ok: { ja: "登録が完了しました。ご協力ありがとうございました。", en: "Registration complete. Thank you!", "zh-CN": "登记完成，谢谢您的配合！", "zh-TW": "登記完成，謝謝您的配合！" },
