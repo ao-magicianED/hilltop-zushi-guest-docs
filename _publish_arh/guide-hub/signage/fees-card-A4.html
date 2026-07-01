@@ -1,0 +1,460 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Optional Fees · 追加料金 — Hilltop Zushi</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F3A34;
+    --primary-deep: #14271F;
+    --accent: #C9A56D;
+    --accent-deep: #A8854B;
+    --bg: #F5F3F0;
+    --bg-soft: #FAF8F4;
+    --text: #2C2C2C;
+    --neutral: #6B6B6B;
+    --good: #2D7A4F;
+    --warning: #D67230;
+    --danger: #C8242A;
+    --jp-font: 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    --serif-font: 'Cormorant Garamond', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: A4 portrait; margin: 0; }
+  html, body { background: #888; }
+  body {
+    font-family: var(--jp-font);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    background: var(--bg);
+    position: relative;
+    padding: 14mm 14mm 12mm;
+    box-shadow: 0 8px 50px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .frame {
+    position: absolute;
+    top: 7mm; left: 7mm; right: 7mm; bottom: 7mm;
+    border: 1px solid rgba(201,165,109,0.5);
+    pointer-events: none;
+  }
+  .frame .corner {
+    position: absolute; width: 18px; height: 18px;
+    border: 2px solid var(--accent);
+  }
+  .frame .corner.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .frame .corner.tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+  .frame .corner.bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+  .frame .corner.br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  .brand { text-align: center; margin-bottom: 2.6mm; }
+  .brand .brand-text { font-family: 'Cormorant Garamond', 'Hiragino Mincho ProN', serif; font-size: 1.4rem; font-weight: 700; color: var(--primary); letter-spacing: 0.22em; margin: 0 0 1mm; line-height: 1; }
+  .brand .tagline {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.56rem;
+    color: var(--neutral);
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .title-block { text-align: center; margin-bottom: 3.4mm; }
+  .title-block h1 {
+    font-family: var(--serif-font);
+    font-size: 2.05rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.14em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .title-block .ja {
+    font-family: var(--jp-font);
+    font-size: 0.94rem;
+    color: var(--accent-deep);
+    margin-top: 1mm;
+    letter-spacing: 0.18em;
+    font-weight: 700;
+  }
+  .title-block .multi {
+    font-size: 0.62rem;
+    color: var(--neutral);
+    margin-top: 0.6mm;
+    letter-spacing: 0.14em;
+  }
+  .title-block .multi .zh { font-family: 'Noto Sans SC', sans-serif; }
+  .title-block .multi .ko { font-family: 'Noto Sans KR', sans-serif; }
+
+  /* オプションサービス */
+  .option-block {
+    background: #fff;
+    border-radius: 2.6mm;
+    padding: 4mm 4mm;
+    margin-bottom: 2.8mm;
+    border-left: 4px solid var(--accent);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .option-block .head {
+    display: flex;
+    align-items: center;
+    gap: 2.2mm;
+    margin-bottom: 2.2mm;
+  }
+  .option-block .icon {
+    font-size: 1.55rem;
+    width: 10.5mm;
+    height: 10.5mm;
+    background: var(--bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .option-block .head-text { flex: 1; }
+  .option-block h2 {
+    font-family: var(--jp-font);
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    line-height: 1.25;
+  }
+  .option-block .h2-en {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.64rem;
+    color: var(--accent-deep);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: 0.3mm;
+    font-weight: 700;
+  }
+  .option-block .h2-multi {
+    font-size: 0.58rem;
+    color: var(--neutral);
+    margin-top: 0.3mm;
+    line-height: 1.25;
+  }
+  .option-block .h2-multi .zh { font-family: 'Noto Sans SC', sans-serif; }
+  .option-block .h2-multi .ko { font-family: 'Noto Sans KR', sans-serif; }
+
+  /* 3段階の料金グリッド */
+  .price-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2mm;
+  }
+  .price-card {
+    background: var(--bg-soft);
+    border-radius: 2mm;
+    padding: 2.4mm 2.4mm;
+    text-align: center;
+    border: 1px solid var(--accent);
+    position: relative;
+  }
+  .price-card.good {
+    background: #EAF5EE;
+    border-color: var(--good);
+  }
+  .price-card.warn {
+    background: #FFF6EE;
+    border-color: var(--warning);
+  }
+  .price-card.danger {
+    background: #FFF1F0;
+    border-color: var(--danger);
+  }
+  .price-card .stage-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.52rem;
+    color: var(--neutral);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 0.6mm;
+  }
+  .price-card.good .stage-label { color: var(--good); }
+  .price-card.warn .stage-label { color: var(--warning); }
+  .price-card.danger .stage-label { color: var(--danger); }
+  .price-card .when {
+    font-family: var(--jp-font);
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.68rem;
+    margin-bottom: 1mm;
+    line-height: 1.3;
+  }
+  .price-card .price {
+    font-family: var(--serif-font);
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 1.42rem;
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+  .price-card.good .price { color: var(--good); }
+  .price-card.warn .price { color: var(--warning); }
+  .price-card.danger .price { color: var(--danger); }
+  .price-card .price-sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.52rem;
+    color: var(--neutral);
+    margin-top: 0.6mm;
+  }
+  .price-card .extra {
+    font-family: var(--jp-font);
+    font-size: 0.56rem;
+    color: var(--text);
+    margin-top: 1mm;
+    padding-top: 1mm;
+    border-top: 1px dashed rgba(0,0,0,0.15);
+    line-height: 1.2;
+  }
+  .price-card .extra-en {
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    color: var(--neutral);
+    font-size: 0.52rem;
+  }
+
+  /* 説明文 */
+  .desc-card {
+    background: var(--bg-soft);
+    border-radius: 2mm;
+    padding: 3mm 4mm;
+    margin-top: 3mm;
+    font-size: 0.65rem;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .desc-card .row { margin-bottom: 0.7mm; }
+  .desc-card .row.jp { font-family: var(--jp-font); font-weight: 500; }
+  .desc-card .row.en { font-family: 'Inter', sans-serif; color: var(--neutral); font-style: italic; }
+  .desc-card .row.zh { font-family: 'Noto Sans SC', sans-serif; color: var(--neutral); }
+  .desc-card .row.ko { font-family: 'Noto Sans KR', sans-serif; color: var(--neutral); }
+
+  /* ペット注意 */
+  .pet-rules {
+    background: #FFF7EE;
+    border: 1px solid var(--warning);
+    border-radius: 2mm;
+    padding: 2.4mm 3.2mm;
+    margin-top: 2.2mm;
+    font-size: 0.6rem;
+    line-height: 1.35;
+  }
+  .pet-rules .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.56rem;
+    color: var(--warning);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 0.6mm;
+  }
+  .pet-rules .row { margin-bottom: 0.2mm; }
+  .pet-rules .row.jp { font-family: var(--jp-font); color: var(--text); font-weight: 500; }
+  .pet-rules .row.en { font-family: 'Inter', sans-serif; color: var(--neutral); font-style: italic; }
+
+  /* 申込方法 */
+  .how-to {
+    background: var(--primary);
+    color: #fff;
+    border-radius: 3mm;
+    padding: 3.2mm 4.2mm;
+    margin-top: auto;
+    text-align: center;
+  }
+  .how-to .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.56rem;
+    color: var(--accent);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 1mm;
+  }
+  .how-to .ja {
+    font-family: var(--jp-font);
+    font-size: 0.76rem;
+    font-weight: 700;
+    margin-bottom: 0.3mm;
+  }
+  .how-to .en {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.64rem;
+    color: rgba(255,255,255,0.85);
+    font-style: italic;
+    line-height: 1.25;
+  }
+
+  .foot {
+    text-align: center;
+    font-size: 0.54rem;
+    color: var(--neutral);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding-top: 1.6mm;
+  }
+  .foot .ja {
+    text-transform: none;
+    letter-spacing: 0.04em;
+    font-family: var(--jp-font);
+    margin-top: 0.3mm;
+    font-size: 0.56rem;
+  }
+
+  /* スマホ最適化: A4を画面幅にフィット */
+  @media (max-width: 880px) {
+    html, body { margin: 0; padding: 0; background: #fff; overflow-x: hidden; overflow-y: auto; }
+    body {
+      display: block;
+      min-height: 0;
+      height: calc(100vw * 1123 / 794);
+    }
+    .sheet {
+      transform: scale(calc(100vw / 794px));
+      transform-origin: top left;
+      box-shadow: none;
+    }
+  }
+
+  @media print {
+    html, body { background: #fff; overflow: hidden; }
+    html { -ms-overflow-style: none; scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+    body { padding: 0; }
+    .sheet { box-shadow: none; page-break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="frame">
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+    </div>
+
+    <header class="brand">
+      <div class="brand-text">HILLTOP ZUSHI</div>
+      <div class="tagline">Optional Fees · オプション料金</div>
+    </header>
+
+    <section class="title-block">
+      <h1>Optional Fees</h1>
+      <div class="ja">追加オプション料金 <span style="display:inline-block;font-size:0.55rem;background:#C9A56D;color:#fff;padding:1mm 3mm;border-radius:1.5mm;letter-spacing:0.1em;font-weight:700;margin-left:2mm;vertical-align:middle;">PER BOOKING · 1予約あたり</span></div>
+      <div class="multi"><span class="zh">附加费用 · 每次预订</span> &middot; <span class="ko">추가 요금 · 예약당</span></div>
+    </section>
+
+    <!-- BBQ -->
+    <section class="option-block">
+      <div class="head">
+        <div class="icon">🔥</div>
+        <div class="head-text">
+          <h2>BBQ ご利用</h2>
+          <div class="h2-en">BBQ Usage Fee</div>
+          <div class="h2-multi"><span class="zh">烧烤使用费</span> &middot; <span class="ko">바비큐 이용료</span></div>
+        </div>
+      </div>
+      <div class="price-grid">
+        <div class="price-card good">
+          <div class="stage-label">Booking · 予約時</div>
+          <div class="when">予約時に申告</div>
+          <div class="price">¥4,400</div>
+          <div class="price-sub">Best price · 最安値</div>
+          <div class="extra">事前申告で最もお得 / Reserve in advance to save</div>
+        </div>
+        <div class="price-card warn">
+          <div class="stage-label">On the day · 当日</div>
+          <div class="when">当日に追加申告</div>
+          <div class="price">¥6,600</div>
+          <div class="price-sub">Same-day surcharge</div>
+          <div class="extra">当日の申告も可能 / Same-day request OK</div>
+        </div>
+        <div class="price-card danger">
+          <div class="stage-label">Unauthorized · 未申告</div>
+          <div class="when">未申告で発覚</div>
+          <div class="price">¥16,000</div>
+          <div class="price-sub">¥11,000 + Cleaning ¥5,000</div>
+          <div class="extra">無申告利用 ¥11,000 + 清掃代 ¥5,000<br><span class="extra-en">Unauthorized use ¥11,000 + Cleaning ¥5,000</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ペット -->
+    <section class="option-block">
+      <div class="head">
+        <div class="icon">🐕</div>
+        <div class="head-text">
+          <h2>ペット同伴</h2>
+          <div class="h2-en">Pet Fee</div>
+          <div class="h2-multi"><span class="zh">宠物费</span> &middot; <span class="ko">반려동물 요금</span></div>
+        </div>
+      </div>
+      <div class="price-grid">
+        <div class="price-card good">
+          <div class="stage-label">Booking · 予約時</div>
+          <div class="when">予約時に申告</div>
+          <div class="price">¥4,400</div>
+          <div class="price-sub">Best price · 最安値</div>
+          <div class="extra">事前申告で最もお得 / Reserve in advance to save</div>
+        </div>
+        <div class="price-card warn">
+          <div class="stage-label">On the day · 当日</div>
+          <div class="when">当日に追加申告</div>
+          <div class="price">¥6,600</div>
+          <div class="price-sub">Same-day surcharge</div>
+          <div class="extra">当日の申告も可能 / Same-day request OK</div>
+        </div>
+        <div class="price-card danger">
+          <div class="stage-label">Unauthorized · 未申告</div>
+          <div class="when">未申告で発覚</div>
+          <div class="price">¥16,000</div>
+          <div class="price-sub">¥11,000 + Cleaning ¥5,000</div>
+          <div class="extra">無申告同伴 ¥11,000 + 清掃代 ¥5,000<br><span class="extra-en">Unauthorized pet ¥11,000 + Cleaning ¥5,000</span></div>
+        </div>
+      </div>
+
+      <div class="pet-rules">
+        <div class="label">⚠ Pet Rules · ペット注意</div>
+        <div class="row jp"><strong>1匹まで</strong> ／ 屋外（庭・テラス）OK ／ 寝室以外の屋内OK ／ <strong>キング寝室（洋室2）NG</strong></div>
+        <div class="row en"><strong>Max 1 pet</strong> · Outdoor OK · Indoor OK (except bedrooms) · <strong>King Bedroom (Room 2) NOT allowed</strong></div>
+      </div>
+    </section>
+
+    <section class="how-to">
+      <div class="label">How to Apply · お申込み方法</div>
+      <div class="ja">Airbnb / Booking メッセージで「BBQ希望」「ペット同伴」とご連絡ください</div>
+      <div class="en">Please send a message via your booking platform: "BBQ" or "Pet" request</div>
+      <div style="margin-top:2.5mm;padding-top:2mm;border-top:1px solid rgba(255,255,255,0.25);font-family:var(--jp-font);font-size:0.7rem;color:#FFCC00;font-weight:700;">⚠ ホストからの確定返信を必ず受け取ってからご利用ください</div>
+      <div style="font-family:'Inter',sans-serif;font-size:0.62rem;color:rgba(255,255,255,0.85);font-style:italic;margin-top:0.5mm;">Please wait for the host's written confirmation before using.</div>
+      <div style="font-family:'Noto Sans SC',sans-serif;font-size:0.6rem;color:rgba(255,255,255,0.85);margin-top:0.3mm;">请在收到房东的确认回复后再使用。</div>
+      <div style="font-family:'Noto Sans KR',sans-serif;font-size:0.6rem;color:rgba(255,255,255,0.85);margin-top:0.3mm;">호스트의 확인 답변을 받은 후에 이용해 주세요.</div>
+    </section>
+
+    <footer class="foot">
+      <div class="ja">明朗会計でご案内</div>
+    </footer>
+  </div>
+</body>
+</html>

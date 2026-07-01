@@ -1,0 +1,2303 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Internal Dashboard v3 — Hilltop Zushi</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1F3A34;
+  --primary-light: #2B4A3F;
+  --primary-deep: #14271F;
+  --accent: #C9A56D;
+  --accent-deep: #A8854B;
+  --bg: #F5F3F0;
+  --bg-soft: #FAF8F4;
+  --bg-card: #FFFFFF;
+  --text: #2C2C2C;
+  --text-light: #6B6B6B;
+  --border: #E8E2D5;
+  --emergency: #C8242A;
+  --warning: #D67230;
+  --info: #2563A4;
+  --good: #2D7A4F;
+  --todo: #F4B400;
+  --critical: #8B0000;
+  --jp-font: 'Hiragino Sans', 'メイリオ', 'Meiryo', 'Yu Gothic', 'Noto Sans JP', sans-serif;
+  --mono: 'JetBrains Mono', Consolas, Menlo, monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 14px; scroll-behavior: smooth; scroll-padding-top: 60px; }
+body {
+  font-family: 'Inter', var(--jp-font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== PIN ロック ===== */
+.lock-screen {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999; color: #fff;
+}
+.lock-screen.hidden { display: none; }
+.lock-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  padding: 48px 40px;
+  text-align: center;
+  max-width: 380px; width: 90%;
+  backdrop-filter: blur(8px);
+}
+.lock-card .logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.lock-card h2 {
+  font-family: var(--jp-font);
+  font-size: 1.25rem;
+  margin-bottom: 6px;
+}
+.lock-card .sub {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 28px;
+  letter-spacing: 0.04em;
+}
+.lock-card input {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 1.15rem;
+  font-family: var(--mono);
+  letter-spacing: 0.32em;
+  text-align: center;
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(201,165,109,0.3);
+  border-radius: 8px;
+  color: #fff;
+  margin-bottom: 14px;
+}
+.lock-card input:focus { outline: none; border-color: var(--accent); }
+.lock-card button {
+  width: 100%; padding: 12px;
+  font-size: 0.92rem; font-weight: 700;
+  letter-spacing: 0.12em;
+  background: var(--accent); color: var(--primary);
+  border: none; border-radius: 8px;
+  cursor: pointer;
+}
+.lock-card button:hover { background: #D4B87A; }
+.lock-error {
+  color: var(--emergency);
+  font-size: 0.78rem;
+  margin-top: 10px;
+  min-height: 16px;
+}
+
+/* ===== トップバー ===== */
+.topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 2px solid var(--accent);
+}
+.topbar .brand { display: flex; align-items: center; gap: 14px; }
+.topbar .brand .name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 700;
+  letter-spacing: 0.16em;
+}
+.topbar .brand .role {
+  background: var(--accent); color: var(--primary);
+  font-size: 0.62rem; font-weight: 800;
+  padding: 3px 8px; border-radius: 4px;
+  letter-spacing: 0.18em;
+}
+.topbar .quick-actions a {
+  color: #fff; text-decoration: none;
+  font-size: 0.78rem;
+  margin-left: 14px;
+  opacity: 0.85;
+  letter-spacing: 0.06em;
+}
+.topbar .quick-actions a:hover { color: var(--accent); }
+.topbar .quick-actions a.urgent { color: #FFB3B3; }
+.hamburger {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* ===== レイアウト ===== */
+.layout {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  min-height: calc(100vh - 56px);
+}
+.sidebar {
+  background: var(--bg-card);
+  border-right: 1px solid var(--border);
+  padding: 18px 0;
+  position: sticky;
+  top: 50px;
+  height: calc(100vh - 50px);
+  overflow-y: auto;
+}
+.sidebar h3 {
+  padding: 0 18px;
+  font-size: 0.58rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  margin-bottom: 4px;
+  margin-top: 14px;
+  font-weight: 700;
+}
+.sidebar h3:first-child { margin-top: 0; }
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 18px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.79rem;
+  border-left: 3px solid transparent;
+}
+.sidebar a:hover { background: var(--bg-soft); border-left-color: var(--accent); }
+.sidebar a.active { background: var(--bg); border-left-color: var(--primary); font-weight: 700; }
+.sidebar a.critical { color: #8B0000; font-weight: 700; }
+.sidebar a.critical:hover { border-left-color: var(--critical); }
+.sidebar .divider { border-top: 1px solid var(--border); margin: 8px 0; }
+
+.main { padding: 24px 32px 60px; max-width: 1100px; }
+
+/* ===== バナー（緊急/Critical） ===== */
+.critical-banner {
+  background: linear-gradient(90deg, var(--critical) 0%, var(--emergency) 100%);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+  font-size: 0.85rem;
+}
+.critical-banner .ic { font-size: 1.4rem; }
+.critical-banner a {
+  color: #FFE0A0;
+  text-decoration: underline;
+  margin-left: auto;
+  font-size: 0.78rem; font-weight: 700;
+}
+
+/* Codex メッセージバナー */
+.codex-quote {
+  background: linear-gradient(90deg, #2C2C2C 0%, #1F3A34 100%);
+  color: #FFE6B3;
+  padding: 14px 22px;
+  border-radius: 8px;
+  margin-bottom: 28px;
+  font-size: 0.86rem;
+  border-left: 4px solid var(--accent);
+}
+.codex-quote .who {
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+/* Today's Ops */
+.today-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.today-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-top: 3px solid var(--primary);
+}
+.today-card.urgent { border-top-color: var(--emergency); }
+.today-card.warn { border-top-color: var(--warning); }
+.today-card.info { border-top-color: var(--info); }
+.today-card.good { border-top-color: var(--good); }
+.today-card .head {
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  color: var(--text-light);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.today-card .v-big {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+}
+.today-card .sub {
+  font-size: 0.74rem;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+.today-card ul {
+  font-size: 0.78rem;
+  padding-left: 16px;
+  margin-top: 6px;
+  line-height: 1.6;
+}
+.today-card .empty {
+  color: var(--text-light);
+  font-size: 0.78rem;
+  font-style: italic;
+}
+.today-card input[type=text],
+.today-card textarea {
+  width: 100%;
+  border: 1px dashed var(--border);
+  background: var(--bg-soft);
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 0.78rem;
+  font-family: inherit;
+  resize: vertical;
+}
+.today-card textarea { min-height: 50px; }
+.today-card .btn {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  border: none;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+/* ===== KPI ===== */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.kpi {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 18px 20px;
+  border-left: 4px solid var(--accent);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.kpi.good { border-left-color: var(--good); }
+.kpi.warn { border-left-color: var(--warning); }
+.kpi.info { border-left-color: var(--info); }
+.kpi.emergency { border-left-color: var(--emergency); }
+.kpi.critical { border-left-color: var(--critical); }
+.kpi .label {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.kpi .value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.1;
+}
+.kpi .value.small { font-size: 1.1rem; }
+.kpi .sub { font-size: 0.72rem; color: var(--text-light); margin-top: 4px; }
+
+/* ===== セクション ===== */
+section.block {
+  margin-bottom: 32px;
+  scroll-margin-top: 70px;
+}
+section.block h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap;
+}
+section.block h2 .ja {
+  font-family: var(--jp-font);
+  font-size: 0.9rem;
+  color: var(--text-light);
+  font-weight: 500;
+}
+section.block h2 .pri {
+  font-size: 0.6rem;
+  background: var(--critical);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.14em;
+}
+section.block h2 .pri.new {
+  background: var(--good);
+}
+section.block .desc {
+  font-size: 0.82rem;
+  color: var(--text-light);
+  margin-bottom: 14px;
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+.card h3 {
+  font-size: 1rem;
+  color: var(--primary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.card.todo { border-left: 4px solid var(--todo); background: #FFFBE6; }
+.card.warn { border-left: 4px solid var(--warning); }
+.card.emergency { border-left: 4px solid var(--emergency); background: #FFF3F3; }
+.card.critical { border-left: 4px solid var(--critical); background: #FFF0F0; }
+.card.info { border-left: 4px solid var(--info); }
+.card.good { border-left: 4px solid var(--good); }
+
+.badge {
+  display: inline-block;
+  font-size: 0.6rem; font-weight: 800;
+  letter-spacing: 0.12em;
+  padding: 2px 7px; border-radius: 4px;
+  background: var(--accent); color: var(--primary);
+}
+.badge.todo { background: var(--todo); color: #1A1A1A; }
+.badge.good { background: var(--good); color: #fff; }
+.badge.warn { background: var(--warning); color: #fff; }
+.badge.emergency { background: var(--emergency); color: #fff; }
+.badge.critical { background: var(--critical); color: #fff; }
+.badge.info { background: var(--info); color: #fff; }
+.badge.new { background: #00A86B; color: #fff; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+}
+table th, table td {
+  padding: 7px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+table th {
+  background: var(--bg-soft);
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.76rem;
+}
+table tr:last-child td { border-bottom: none; }
+table code {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  background: var(--bg);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.4fr) 1fr;
+  gap: 7px 16px;
+  font-size: 0.86rem;
+}
+.kv .k {
+  color: var(--text-light);
+  font-size: 0.76rem;
+  padding-top: 2px;
+}
+.kv .v { font-weight: 500; }
+.kv .v.todo {
+  background: #FFF5C2;
+  padding: 1px 6px;
+  border-radius: 3px;
+  color: #8B6914;
+  display: inline-block;
+}
+.kv .v.critical {
+  background: #FFD9D9;
+  padding: 1px 6px;
+  border-radius: 3px;
+  color: #8B0000;
+  display: inline-block;
+  font-weight: 700;
+}
+.kv .v code {
+  font-family: var(--mono);
+  background: var(--bg-soft);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+
+.link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: var(--info);
+  color: #fff !important;
+  border-radius: 5px;
+  font-size: 0.72rem;
+  text-decoration: none !important;
+  margin: 3px 4px 3px 0;
+  font-weight: 600;
+}
+.link-btn:hover { opacity: 0.85; }
+.link-btn.maps { background: #4285F4; }
+.link-btn.sheet { background: #0F9D58; }
+.link-btn.drive { background: #4285F4; }
+.link-btn.web { background: var(--accent-deep); }
+.link-btn.guide { background: var(--primary); }
+.link-btn.local { background: #555; }
+.link-btn.tel { background: #25A57F; }
+.link-btn.tel::before { content: '📞 '; }
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.three-col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+/* SOP（緊急時手順） */
+.sop-card {
+  background: var(--bg-card);
+  border-left: 4px solid var(--emergency);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.sop-card.fire { border-left-color: var(--critical); }
+.sop-card.quake { border-left-color: var(--warning); }
+.sop-card.gas { border-left-color: var(--emergency); }
+.sop-card.injury { border-left-color: var(--info); }
+.sop-card .scenario {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+.sop-card .role {
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  background: var(--primary);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 3px;
+  margin-left: 4px;
+  text-transform: uppercase;
+}
+.sop-card .sla {
+  font-size: 0.7rem;
+  color: var(--emergency);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.sop-card ol {
+  margin-left: 22px;
+  font-size: 0.8rem;
+  line-height: 1.7;
+}
+.sop-card .talk {
+  background: #FFFDF5;
+  border-left: 3px solid var(--accent);
+  padding: 8px 10px;
+  font-size: 0.78rem;
+  margin-top: 6px;
+  font-style: italic;
+  color: #555;
+}
+
+.checkbox-list {
+  list-style: none;
+  padding-left: 0;
+}
+.checkbox-list li {
+  font-size: 0.82rem;
+  padding: 4px 0;
+  line-height: 1.5;
+}
+.checkbox-list li::before {
+  content: '☐ ';
+  font-family: var(--mono);
+  color: var(--accent);
+  margin-right: 4px;
+}
+.checkbox-list li.done::before {
+  content: '☑ ';
+  color: var(--good);
+}
+
+/* 在庫パー（下限） */
+.par-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+.par-item {
+  background: var(--bg-soft);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+.par-item .name {
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--primary);
+  margin-bottom: 2px;
+}
+.par-item .par {
+  font-size: 0.72rem;
+  color: var(--text-light);
+}
+.par-item .par strong { color: var(--emergency); }
+
+@media (max-width: 880px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .sidebar.open {
+    display: block;
+    position: fixed;
+    top: 50px; left: 0;
+    width: 240px;
+    z-index: 50;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+  }
+  .hamburger { display: inline-block; }
+  .topbar .quick-actions a { display: none; }
+  .main { padding: 18px 14px 40px; }
+  .two-col, .three-col { grid-template-columns: 1fr; }
+}
+
+footer.dash-footer {
+  background: var(--primary);
+  color: rgba(255,255,255,0.7);
+  padding: 20px;
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+}
+</style>
+</head>
+<body>
+
+<!-- ===== PIN ロック ===== -->
+<div class="lock-screen" id="lock">
+  <div class="lock-card">
+    <div class="logo">HILLTOP ZUSHI</div>
+    <h2>Internal Dashboard</h2>
+    <div class="sub">運営者専用ページ · Authorized Personnel Only</div>
+    <input type="password" id="pin" placeholder="PIN" maxlength="20" autocomplete="off">
+    <button onclick="unlock()">UNLOCK</button>
+    <div class="lock-error" id="err"></div>
+  </div>
+</div>
+
+<!-- ===== トップバー ===== -->
+<nav class="topbar">
+  <div class="brand">
+    <button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+    <span class="name">HILLTOP ZUSHI</span>
+    <span class="role">INTRA v3 · 運営者専用</span>
+  </div>
+  <div class="quick-actions">
+    <a href="#today" class="urgent">🏠 今日</a>
+    <a href="#emergency-sop" class="urgent">🚨 緊急SOP</a>
+    <a href="#shutoff-map">🔧 止め方</a>
+    <a href="#compliance">⚖ 法令</a>
+    <a href="#contacts">☎ 連絡先</a>
+    <a href="#todo" class="urgent">⚠ TODO</a>
+  </div>
+</nav>
+
+<!-- ===== レイアウト ===== -->
+<div class="layout">
+
+  <!-- サイドバー -->
+  <aside class="sidebar">
+    <h3>🏠 トップ</h3>
+    <a href="#today" class="critical">今日の運用</a>
+
+    <h3>🏡 物件</h3>
+    <a href="#overview">物件概要</a>
+    <a href="#contacts">☎ 重要連絡先</a>
+
+    <h3>🚨 緊急時</h3>
+    <a href="#emergency-sop" class="critical">事象別 緊急SOP</a>
+    <a href="#shutoff-map" class="critical">設備「止め方」マップ</a>
+    <a href="#hospitals">救急病院</a>
+    <a href="#disaster">災害対応（逗子）</a>
+
+    <h3>⚖ 法令・許認可</h3>
+    <a href="#compliance" class="critical">届出・標識・名簿</a>
+    <a href="#building-safety" class="critical">耐震・消防</a>
+
+    <h3>📋 契約・パートナー</h3>
+    <a href="#contract">清掃契約・SLA</a>
+    <a href="#insurance">火災保険</a>
+    <a href="#players">プレイヤー</a>
+    <a href="#partners">共同運営50:50</a>
+
+    <h3>⚙ 運営オペ</h3>
+    <a href="#operations">CI/CO・ペナルティ</a>
+    <a href="#guest-check">ゲスト本人確認・人数</a>
+    <a href="#complaint-sop">近隣クレーム対応</a>
+    <a href="#bbq-sop">BBQ安全運用</a>
+    <a href="#trash">ゴミ収集</a>
+    <a href="#listings">掲載サイト</a>
+
+    <h3>📝 ログ・記録</h3>
+    <a href="#incident-log">インシデントログ</a>
+
+    <h3>📦 備品・在庫</h3>
+    <a href="#equipment">購入備品</a>
+    <a href="#par-stock">在庫パー（下限）</a>
+
+    <h3>🔧 物件保守</h3>
+    <a href="#maintenance">点検カレンダー</a>
+
+    <h3>🔐 セキュリティ</h3>
+    <a href="#access-log">鍵・アクセス台帳</a>
+    <a href="#security">カメラ・Wi-Fi・OTA</a>
+    <a href="#privacy">個人情報運用</a>
+
+    <h3>💰 財務・税務</h3>
+    <a href="#fee">経費・財務</a>
+    <a href="#tax">税務・インボイス</a>
+    <a href="#kpi">収益KPI</a>
+
+    <h3>📖 マニュアル</h3>
+    <a href="#guides">ガイド類</a>
+    <a href="#signage">掲示物</a>
+
+    <h3>👥 チーム</h3>
+    <a href="#team-ops">RACI・代替要員</a>
+
+    <h3>☁ システム</h3>
+    <a href="#hosting">Cloudflare</a>
+    <a href="#assets">アセット</a>
+
+    <div class="divider"></div>
+    <a href="#todo" style="color:#B87A1F;font-weight:700;">⚠ 要確認TODO</a>
+  </aside>
+
+  <main class="main">
+
+    <!-- Codex Quote -->
+    <div class="codex-quote">
+      <div class="who">Codex Review · 2026-05-26</div>
+      🎯 「<strong>旧耐震 × 最大12名 × BBQ の組み合わせは事故が起きる前提</strong>で、証跡（点検・配置図・ログ）を残す運用に振り切ってください。」
+    </div>
+
+    <!-- Critical バナー -->
+    <div class="critical-banner">
+      <span class="ic">🚨</span>
+      <div>
+        <strong>Critical 未対応項目あり</strong>: 住宅宿泊事業届出番号・耐震診断・緊急時SOP掲示・法定標識・設備「止め方」写真 が未完です。
+      </div>
+      <a href="#todo">→ TODO へ</a>
+    </div>
+
+    <!-- ===== 🏠 1. 今日の運用 ===== -->
+    <section class="block" id="today">
+      <h2>🏠 今日の運用ダッシュボード <span class="ja">Today's Operations</span> <span class="pri new">NEW v3</span></h2>
+      <p class="desc">毎朝1分で確認・更新。手動入力分は <strong>sessionStorage</strong> に保存（タブ閉じるとリセット）。</p>
+
+      <div class="today-grid">
+        <div class="today-card urgent">
+          <div class="head">🔔 本日のCheck-in</div>
+          <input type="text" id="t-checkin" placeholder="例: 16:00 田中様 4名">
+          <div class="sub">ゲスト名 / 人数 / 特記事項</div>
+        </div>
+        <div class="today-card warn">
+          <div class="head">🚪 本日のCheck-out</div>
+          <input type="text" id="t-checkout" placeholder="例: 10:00 山田様 → 清掃16時">
+          <div class="sub">CO時刻 / 清掃開始予定</div>
+        </div>
+        <div class="today-card info">
+          <div class="head">💬 未返信メッセージ</div>
+          <textarea id="t-unread" placeholder="Airbnb 2件 / Booking 1件 などメモ"></textarea>
+          <div class="sub">目標: 24時間以内返信</div>
+        </div>
+        <div class="today-card">
+          <div class="head">🧹 清掃ステータス</div>
+          <textarea id="t-cleaning" placeholder="清掃完了 / 写真未提出 / 備品補充済 など"></textarea>
+        </div>
+        <div class="today-card emergency">
+          <div class="head">⚠ 未解決インシデント</div>
+          <textarea id="t-incident" placeholder="ガスコンロ調子悪い / クレーム対応中など"></textarea>
+        </div>
+        <div class="today-card good">
+          <div class="head">📅 直近7日 予約リスク</div>
+          <textarea id="t-risk" placeholder="6/2 BBQ予約あり / 6/4 12名フル / 台風予報 など"></textarea>
+        </div>
+      </div>
+
+      <div style="text-align:right;">
+        <button class="btn" onclick="saveToday()" style="background:var(--primary);color:#fff;border:none;padding:6px 14px;border-radius:4px;font-size:0.78rem;cursor:pointer;">💾 一時保存（タブ閉じるまで）</button>
+        <button class="btn" onclick="clearToday()" style="background:#888;color:#fff;border:none;padding:6px 14px;border-radius:4px;font-size:0.78rem;cursor:pointer;margin-left:8px;">🗑 クリア</button>
+      </div>
+
+      <div class="card info" style="margin-top:16px;">
+        <h3>📋 朝のチェックリスト</h3>
+        <ul class="checkbox-list">
+          <li>本日のCI/CO・特記事項を上記に記入</li>
+          <li>OTAメッセージ確認（Airbnb / Booking 両方）</li>
+          <li>清掃完了写真の確認（黒須氏から）</li>
+          <li>備品在庫アラート確認 → <a href="#par-stock">在庫パー</a></li>
+          <li>天気予報チェック（BBQ予約・台風時は配慮）</li>
+          <li>消火器・SwitchBot電池の異常表示なし</li>
+          <li>Tapo C660 カメラ正常録画中</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== 🏡 物件概要 ===== -->
+    <section class="block" id="overview">
+      <h2>🏡 物件概要 <span class="ja">Property Overview</span></h2>
+      <div class="kpi-grid">
+        <div class="kpi good">
+          <div class="label">Property</div>
+          <div class="value small">Hilltop Zushi</div>
+          <div class="sub">森の隠れ家</div>
+        </div>
+        <div class="kpi info">
+          <div class="label">Capacity</div>
+          <div class="value">12<span style="font-size:0.7rem;color:var(--text-light);"> guests</span></div>
+          <div class="sub">6 寝室</div>
+        </div>
+        <div class="kpi">
+          <div class="label">Address</div>
+          <div class="value small">逗子市池子 2-10-9</div>
+          <div class="sub">京急 神武寺駅 徒歩5分</div>
+        </div>
+        <div class="kpi critical">
+          <div class="label">築年</div>
+          <div class="value small">昭和42年</div>
+          <div class="sub">⚠ 旧耐震基準</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="kv">
+          <div class="k">正式名称</div><div class="v">Hilltop Zushi（ヒルトップ逗子）</div>
+          <div class="k">所在地</div><div class="v">神奈川県 逗子市 池子 2-10-9 <a class="link-btn maps" href="https://www.google.com/maps/search/?api=1&query=%E7%A5%9E%E5%A5%88%E5%B7%9D%E7%9C%8C%E9%80%97%E5%AD%90%E5%B8%82%E6%B1%A0%E5%AD%902-10-9" target="_blank">📍 Maps</a></div>
+          <div class="k">郵便番号</div><div class="v">249-0003</div>
+          <div class="k">建物</div><div class="v">2階建て戸建て · <strong style="color:var(--critical);">昭和42年（1967年）築</strong> · 木造 · 約118㎡</div>
+          <div class="k">耐震基準</div><div class="v"><span class="v critical">⚠ 旧耐震基準（1981年5月以前）</span></div>
+          <div class="k">最寄駅</div><div class="v">京急逗子線 神武寺駅（KK52）徒歩約5分 / JR横須賀線 東逗子駅 徒歩約90秒</div>
+          <div class="k">最大収容</div><div class="v">12名（6洋室）</div>
+          <div class="k">ベッド構成</div><div class="v">セミダブル×4 / ダブル×2 / キング×1</div>
+          <div class="k">給湯器</div><div class="v">24号ガス給湯器（プロパンガス）</div>
+          <div class="k">スマートロック</div><div class="v">SwitchBot テンキー式</div>
+          <div class="k">届出番号</div><div class="v"><span class="v critical">⚠ 未確認・要記録</span></div>
+          <div class="k">営業形態</div><div class="v"><span class="v todo">⚠ 住宅宿泊事業 / 旅館業簡易宿所 要確定</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ☎ 重要連絡先 ===== -->
+    <section class="block" id="contacts">
+      <h2>☎ 重要連絡先一覧 <span class="ja">Critical Contacts</span> <span class="pri">CRITICAL</span></h2>
+      <p class="desc">用途別に整理。携帯のお気に入りにも登録すること。</p>
+
+      <div class="card emergency">
+        <h3>🚑 緊急通報（24h）</h3>
+        <table>
+          <tr><th>用途</th><th>連絡先</th><th>備考</th></tr>
+          <tr><td><strong>火災・救急</strong></td><td><code>119</code></td><td>「神奈川県逗子市池子2-10-9 Hilltop Zushi」</td></tr>
+          <tr><td><strong>警察</strong></td><td><code>110</code></td><td>侵入・盗難・暴力沙汰</td></tr>
+          <tr><td><strong>逗子市消防署</strong></td><td><a class="link-btn tel" href="tel:0468710119">046-871-0119</a></td><td>予防・査察</td></tr>
+        </table>
+      </div>
+
+      <div class="card warn">
+        <h3>🔧 運営パートナー</h3>
+        <table>
+          <tr><th>用途</th><th>連絡先</th><th>備考</th></tr>
+          <tr><td><strong>清掃 / 駆けつけ</strong><br>株式会社インビックス 黒須 大</td><td><a class="link-btn tel" href="tel:09029452046">090-2945-2046</a></td><td>小田原市堀之内196-2-2 平塚店舗103</td></tr>
+        </table>
+      </div>
+
+      <div class="card info">
+        <h3>🏘 不動産・賃貸</h3>
+        <table>
+          <tr><th>用途</th><th>連絡先</th><th>備考</th></tr>
+          <tr><td><strong>貸主</strong> さくら建設(株)</td><td><a class="link-btn tel" href="tel:0468849562">046-884-9562</a></td><td>逗子市桜山6-19-24</td></tr>
+          <tr><td><strong>管理</strong> 有限会社藍コーポレーション</td><td><a class="link-btn tel" href="tel:0468747178">046-874-7178</a></td><td>設備不具合の一次窓口</td></tr>
+          <tr><td>仲介 すこやか不動産 クロカワ氏</td><td><span class="v todo">⚠ 連絡先要確認</span></td><td>USEN保証窓口</td></tr>
+          <tr><td>初期費用 振込先</td><td>有限会社アイ・コーポレーション</td><td>¥596,160 振込</td></tr>
+        </table>
+      </div>
+
+      <div class="card info">
+        <h3>⚡ ライフライン</h3>
+        <table>
+          <tr><th>サービス</th><th>業者</th><th>連絡先</th></tr>
+          <tr><td><strong>プロパンガス</strong></td><td>株式会社サガミ</td><td><a class="link-btn tel" href="tel:0468333131">046-833-3131</a> · ガス漏れ最優先</td></tr>
+          <tr><td><strong>電気</strong></td><td>東京電力 EP</td><td>停電 <code>0120-995-007</code></td></tr>
+          <tr><td><strong>水道</strong></td><td>神奈川県営水道</td><td><a class="link-btn tel" href="tel:0467226200">0467-22-6200</a></td></tr>
+          <tr><td><strong>Wi-Fi</strong></td><td><span class="v todo">⚠ プロバイダ要確認</span></td><td>—</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>🏛 行政・公的機関</h3>
+        <table>
+          <tr><th>機関</th><th>連絡先</th><th>用途</th></tr>
+          <tr><td>鎌倉保健福祉事務所</td><td><a class="link-btn tel" href="tel:0467243900">0467-24-3900</a></td><td>住宅宿泊事業届出・苦情通報</td></tr>
+          <tr><td>逗子市役所</td><td><a class="link-btn tel" href="tel:0468731111">046-873-1111</a></td><td>ゴミ収集・行政手続</td></tr>
+          <tr><td>逗子市消防署</td><td><a class="link-btn tel" href="tel:0468710119">046-871-0119</a></td><td>消防申請</td></tr>
+        </table>
+      </div>
+
+      <div class="card todo">
+        <h3>📋 士業（要選定・要記録）</h3>
+        <div class="kv">
+          <div class="k">行政書士</div><div class="v todo">⚠ 民泊届出代行有無</div>
+          <div class="k">税理士</div><div class="v todo">⚠ 顧問契約有無</div>
+          <div class="k">司法書士</div><div class="v todo">⚠ 合同会社登記</div>
+          <div class="k">弁護士</div><div class="v todo">⚠ 顧問・トラブル時相談先</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 🚨 緊急SOP ===== -->
+    <section class="block" id="emergency-sop">
+      <h2>🚨 事象別 緊急対応SOP <span class="ja">Emergency SOP</span> <span class="pri">CRITICAL</span></h2>
+      <p class="desc">住宅宿泊事業者は<strong>苦情・トラブルに30分以内に現地対応</strong>する義務あり。各SOPは「誰が・何分以内に・何を」まで明文化済。<br>印刷して<strong>冷蔵庫扉に掲示</strong>すること。</p>
+
+      <div class="sop-card fire">
+        <div class="scenario">🔥 1. 火災・煙感知 <span class="role">担当: 第一発見者→あお</span></div>
+        <div class="sla">⏱ SLA: 即119・5分以内に運営者通知・30分以内現地</div>
+        <ol>
+          <li><strong>即119通報</strong>（住所「神奈川県逗子市池子2-10-9 Hilltop Zushi」）</li>
+          <li>ゲスト全員を屋外退避（玄関→下り坂方向）</li>
+          <li>初期消火可能なら消火器、不能なら退避優先</li>
+          <li>あお → 空ちゃん → 黒須氏（インビックス）の順で連絡</li>
+          <li>藍コーポレーション 046-874-7178 へ報告</li>
+          <li>火災後: 警察・保険会社へ通報、ゲスト写真・状況をログ化</li>
+        </ol>
+        <div class="talk">📞 ゲストへの初動: 「Hilltop Zushi 運営です。すぐ建物から出てください。玄関から坂を下りる方向です。今119通報しました。」</div>
+      </div>
+
+      <div class="sop-card quake">
+        <div class="scenario">🌏 2. 地震（震度4以上） <span class="role">担当: ゲスト自助→あお</span></div>
+        <div class="sla">⏱ SLA: 揺れ収まり次第即連絡・1時間以内現地確認</div>
+        <ol>
+          <li>ゲストは「机の下・建物中央へ」（ハウスガイドv3にも記載）</li>
+          <li>収まったらガス元栓・電気ブレーカー確認 → <a href="#shutoff-map">止め方マップ</a></li>
+          <li>給湯器（プロパン）漏れ・異臭確認</li>
+          <li>建物に亀裂・傾きがあれば即避難（旧耐震）</li>
+          <li>避難所: 逗子市立池子小学校 / 久木中学校</li>
+          <li>翌日: 専門業者による構造点検手配</li>
+        </ol>
+      </div>
+
+      <div class="sop-card gas">
+        <div class="scenario">💨 3. ガス漏れ・警報器作動 <span class="role">担当: 第一発見者→サガミ</span></div>
+        <div class="sla">⏱ SLA: 即対応・5分以内サガミ通報</div>
+        <ol>
+          <li><strong>火気厳禁</strong>（電灯スイッチも触らない）</li>
+          <li>窓を開けて換気</li>
+          <li>元栓（屋外プロパンボンベ）を閉める → <a href="#shutoff-map">止め方マップ</a></li>
+          <li>サガミ <a class="link-btn tel" href="tel:0468333131">046-833-3131</a></li>
+          <li>ゲスト全員を屋外退避</li>
+        </ol>
+        <div class="talk">📞 サガミへの台本: 「Hilltop Zushi 池子2-10-9 です。ガス漏れの疑いで全員退避中。元栓は閉めました。至急お願いします。」</div>
+      </div>
+
+      <div class="sop-card injury">
+        <div class="scenario">🚑 4. ゲスト負傷・急病 <span class="role">担当: 同行者→119→あお</span></div>
+        <div class="sla">⏱ SLA: 重症は即119・軽症は1時間以内現地</div>
+        <ol>
+          <li>意識・呼吸を確認 → 重症なら即119</li>
+          <li>軽傷: 救急箱 <span class="v todo">⚠ 場所要明記</span></li>
+          <li>夜間・休日: 横須賀共済病院 <a class="link-btn tel" href="tel:0468223433">046-822-3433</a>（二次救急24h）</li>
+          <li>Airbnb/Bookingメッセージで状況記録（保険請求用）</li>
+          <li><a href="#incident-log">インシデントログ</a>に記入</li>
+        </ol>
+      </div>
+
+      <div class="sop-card" style="border-left-color: var(--critical);">
+        <div class="scenario">⚠ 5. 崖からの転落（パノラマテラス側） <span class="role">担当: 第一発見者</span></div>
+        <div class="sla">⏱ SLA: 即119・動かさない</div>
+        <ol>
+          <li>119通報 → 救急隊到着まで動かさない</li>
+          <li>意識確認 → 出血があれば清潔な布で圧迫止血</li>
+          <li>「掲示物 #2 立入禁止警告」が機能していたか写真記録（証跡）</li>
+          <li>保険会社（火災保険・施設賠償特約）へ即連絡</li>
+          <li><a href="#incident-log">インシデントログ</a> 詳細記入・本件は保健所報告も検討</li>
+        </ol>
+      </div>
+
+      <div class="sop-card" style="border-left-color: var(--warning);">
+        <div class="scenario">⚡ 6. 停電 <span class="role">担当: あお</span></div>
+        <div class="sla">⏱ SLA: 1時間以内に状況把握・ゲスト連絡</div>
+        <ol>
+          <li>近隣も停電か確認 → 地域停電なら東京電力 <code>0120-995-007</code></li>
+          <li>個別ブレーカー: 場所 <span class="v todo">⚠ 要明記</span> → <a href="#shutoff-map">止め方マップ</a></li>
+          <li>給湯器再点火確認</li>
+          <li>1時間以上復旧しないならゲストへ謝罪 + 状況説明</li>
+          <li>2時間以上→宿泊代金部分返金検討（要協議）</li>
+        </ol>
+      </div>
+
+      <div class="sop-card" style="border-left-color: var(--info);">
+        <div class="scenario">💧 7. 断水・漏水 <span class="role">担当: あお→藍コーポ</span></div>
+        <ol>
+          <li>漏水: 元栓（玄関外メーターボックス）を閉める → <a href="#shutoff-map">止め方マップ</a></li>
+          <li>神奈川県営水道 <a class="link-btn tel" href="tel:0467226200">0467-22-6200</a></li>
+          <li>下階浸水の恐れ → 藍コーポレーション 046-874-7178 へ即連絡</li>
+        </ol>
+      </div>
+
+      <div class="sop-card" style="border-left-color: var(--warning);">
+        <div class="scenario">😡 8. 近隣クレーム <span class="role">担当: あお or 空ちゃん（距離近い側）</span></div>
+        <div class="sla">⏱ SLA: <strong>30分以内に現地</strong>（法定義務）</div>
+        <ol>
+          <li>苦情を受けた時刻・苦情者・内容を即メモ → <a href="#complaint-sop">クレーム対応SOP</a> 参照</li>
+          <li>ゲストへ静粛化を依頼（特に夜21:00以降）</li>
+          <li>苦情記録様式に: 日時・苦情者・内容・対応・結果を記録 → 3年保管</li>
+          <li>重大時は鎌倉保健福祉事務所 0467-24-3900 へ報告</li>
+          <li>同じ苦情者から3回以上 → 直接お詫び訪問</li>
+        </ol>
+      </div>
+
+      <div class="sop-card" style="border-left-color: var(--emergency);">
+        <div class="scenario">🚪 9. 鍵閉じ込め / スマートロック不具合 <span class="role">担当: 黒須氏 or あお</span></div>
+        <ol>
+          <li>SwitchBot のバッテリー残量確認（外側テンキー部分）</li>
+          <li>予備キー所在: <span class="v todo">⚠ 要記録（金庫 or 黒須氏携行）</span></li>
+          <li>業者駆けつけ: 黒須氏 090-2945-2046 / 鍵業者契約有無 要確認</li>
+          <li>PIN再発行 → <a href="#access-log">アクセス台帳</a> に記録</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===== 🔧 設備止め方マップ ===== -->
+    <section class="block" id="shutoff-map">
+      <h2>🔧 設備「止め方」マップ <span class="ja">Shutoff Locations</span> <span class="pri new">NEW v3</span> <span class="pri">CRITICAL</span></h2>
+      <p class="desc">事故時に一番効く情報。<strong>位置の写真</strong>を撮影 → 印刷して玄関内側に掲示。各操作は5秒で判断できるように。</p>
+
+      <div class="card critical">
+        <h3>🚰 ガス元栓（プロパンボンベ）</h3>
+        <div class="kv">
+          <div class="k">場所</div><div class="v todo">⚠ 屋外（要写真・位置メモ）</div>
+          <div class="k">止め方</div><div class="v">時計回りに回す（赤レバー）</div>
+          <div class="k">使う場面</div><div class="v">ガス漏れ・地震時・長期不在前</div>
+          <div class="k">復旧</div><div class="v">サガミ立ち会い推奨（点火不良時）</div>
+        </div>
+      </div>
+
+      <div class="card critical">
+        <h3>💧 水道元栓・止水栓</h3>
+        <div class="kv">
+          <div class="k">建物全体 元栓</div><div class="v todo">⚠ 玄関外メーターボックス内（要写真）</div>
+          <div class="k">トイレ止水栓</div><div class="v todo">⚠ 各トイレ脇（要写真）</div>
+          <div class="k">洗面・キッチン</div><div class="v todo">⚠ シンク下（要写真）</div>
+          <div class="k">使う場面</div><div class="v">漏水・水道工事時</div>
+        </div>
+      </div>
+
+      <div class="card critical">
+        <h3>⚡ 分電盤・ブレーカー</h3>
+        <div class="kv">
+          <div class="k">場所</div><div class="v todo">⚠ 要写真（玄関 or 洗面所と推定）</div>
+          <div class="k">主幹ブレーカー</div><div class="v">一番大きいスイッチ（左端）</div>
+          <div class="k">使う場面</div><div class="v">漏電・水濡れ・長期不在前</div>
+          <div class="k">復旧手順</div><div class="v">①全部OFF ②主幹ON ③個別を順番にON</div>
+        </div>
+      </div>
+
+      <div class="card warn">
+        <h3>🔥 給湯器（24号 プロパン）</h3>
+        <div class="kv">
+          <div class="k">本体位置</div><div class="v todo">⚠ 屋外（要写真）</div>
+          <div class="k">リモコン</div><div class="v">キッチン / 浴室</div>
+          <div class="k">エラー時</div><div class="v">電源OFF→1分→ON で大半解決</div>
+          <div class="k">点火不良</div><div class="v">ガス元栓・電源・水量を順に確認</div>
+        </div>
+      </div>
+
+      <div class="card warn">
+        <h3>📶 Wi-Fiルーター</h3>
+        <div class="kv">
+          <div class="k">場所</div><div class="v todo">⚠ 要記録</div>
+          <div class="k">再起動</div><div class="v">電源抜く→30秒待つ→挿す（5分で復旧）</div>
+        </div>
+      </div>
+
+      <div class="card info">
+        <h3>📷 写真撮影TODO</h3>
+        <ul class="checkbox-list">
+          <li>ガス元栓（赤レバー含む全景＋ズーム）</li>
+          <li>水道元栓（メーターボックス開けた状態）</li>
+          <li>分電盤（蓋開けた状態・ラベル可読）</li>
+          <li>給湯器本体＋型番</li>
+          <li>給湯器リモコン（キッチン・浴室）</li>
+          <li>Wi-Fiルーター本体</li>
+          <li>消火器の設置位置</li>
+          <li>救急箱の場所</li>
+          <li>予備キーの保管場所</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== 🏥 救急病院 ===== -->
+    <section class="block" id="hospitals">
+      <h2>🏥 近隣 救急対応病院リスト <span class="ja">Hospitals</span></h2>
+      <div class="card">
+        <table>
+          <tr><th>病院</th><th>住所</th><th>電話</th><th>区分</th></tr>
+          <tr><td><strong>横須賀共済病院</strong></td><td>横須賀市米が浜通1-16</td><td><a class="link-btn tel" href="tel:0468223433">046-822-3433</a></td><td><span class="badge emergency">二次救急 24h</span></td></tr>
+          <tr><td><strong>湘南鎌倉総合病院</strong></td><td>鎌倉市岡本1370-1</td><td><a class="link-btn tel" href="tel:0467461717">0467-46-1717</a></td><td><span class="badge emergency">三次救急</span></td></tr>
+          <tr><td><strong>逗子病院</strong></td><td>逗子市山の根1-7-17</td><td><a class="link-btn tel" href="tel:0468711663">046-871-1663</a></td><td><span class="badge info">地域中核</span></td></tr>
+          <tr><td><strong>葉山ハートセンター</strong></td><td>三浦郡葉山町下山口1898-1</td><td><a class="link-btn tel" href="tel:0468751717">046-875-1717</a></td><td><span class="badge info">循環器</span></td></tr>
+          <tr><td>休日急患診療所</td><td>逗子市役所内</td><td><a class="link-btn tel" href="tel:0468731899">046-873-1899</a></td><td><span class="badge good">休日のみ</span></td></tr>
+        </table>
+        <p style="font-size:0.76rem;color:var(--text-light);margin-top:8px;">※ 英語対応・夜間対応有無は要再確認</p>
+      </div>
+    </section>
+
+    <!-- ===== 🌊 災害対応 ===== -->
+    <section class="block" id="disaster">
+      <h2>🌊 災害対応（逗子の現実） <span class="ja">Disaster Plan</span> <span class="pri new">NEW v3</span></h2>
+      <p class="desc">逗子市の災害想定（地震・台風・土砂・浸水）に基づく事前準備とゲスト案内。</p>
+
+      <div class="two-col">
+        <div class="card warn">
+          <h3>🌏 地震想定</h3>
+          <ul style="padding-left:20px;font-size:0.84rem;">
+            <li>相模トラフ地震（最大震度6強想定）</li>
+            <li>旧耐震基準 → 半倒壊リスク</li>
+            <li>津波: 池子地区は標高25m以上で<strong>津波浸水想定外</strong></li>
+            <li>非常用持出: 水・食料・モバイルバッテリー・懐中電灯</li>
+          </ul>
+        </div>
+        <div class="card warn">
+          <h3>🌀 台風・大雨</h3>
+          <ul style="padding-left:20px;font-size:0.84rem;">
+            <li>逗子市は<strong>土砂災害警戒区域</strong>あり（池子周辺要確認）</li>
+            <li>窓の養生テープ・庭の物（BBQ用品）室内退避</li>
+            <li>停電に備え 飲料水・懐中電灯確保</li>
+            <li>強風時のBBQ使用禁止</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card todo">
+        <h3>📦 非常用備蓄（要整備）</h3>
+        <table>
+          <tr><th>品目</th><th>推奨量（12名想定）</th><th>状態</th></tr>
+          <tr><td>飲料水（1人/日 3L）</td><td>12名 × 3日 = 108L</td><td><span class="v todo">⚠ 未整備</span></td></tr>
+          <tr><td>非常食</td><td>12名 × 3日</td><td><span class="v todo">⚠ 未整備</span></td></tr>
+          <tr><td>モバイルバッテリー</td><td>2-3個</td><td><span class="v todo">⚠ 要購入</span></td></tr>
+          <tr><td>懐中電灯</td><td>3個以上</td><td><span class="v todo">⚠ 要確認</span></td></tr>
+          <tr><td>救急箱</td><td>1セット</td><td><span class="v todo">⚠ 設置場所未明記</span></td></tr>
+          <tr><td>携帯ラジオ</td><td>1台</td><td><span class="v todo">⚠</span></td></tr>
+        </table>
+      </div>
+
+      <div class="card info">
+        <h3>🗺 避難場所（逗子市指定）</h3>
+        <table>
+          <tr><th>用途</th><th>避難所</th><th>距離</th></tr>
+          <tr><td>近隣避難</td><td>逗子市立池子小学校</td><td>徒歩約5分</td></tr>
+          <tr><td>広域避難</td><td>逗子市立久木中学校</td><td>徒歩約15分</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <h3>📋 ゲスト向け 多言語災害案内（要作成）</h3>
+        <p style="font-size:0.82rem;">日本語・英語・中国語・韓国語・フランス語で「地震時の行動」「避難所」「持出品」を1枚にまとめ、ハウスガイドv3に統合済（要確認）。</p>
+      </div>
+    </section>
+
+    <!-- ===== ⚖ 法令コンプライアンス ===== -->
+    <section class="block" id="compliance">
+      <h2>⚖ 法令・許認可コンプライアンス <span class="ja">Compliance</span> <span class="pri">CRITICAL</span></h2>
+      <p class="desc">違反 = 業務停止・罰金・OTAアカウントBAN。年1回見直し。</p>
+
+      <div class="card critical">
+        <h3>🏛 住宅宿泊事業 / 旅館業 届出</h3>
+        <div class="kv">
+          <div class="k">営業形態</div><div class="v critical">⚠ 未確定（住宅宿泊事業 / 旅館業簡易宿所）</div>
+          <div class="k">届出番号</div><div class="v critical">⚠ 未記録</div>
+          <div class="k">届出日</div><div class="v todo">⚠</div>
+          <div class="k">届出窓口</div><div class="v">鎌倉保健福祉事務所 0467-24-3900</div>
+          <div class="k">法定標識</div><div class="v todo">⚠ 玄関掲示・写真記録要</div>
+        </div>
+      </div>
+
+      <div class="card emergency">
+        <h3>📊 180日ルール · 稼働日カウンター</h3>
+        <p>住宅宿泊事業 = 年間180日上限。マンスリー（30日以上）はカウント外。</p>
+        <table style="margin-top:8px;">
+          <tr><th>2026年</th><th>消化日数</th><th>残り</th></tr>
+          <tr><td>累計（1〜5月）</td><td><span class="v todo">⚠ 集計要</span></td><td>180日 − 集計値</td></tr>
+        </table>
+      </div>
+
+      <div class="card warn">
+        <h3>📅 2か月ごと 定期報告（法定義務）</h3>
+        <table style="margin-top:8px;">
+          <tr><th>報告期間</th><th>提出期限</th><th>状態</th></tr>
+          <tr><td>4-5月</td><td>6月15日</td><td><span class="v critical">⚠ 期限迫る</span></td></tr>
+          <tr><td>6-7月</td><td>8月15日</td><td>—</td></tr>
+          <tr><td>8-9月</td><td>10月15日</td><td>—</td></tr>
+          <tr><td>10-11月</td><td>12月15日</td><td>—</td></tr>
+          <tr><td>12-1月</td><td>2月15日</td><td>—</td></tr>
+          <tr><td>2-3月</td><td>4月15日</td><td>—</td></tr>
+        </table>
+      </div>
+
+      <div class="card info">
+        <h3>👥 宿泊者名簿 運用SOP（3年保存）</h3>
+        <div class="kv">
+          <div class="k">記録項目</div><div class="v">氏名 / 住所 / 職業 / 宿泊日 / 国籍 / 旅券番号（外国人）</div>
+          <div class="k">本人確認</div><div class="v">ICTビデオ通話 or 顔認証ツール</div>
+          <div class="k">パスポートコピー</div><div class="v">外国人は写し保存必須</div>
+          <div class="k">保存期間</div><div class="v"><strong>3年間</strong></div>
+          <div class="k">廃棄方法</div><div class="v todo">⚠ ポリシー要策定</div>
+        </div>
+      </div>
+
+      <div class="card todo">
+        <h3>🏘 近隣周知・苦情対応記録</h3>
+        <div class="kv">
+          <div class="k">配布日</div><div class="v todo">⚠</div>
+          <div class="k">配布範囲</div><div class="v todo">⚠ 隣接 + 向かい3軒以上推奨</div>
+          <div class="k">自治会長</div><div class="v todo">⚠ 連絡先要確認</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 🏗 耐震・消防 ===== -->
+    <section class="block" id="building-safety">
+      <h2>🏗 建物安全（耐震・消防） <span class="ja">Building Safety</span> <span class="pri">CRITICAL</span></h2>
+      <p class="desc"><strong>「意見」ではなく「証跡」が命。</strong>診断書・是正計画・配置図・点検記録を揃える。</p>
+
+      <div class="card critical">
+        <h3>⚠ 耐震診断（昭和42年築・旧耐震）</h3>
+        <div class="kv">
+          <div class="k">築年</div><div class="v critical">昭和42年（1967年）= 築59年</div>
+          <div class="k">耐震診断</div><div class="v todo">⚠ 未実施（将来対応・記録のみ）</div>
+          <div class="k">補強工事</div><div class="v todo">— 診断後判断</div>
+          <div class="k">逗子市補助制度</div><div class="v todo">— 将来検討</div>
+        </div>
+        <p style="font-size:0.78rem;margin-top:8px;color:var(--text-light);">
+          ※ 当面は緊急SOP掲示・消火器整備・避難経路明示で運用カバー。
+        </p>
+      </div>
+
+      <div class="card warn">
+        <h3>🔥 消防設備（証跡管理）</h3>
+        <table>
+          <tr><th>設備</th><th>状態</th><th>証跡（写真・台帳）</th></tr>
+          <tr><td>消防法令適合通知書</td><td><span class="v todo">⚠ 取得有無要確認</span></td><td>PDFで保管</td></tr>
+          <tr><td>住宅用火災警報器</td><td><span class="v todo">⚠ 設置箇所要確認</span></td><td>配置図 + 写真</td></tr>
+          <tr><td>消火器</td><td><span class="v todo">⚠ 位置・有効期限要記録</span></td><td>位置写真 + 期限管理</td></tr>
+          <tr><td>誘導標識・避難経路図</td><td><span class="v todo">⚠ 掲示要</span></td><td>掲示写真</td></tr>
+          <tr><td>消火器点検記録</td><td><span class="v todo">⚠ 台帳作成要</span></td><td>年1回点検・5年で交換</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== 📋 清掃契約・SLA ===== -->
+    <section class="block" id="contract">
+      <h2>📋 清掃業務委託契約・SLA <span class="ja">Cleaning Contract &amp; SLA</span></h2>
+
+      <div class="card">
+        <h3>契約当事者 <span class="badge">EXECUTED</span></h3>
+        <div class="kv">
+          <div class="k">甲（委託者）</div><div class="v"><strong>ブルーステージ合同会社</strong><br>東京都台東区寿3-13-10-202 · 代表社員 青羽 修二</div>
+          <div class="k">乙（受託者）</div><div class="v"><strong>株式会社インビックス</strong><br>神奈川県小田原市堀之内196-2-2 平塚店舗103 · 代表取締役 黒須 大</div>
+          <div class="k">対象施設</div><div class="v">神奈川県逗子市池子2-10-9</div>
+          <div class="k">契約期間</div><div class="v">締結日から1年 · 1ヶ月前申出なしで自動更新</div>
+          <div class="k">緊急駆けつけ連絡先</div><div class="v"><code>090-2945-2046</code></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>料金体系 <span class="badge info">PRICE LIST</span></h3>
+        <table>
+          <tr><th>区分</th><th>料金（税抜）</th></tr>
+          <tr><td>客室清掃（通常）</td><td><strong>¥20,500/回</strong></td></tr>
+          <tr><td>客室清掃（CO翌日が清掃日）</td><td>¥19,000/回</td></tr>
+          <tr><td>特別清掃</td><td>¥3,000/時</td></tr>
+          <tr><td>緊急駆けつけ（1h未満）</td><td>¥14,000</td></tr>
+          <tr><td>緊急駆けつけ（1h超）</td><td>¥14,000 + ¥5,000/h</td></tr>
+          <tr><td>備品在庫管理代行</td><td>¥1,500/月</td></tr>
+          <tr><td>年末年始（12/28-31, 1/1-4）</td><td>+50%加算</td></tr>
+          <tr><td>当日キャンセル</td><td>請負額100%</td></tr>
+        </table>
+      </div>
+
+      <div class="card warn">
+        <h3>🧹 清掃SLA + 受入基準 <span class="pri new">NEW v3</span></h3>
+        <p>¥20,500/回を払っている以上、品質基準を明文化。受入NGの場合はやり直し依頼。</p>
+        <table style="margin-top:10px;">
+          <tr><th>項目</th><th>受入基準</th><th>証跡</th></tr>
+          <tr><td>必須撮影</td><td>各寝室・浴室・キッチン・玄関・庭BBQの「After写真」</td><td>清掃完了報告に添付</td></tr>
+          <tr><td>消耗品補充</td><td>トイペ各室2巻以上・タオル人数+1・洗剤満タン</td><td><a href="#par-stock">在庫パー</a></td></tr>
+          <tr><td>BBQグリル</td><td>使用形跡の完全除去・炭灰の処理</td><td>After写真</td></tr>
+          <tr><td>破損報告</td><td>当日中にあおへLINE / 写真添付</td><td><a href="#incident-log">インシデントログ</a></td></tr>
+          <tr><td>やり直し基準</td><td>NG写真3枚以上 / ゲスト苦情発生時</td><td>—</td></tr>
+          <tr><td>繁忙期バックアップ</td><td><span class="v todo">⚠ 黒須氏不在時の代替清掃業者要確保</span></td><td>—</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== 🛡 火災保険 ===== -->
+    <section class="block" id="insurance">
+      <h2>🛡 火災保険・賠償保険 <span class="ja">Insurance</span></h2>
+      <div class="card todo">
+        <h3>⚠ 選定状況</h3>
+        <div class="kv">
+          <div class="k">フォルダ</div><div class="v"><code>神武寺民泊PJ\保険関係\20260417 保険見積もり\</code></div>
+          <div class="k">プラン数</div><div class="v">4プラン（A〜D）</div>
+          <div class="k">比較資料</div><div class="v"><code>Hilltop_Zushi_保険プラン比較_20260418.pptx</code></div>
+          <div class="k">契約済プラン</div><div class="v todo">⚠ 要確認</div>
+          <div class="k">施設賠償特約</div><div class="v todo">⚠ 崖転落リスク対応か要確認</div>
+          <div class="k">JAPA民泊保険（候補）</div><div class="v">¥32,000/年 候補</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 👥 プレイヤー ===== -->
+    <section class="block" id="players">
+      <h2>👥 関係者プレイヤー <span class="ja">Players</span></h2>
+      <div class="card">
+        <h3>共同運営チーム</h3>
+        <table>
+          <tr><th>名前</th><th>役割</th><th>備考</th></tr>
+          <tr><td><strong>あお（青羽 修二）</strong></td><td>共同運営・PJ全体管理・経費</td><td>ブルーステージ合同会社 代表</td></tr>
+          <tr><td><strong>空ちゃん（戎 空）</strong></td><td>共同運営（折半）・経費報告先</td><td>振込名義「エビス カナタ」</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>外部パートナー（確定）</h3>
+        <table>
+          <tr><th>組織</th><th>役割</th><th>連絡先</th></tr>
+          <tr><td>株式会社インビックス 黒須 大</td><td>清掃・緊急駆けつけ</td><td>📞 090-2945-2046</td></tr>
+          <tr><td>さくら建設(株)</td><td>貸主</td><td>📞 046-884-9562</td></tr>
+          <tr><td>有限会社藍コーポレーション</td><td>管理会社</td><td>📞 046-874-7178</td></tr>
+          <tr><td>株式会社サガミ</td><td>プロパンガス</td><td>📞 046-833-3131</td></tr>
+        </table>
+      </div>
+      <div class="card todo">
+        <h3>関与者（要確認）</h3>
+        <table>
+          <tr><th>名前</th><th>関与</th><th>確認事項</th></tr>
+          <tr><td>LICOさん</td><td>BBQ用品リストレビュー</td><td>連絡先・継続関与</td></tr>
+          <tr><td>西崎さん</td><td><span class="badge todo">役割不明</span></td><td>あおさんに確認</td></tr>
+          <tr><td>えりなちゃん（タイミー）</td><td>—</td><td>—</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== 💼 共同運営 ===== -->
+    <section class="block" id="partners">
+      <h2>💼 共同運営・拠出ルール <span class="ja">Partnership 50:50</span></h2>
+      <div class="card good">
+        <h3>原則: あお × 空ちゃん 50:50</h3>
+        <ul style="padding-left:20px;font-size:0.86rem;">
+          <li>不動産初期費用 ¥900,050 はブルーステージから直接支払 → あおのみなし入金</li>
+          <li>青空銀行（共有口座）への入金ベースで折半チェック</li>
+          <li>個人立替は別枠で後日精算</li>
+        </ul>
+      </div>
+      <div class="card todo">
+        <h3>📜 共同運営契約書（書面化）</h3>
+        <div class="kv">
+          <div class="k">書面化</div><div class="v todo">⚠ 未確認</div>
+          <div class="k">撤退条件</div><div class="v todo">⚠ 死亡・離婚時のルール明文化推奨</div>
+          <div class="k">意思決定しきい値</div><div class="v todo">⚠ 50万円超は両者承認</div>
+        </div>
+      </div>
+      <div class="card info">
+        <h3>2026年4月時点 財務スナップショット</h3>
+        <table>
+          <tr><th>項目</th><th>金額</th></tr>
+          <tr><td>青空銀行残高（4/10時点）</td><td>¥1,003,763</td></tr>
+          <tr><td>拠出累計（空ちゃん）</td><td>¥1,000,000</td></tr>
+          <tr><td>拠出累計（あお・みなし含む）</td><td>¥1,500,050</td></tr>
+          <tr><td>空ちゃん不足額</td><td>¥250,025</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== ⚙ 運用ルール ===== -->
+    <section class="block" id="operations">
+      <h2>⚙ 運用ルール・ペナルティ <span class="ja">Operations</span></h2>
+      <div class="two-col">
+        <div class="card">
+          <h3>🏡 チェックイン / アウト</h3>
+          <div class="kv">
+            <div class="k">チェックイン</div><div class="v"><strong>16:00〜</strong></div>
+            <div class="k">チェックアウト</div><div class="v"><strong>10:00まで</strong></div>
+            <div class="k">入室</div><div class="v">キーボックス + 暗証番号<br>（予約メッセージで都度送付）</div>
+            <div class="k">セーフティBOX</div><div class="v">洋室3 · 鍵は金庫裏</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>💰 BBQ・ペット追加料金</h3>
+          <table>
+            <tr><th>区分</th><th>金額</th></tr>
+            <tr><td>予約時申告</td><td><span class="badge good">¥4,400</span></td></tr>
+            <tr><td>当日追加</td><td><span class="badge warn">¥6,600</span></td></tr>
+            <tr><td>未申告で発覚</td><td><span class="badge emergency">¥16,000</span></td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="card warn">
+        <h3>⚠ ペナルティ一覧</h3>
+        <table>
+          <tr><th>違反</th><th>金額</th></tr>
+          <tr><td>室内喫煙</td><td><strong>¥50,000〜</strong>（特殊清掃・消臭）</td></tr>
+          <tr><td>スマートロック紛失</td><td>¥25,000</td></tr>
+          <tr><td>鍵紛失</td><td>¥30,000（シリンダー交換）</td></tr>
+          <tr><td>BBQ機材損傷</td><td>修理費実費</td></tr>
+          <tr><td>定員超過</td><td>1名 ¥10,000 + 清掃追加</td></tr>
+          <tr><td>CO遅延</td><td>¥3,000（30分）/ 以後 ¥1,500/30分</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== 👥 ゲスト本人確認・人数超過 ===== -->
+    <section class="block" id="guest-check">
+      <h2>👥 ゲスト本人確認・人数超過・パーティ対策 <span class="ja">Guest Verification</span> <span class="pri new">NEW v3</span></h2>
+      <p class="desc">最大12名 = パーティ会場化リスク。予約前後の確認とリアルタイム監視が要。</p>
+
+      <div class="card">
+        <h3>📋 予約受領時の確認項目</h3>
+        <ul class="checkbox-list">
+          <li>代表者本人確認（OTAアカウントとパスポート/免許照合）</li>
+          <li>宿泊目的（家族旅行 / 友人グループ / 仕事）の確認</li>
+          <li>人数の最終確定（変更時は事前連絡必須を伝える）</li>
+          <li>外国人ゲストはパスポート写しを事前送付依頼</li>
+          <li>BBQ・ペット申告の最終確認</li>
+          <li>レビュー実績の確認（新規アカウントは要警戒）</li>
+        </ul>
+      </div>
+
+      <div class="card warn">
+        <h3>🎉 パーティ・イベント禁止ルール</h3>
+        <div class="kv">
+          <div class="k">基本方針</div><div class="v">宿泊者以外の出入り禁止 / 大声・音楽21:00以降禁止</div>
+          <div class="k">事前明示</div><div class="v">予約承諾時とハウスガイドv3に記載</div>
+          <div class="k">違反時</div><div class="v"><strong>即退去 + 違約金 + クリーニング実費</strong></div>
+          <div class="k">監視手段</div><div class="v">屋外カメラ Tapo C660 + 近隣からの通報</div>
+          <div class="k">疑わしい予約</div><div class="v">レビュー0件・短期予約・卒業シーズン・人数MAX等</div>
+        </div>
+      </div>
+
+      <div class="card emergency">
+        <h3>🚨 人数超過・無断招待 検知時の対応</h3>
+        <ol style="margin-left:22px;font-size:0.84rem;line-height:1.7;">
+          <li>Tapo カメラ録画で人数を確認・記録</li>
+          <li>ゲストへOTAメッセージで「契約人数を超えています」と通告</li>
+          <li>従わない場合は現地訪問（あお or 黒須氏）</li>
+          <li>追加料金 ¥10,000/名 + 清掃追加 を請求</li>
+          <li>悪質ならOTA運営に通報 → アカウントBAN申請</li>
+          <li><a href="#incident-log">インシデントログ</a> 詳細記録</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===== 😡 近隣クレーム対応SOP ===== -->
+    <section class="block" id="complaint-sop">
+      <h2>😡 近隣クレーム対応SOP <span class="ja">Neighbor Complaint</span> <span class="pri new">NEW v3</span></h2>
+      <p class="desc">住宅宿泊事業者は<strong>30分以内現地対応</strong>が法定義務。</p>
+
+      <div class="card warn">
+        <h3>📞 受電時 台本（一次受け）</h3>
+        <div class="talk" style="font-style:normal;">
+          「Hilltop Zushi 運営の青羽です。ご迷惑をおかけし誠に申し訳ございません。<br><br>
+          まず状況を教えてください：<br>
+          ① いつから / どのくらい続いていますか？<br>
+          ② どんな音 / 状況ですか？<br>
+          ③ お客様のお名前と、念のためご連絡先を伺ってもよろしいでしょうか。<br><br>
+          <strong>すぐに現地確認に向かいます。30分以内に対応します。</strong>結果は必ずご連絡差し上げます。」
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🚗 現地急行判断基準</h3>
+        <table>
+          <tr><th>苦情内容</th><th>SLA</th><th>担当</th></tr>
+          <tr><td>夜間騒音（22:00以降）</td><td>30分以内</td><td>距離近い側（あお or 空ちゃん）</td></tr>
+          <tr><td>BBQ煙・匂い</td><td>30分以内</td><td>同上</td></tr>
+          <tr><td>路駐・違法駐車</td><td>1時間以内</td><td>同上</td></tr>
+          <tr><td>ゴミ出しトラブル</td><td>翌日朝</td><td>同上</td></tr>
+          <tr><td>3回以上同じ苦情</td><td>即日</td><td>あお（直接お詫び訪問）</td></tr>
+        </table>
+      </div>
+
+      <div class="card emergency">
+        <h3>💸 返金判断基準（自分用メモ）</h3>
+        <table>
+          <tr><th>状況</th><th>判断</th></tr>
+          <tr><td>近隣からの苦情でゲスト退去発生</td><td>残宿泊代金 50% 返金</td></tr>
+          <tr><td>悪質な迷惑行為で違約金請求</td><td>返金なし + 違約金</td></tr>
+          <tr><td>運営側の落ち度（設備不良）</td><td>100%返金 + 謝罪</td></tr>
+        </table>
+      </div>
+
+      <div class="card info">
+        <h3>📝 苦情記録様式（3年保管・法定）</h3>
+        <ul class="checkbox-list">
+          <li>受付日時 / 受付者</li>
+          <li>苦情者の名前・連絡先（任意）</li>
+          <li>苦情内容（できるだけ具体的に）</li>
+          <li>現地到着時刻</li>
+          <li>対応内容（誰が何をしたか）</li>
+          <li>結果（苦情者の納得度）</li>
+          <li>再発防止策</li>
+          <li>関連する <a href="#incident-log">インシデント番号</a></li>
+        </ul>
+      </div>
+
+      <div class="card todo">
+        <h3>🏘 再発防止アクション</h3>
+        <div class="kv">
+          <div class="k">近隣説明文テンプレ</div><div class="v todo">⚠ 要作成（謝罪 + 再発防止策 + 連絡先）</div>
+          <div class="k">挨拶回り</div><div class="v">開業時 + 半年に1回 推奨</div>
+          <div class="k">手土産</div><div class="v">逗子土産 ¥1,500程度</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 🔥 BBQ安全運用SOP ===== -->
+    <section class="block" id="bbq-sop">
+      <h2>🔥 BBQ安全運用SOP <span class="ja">BBQ Safety SOP</span> <span class="pri new">NEW v3</span> <span class="pri">CRITICAL</span></h2>
+      <p class="desc">BBQ施設は最大の事故リスク源。掲示物 + ハウスガイド + 当日確認の3層で対応。</p>
+
+      <div class="card emergency">
+        <h3>⛔ 使用禁止条件（即停止）</h3>
+        <table>
+          <tr><th>条件</th><th>判断基準</th></tr>
+          <tr><td>強風</td><td><strong>風速 5m/s 以上</strong>（火の粉飛散リスク）</td></tr>
+          <tr><td>豪雨・落雷</td><td>雨脚強・雷注意報発令時</td></tr>
+          <tr><td>火災警報発令</td><td>逗子市・神奈川県の警報時</td></tr>
+          <tr><td>夜間</td><td>20:00以降（騒音・近隣配慮）</td></tr>
+          <tr><td>定員超過</td><td>炭火管理が雑になるため即停止</td></tr>
+          <tr><td>飲酒泥酔</td><td>火気管理不能で即停止</td></tr>
+        </table>
+      </div>
+
+      <div class="card warn">
+        <h3>✅ 器具点検チェック（清掃時）</h3>
+        <ul class="checkbox-list">
+          <li>Weber 57cm コンパクトケトル 本体破損なし</li>
+          <li>ユニフレーム ファイアグリル 歪み・サビなし</li>
+          <li>火ばさみ・トングの状態</li>
+          <li>消火具（水バケツ + 消火器）が手の届く位置にある</li>
+          <li>炭・着火剤 在庫あり（<a href="#par-stock">在庫パー</a>）</li>
+          <li>耐熱手袋 状態確認</li>
+          <li>近隣に煙が直接行かないか配置確認</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>🧯 消火具配置図（要写真追加）</h3>
+        <div class="kv">
+          <div class="k">水バケツ</div><div class="v todo">⚠ BBQエリア横（要写真）</div>
+          <div class="k">消火器</div><div class="v todo">⚠ 玄関 + BBQエリア（要写真）</div>
+          <div class="k">消火砂（推奨）</div><div class="v todo">⚠ 未配備 / 検討</div>
+          <div class="k">水道</div><div class="v">庭の散水栓を使用可能</div>
+        </div>
+      </div>
+
+      <div class="card info">
+        <h3>📋 後片付け基準（ゲスト依頼事項）</h3>
+        <ol style="margin-left:22px;font-size:0.84rem;line-height:1.7;">
+          <li>炭は完全消火（水を十分にかける）</li>
+          <li>翌朝まで灰の温度確認</li>
+          <li>炭灰は専用バケツへ（ゴミ袋直入れ禁止）</li>
+          <li>グリル本体は油分を拭き取る</li>
+          <li>使用後の調理器具を流し台へ</li>
+        </ol>
+        <p style="font-size:0.78rem;margin-top:6px;color:var(--text-light);">※ 違反時はBBQ機材損傷費 + 清掃追加</p>
+      </div>
+
+      <div class="card">
+        <h3>🌬 風速チェック方法</h3>
+        <p style="font-size:0.84rem;">
+          ゲストへ案内: <strong>Yahoo!天気アプリ・tenki.jp</strong> で「逗子 風速」を検索 →
+          5m/s以上なら使用不可。<br>
+          掲示物 #4 BBQルールに明記済。
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== ♻ ゴミ収集 ===== -->
+    <section class="block" id="trash">
+      <h2>♻ ゴミ収集スケジュール <span class="ja">Trash Schedule</span></h2>
+      <div class="card">
+        <table>
+          <tr><th>カテゴリ</th><th>収集日</th></tr>
+          <tr><td>燃やすごみ</td><td>火・金</td></tr>
+          <tr><td>容器包装プラ</td><td>水</td></tr>
+          <tr><td>不燃・ペットボトル</td><td>木</td></tr>
+          <tr><td>あきびん</td><td>第2・第4 水曜</td></tr>
+          <tr><td>草・葉・植木</td><td>第1・第3・第5 月曜</td></tr>
+          <tr><td>危険有害・小型家電</td><td>第2・第4 月曜</td></tr>
+        </table>
+        <div style="font-size:0.78rem;color:var(--text-light);margin-top:8px;">⚠ 朝8:00まで搬出 · さんあーるアプリで通知設定可</div>
+      </div>
+    </section>
+
+    <!-- ===== 📱 掲載サイト ===== -->
+    <section class="block" id="listings">
+      <h2>📱 掲載サイト <span class="ja">Listings</span></h2>
+      <div class="card todo">
+        <h3>掲載状況</h3>
+        <div class="kv">
+          <div class="k">Airbnb</div><div class="v todo">⚠ URL未確認 / 2FA要確認</div>
+          <div class="k">Booking.com</div><div class="v todo">⚠ URL未確認 / 2FA要確認</div>
+          <div class="k">楽天Vacation Stay</div><div class="v">Phase 4予定</div>
+          <div class="k">運用方針</div><div class="v">手動管理（サイトコントローラー未導入）</div>
+          <div class="k">キャンセルポリシー</div><div class="v todo">⚠ 各OTA設定値要記録</div>
+          <div class="k">最低宿泊日数</div><div class="v todo">⚠ 季節別設定要記録</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 📝 インシデントログ ===== -->
+    <section class="block" id="incident-log">
+      <h2>📝 インシデントログ <span class="ja">Incident Log</span> <span class="pri new">NEW v3</span></h2>
+      <p class="desc">事故・ヒヤリハットを<strong>すべて</strong>記録。日々の改善・保険請求・行政報告の根拠。</p>
+
+      <div class="card">
+        <h3>📋 記録様式（テンプレ）</h3>
+        <table>
+          <tr><th>項目</th><th>記録内容</th></tr>
+          <tr><td>インシデント番号</td><td>YYYYMMDD-連番（例: 20260526-001）</td></tr>
+          <tr><td>発生日時</td><td>—</td></tr>
+          <tr><td>発見者・連絡経路</td><td>—</td></tr>
+          <tr><td>分類</td><td>事故 / ヒヤリハット / クレーム / 設備不良 / 違反行為</td></tr>
+          <tr><td>状況</td><td>5W1Hで具体的に</td></tr>
+          <tr><td>初動対応</td><td>誰が何をしたか</td></tr>
+          <tr><td>原因</td><td>—</td></tr>
+          <tr><td>再発防止策</td><td>—</td></tr>
+          <tr><td>写真添付</td><td>クラウド保管先パス</td></tr>
+          <tr><td>対外報告</td><td>保険 / 行政 / OTA 要否</td></tr>
+          <tr><td>関連 苦情記録番号</td><td>—</td></tr>
+        </table>
+      </div>
+
+      <div class="card info">
+        <h3>📂 保管先（要決定）</h3>
+        <div class="kv">
+          <div class="k">運用ツール</div><div class="v todo">⚠ Notion / Google Sheets / Airtable から選定</div>
+          <div class="k">保存期間</div><div class="v">最低5年（保険請求時効考慮）</div>
+          <div class="k">アクセス権</div><div class="v">あお・空ちゃん・税理士のみ</div>
+        </div>
+      </div>
+
+      <div class="card warn">
+        <h3>🚨 報告必須レベル</h3>
+        <table>
+          <tr><th>レベル</th><th>例</th><th>対外報告</th></tr>
+          <tr><td>L1 軽微</td><td>備品破損・小さな不具合</td><td>—</td></tr>
+          <tr><td>L2 中</td><td>ゲスト軽傷・近隣クレーム</td><td>保険会社 検討</td></tr>
+          <tr><td>L3 重大</td><td>救急搬送・崖転落・火災</td><td>保険・OTA・行政（保健所）必須</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== 📦 備品 ===== -->
+    <section class="block" id="equipment">
+      <h2>📦 購入備品リスト <span class="ja">Equipment</span></h2>
+      <div class="card">
+        <h3>🔥 BBQ用品（最終版v4）</h3>
+        <div class="kv">
+          <div class="k">最新ファイル</div><div class="v"><code>BBQ用品リスト_Hilltop_Zushi_最終版_v4.xlsx</code></div>
+          <div class="k">合計金額（v3参考）</div><div class="v">¥236,839</div>
+          <div class="k">グリル</div><div class="v">Weber 57cm + ユニフレーム ファイアグリル</div>
+          <div class="k">炭</div><div class="v">炭魂 オガ備長炭 10kg</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>📊 神武寺民泊 全体備品リスト</h3>
+        <a class="link-btn sheet" href="https://docs.google.com/spreadsheets/d/1QkVOfXHqlHMR7LJc8ZxS_ragt1GiPCtF5djjcYBg_w4/edit" target="_blank">📊 スプレッドシートを開く</a>
+      </div>
+    </section>
+
+    <!-- ===== 📦 在庫パー ===== -->
+    <section class="block" id="par-stock">
+      <h2>📦 在庫パー（下限管理） <span class="ja">Par Stock</span> <span class="pri new">NEW v3</span></h2>
+      <p class="desc">「欠品が一番クレームになる」（Codex指摘）。在庫がパー以下になったら即発注。</p>
+
+      <div class="card">
+        <h3>🛁 客室消耗品</h3>
+        <div class="par-grid">
+          <div class="par-item">
+            <div class="name">トイレットペーパー</div>
+            <div class="par">下限: <strong>各トイレ2巻 + ストック12巻</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">バスタオル</div>
+            <div class="par">下限: <strong>15枚</strong>（12名+予備3）</div>
+          </div>
+          <div class="par-item">
+            <div class="name">フェイスタオル</div>
+            <div class="par">下限: <strong>20枚</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">シャンプー・コンディショナー</div>
+            <div class="par">下限: <strong>各浴室1本ボトル + ストック1</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">ボディソープ</div>
+            <div class="par">下限: <strong>各浴室1本</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">ハンドソープ</div>
+            <div class="par">下限: <strong>洗面所各1 + ストック2</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🧹 清掃用消耗品</h3>
+        <div class="par-grid">
+          <div class="par-item">
+            <div class="name">食器用洗剤</div>
+            <div class="par">下限: <strong>1本</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">洗濯洗剤</div>
+            <div class="par">下限: <strong>1本</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">ゴミ袋（45L 燃やす）</div>
+            <div class="par">下限: <strong>20枚</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">ゴミ袋（30L プラ）</div>
+            <div class="par">下限: <strong>20枚</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">キッチンペーパー</div>
+            <div class="par">下限: <strong>3ロール</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">アルコールスプレー</div>
+            <div class="par">下限: <strong>1本</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card info">
+        <h3>🦟 虫対策</h3>
+        <div class="par-grid">
+          <div class="par-item">
+            <div class="name">蚊取り線香</div>
+            <div class="par">下限: <strong>30巻</strong>（夏季は60巻）</div>
+          </div>
+          <div class="par-item">
+            <div class="name">虫よけスプレー</div>
+            <div class="par">下限: <strong>2本</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">殺虫剤（ゴキジェット等）</div>
+            <div class="par">下限: <strong>1本</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">虫取り紙</div>
+            <div class="par">下限: <strong>5枚</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card warn">
+        <h3>🔥 BBQ消耗品（月次補充）</h3>
+        <p style="font-size:0.84rem;">月額目安: <strong>約 ¥7,497/月</strong></p>
+        <div class="par-grid">
+          <div class="par-item">
+            <div class="name">オガ備長炭 10kg</div>
+            <div class="par">下限: <strong>2袋</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">点火キューブ</div>
+            <div class="par">下限: <strong>20個</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">CB缶（カセットコンロ）</div>
+            <div class="par">下限: <strong>6本</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">紙皿（仕切付バガス）</div>
+            <div class="par">下限: <strong>50枚</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">紙コップ</div>
+            <div class="par">下限: <strong>50個</strong></div>
+          </div>
+          <div class="par-item">
+            <div class="name">割り箸</div>
+            <div class="par">下限: <strong>50膳</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card todo">
+        <h3>📋 発注ルート（要決定）</h3>
+        <div class="kv">
+          <div class="k">通常発注</div><div class="v">Amazon / 楽天（ブルーステージ法人カード）</div>
+          <div class="k">緊急発注</div><div class="v todo">⚠ 黒須氏に依頼可否を確認</div>
+          <div class="k">在庫管理代行</div><div class="v">¥1,500/月 でインビックスへ委託済（契約書記載）</div>
+          <div class="k">保管場所</div><div class="v todo">⚠ 清掃用具・予備品の保管場所を明記</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 🔧 設備保守カレンダー ===== -->
+    <section class="block" id="maintenance">
+      <h2>🔧 設備保守カレンダー <span class="ja">Maintenance</span></h2>
+      <p class="desc">築59年・12名収容で設備劣化リスク高。点検記録 = 証跡。</p>
+      <div class="card">
+        <h3>📅 定期点検スケジュール</h3>
+        <table>
+          <tr><th>設備</th><th>頻度</th><th>状態</th></tr>
+          <tr><td>給湯器24号</td><td>10年 + 異常時</td><td><span class="v todo">⚠</span></td></tr>
+          <tr><td>エアコン洗浄</td><td>年1回（夏前）</td><td><span class="v todo">⚠</span></td></tr>
+          <tr><td>消火器</td><td>製造5年で交換</td><td><span class="v todo">⚠</span></td></tr>
+          <tr><td>火災警報器電池</td><td>10年</td><td><span class="v todo">⚠</span></td></tr>
+          <tr><td>SwitchBot電池</td><td>6ヶ月</td><td><span class="v todo">⚠</span></td></tr>
+          <tr><td>Tapo microSD</td><td>月1回</td><td><span class="v todo">⚠</span></td></tr>
+          <tr><td>BBQグリル清掃</td><td>使用後毎回</td><td>—</td></tr>
+          <tr><td>庭木剪定</td><td>年2回</td><td><span class="v todo">⚠</span></td></tr>
+          <tr><td>崖側フェンス強度</td><td>季節毎</td><td><span class="v todo">⚠</span></td></tr>
+          <tr><td>雨樋・屋根</td><td>年1回 + 台風後</td><td><span class="v todo">⚠</span></td></tr>
+          <tr><td>シロアリ予防</td><td>5年に1回</td><td><span class="v todo">⚠</span></td></tr>
+        </table>
+      </div>
+      <div class="card info">
+        <h3>💧 湿気対策 STEP</h3>
+        <table>
+          <tr><th>STEP</th><th>内容</th><th>コスト</th></tr>
+          <tr><td>1</td><td>除湿剤・サーキュレーター</td><td>約¥13,000</td></tr>
+          <tr><td>2</td><td>換気・送風強化</td><td>約¥17,000</td></tr>
+          <tr><td>3</td><td>除湿機3台</td><td>約¥117,000〜148,000</td></tr>
+          <tr><td>4</td><td>床下対策（大家相談）</td><td>—</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== 🔑 鍵・アクセス台帳 ===== -->
+    <section class="block" id="access-log">
+      <h2>🔑 鍵・アクセス管理台帳 <span class="ja">Access Log</span> <span class="pri new">NEW v3</span></h2>
+      <p class="desc">PIN・物理鍵・スマートロックの<strong>発行・失効ログ</strong>を残す。</p>
+
+      <div class="card">
+        <h3>📋 PIN/鍵 種別と運用ルール</h3>
+        <table>
+          <tr><th>種別</th><th>運用</th><th>失効ルール</th></tr>
+          <tr><td>ゲスト用PIN</td><td>予約毎に変更（4-6桁）</td><td>CO翌日自動失効</td></tr>
+          <tr><td>清掃業者用PIN</td><td>固定 or 月次更新</td><td><span class="v todo">⚠ 要決定</span></td></tr>
+          <tr><td>運営者用PIN</td><td>あお・空ちゃん別個</td><td>退出時即失効</td></tr>
+          <tr><td>マスターキー（物理）</td><td>金庫保管</td><td>—</td></tr>
+          <tr><td>予備キー</td><td><span class="v todo">⚠ 場所要記録</span></td><td>—</td></tr>
+        </table>
+      </div>
+
+      <div class="card warn">
+        <h3>📝 発行ログ（テンプレ）</h3>
+        <table>
+          <tr><th>発行日</th><th>対象</th><th>PIN/鍵</th><th>有効期限</th><th>失効日</th><th>備考</th></tr>
+          <tr><td>—</td><td>例: 田中様（予約#A123）</td><td>4桁</td><td>CI〜CO+1日</td><td>—</td><td>—</td></tr>
+        </table>
+        <p style="font-size:0.78rem;color:var(--text-light);margin-top:8px;">
+          ※ 月次で残存PIN洗い出し → 古いゲストPINを無効化
+        </p>
+      </div>
+
+      <div class="card emergency">
+        <h3>🚨 緊急開錠手段</h3>
+        <ol style="margin-left:22px;font-size:0.84rem;line-height:1.7;">
+          <li>SwitchBot 一時PIN発行（スマホアプリから）</li>
+          <li>マスターPIN（金庫から取出）</li>
+          <li>物理予備キー使用</li>
+          <li>鍵業者駆けつけ（<span class="v todo">⚠ 契約業者要確定</span>）</li>
+        </ol>
+      </div>
+
+      <div class="card info">
+        <h3>👀 アプリ・アカウント アクセス権</h3>
+        <table>
+          <tr><th>アカウント</th><th>アクセス可能者</th></tr>
+          <tr><td>SwitchBot アプリ</td><td>あお / 空ちゃん / 黒須氏</td></tr>
+          <tr><td>Tapo アプリ</td><td>あお のみ</td></tr>
+          <tr><td>Airbnb 管理画面</td><td>あお / 空ちゃん</td></tr>
+          <tr><td>Booking.com Extranet</td><td>あお / 空ちゃん</td></tr>
+          <tr><td>本ダッシュボード</td><td>あお / 空ちゃん（PIN共有）</td></tr>
+        </table>
+        <p style="font-size:0.78rem;color:var(--text-light);margin-top:8px;">※ 退職・離脱時は即アクセス削除のSOP要</p>
+      </div>
+    </section>
+
+    <!-- ===== 🔐 セキュリティ ===== -->
+    <section class="block" id="security">
+      <h2>🔐 セキュリティ管理 <span class="ja">Security</span></h2>
+      <div class="card warn">
+        <h3>📹 Tapo C660 カメラ</h3>
+        <div class="kv">
+          <div class="k">設置台数</div><div class="v">複数（10台以上 / 物件横断）</div>
+          <div class="k">microSD</div><div class="v">SanDisk High Endurance 256GB</div>
+          <div class="k">録画保存</div><div class="v todo">⚠ 7日 / 30日 ポリシー要策定</div>
+          <div class="k">設置場所</div><div class="v todo">⚠ 全屋外確認・室内は撤去</div>
+          <div class="k">ゲスト告知</div><div class="v todo">⚠ ハウスガイド・OTA記載必須</div>
+        </div>
+      </div>
+      <div class="card emergency">
+        <h3>🔒 OTA 2FA</h3>
+        <div class="kv">
+          <div class="k">Airbnb 2FA</div><div class="v todo">⚠ 必須</div>
+          <div class="k">Booking 2FA</div><div class="v todo">⚠ 必須</div>
+          <div class="k">Cloudflare 2FA</div><div class="v todo">⚠</div>
+          <div class="k">Google 2FA</div><div class="v todo">⚠ ブルーステージ用</div>
+        </div>
+      </div>
+      <div class="card info">
+        <h3>📶 Wi-Fi</h3>
+        <div class="kv">
+          <div class="k">SSID</div><div class="v todo">⚠</div>
+          <div class="k">パスワード</div><div class="v">予約メッセージで送付</div>
+          <div class="k">ゲスト/管理者分離</div><div class="v todo">⚠</div>
+          <div class="k">定期変更</div><div class="v todo">⚠ 6ヶ月毎</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 🛡 個人情報運用 ===== -->
+    <section class="block" id="privacy">
+      <h2>🛡 個人情報運用ルール <span class="ja">Privacy Policy</span> <span class="pri new">NEW v3</span></h2>
+      <p class="desc">宿泊者名簿・パスポートコピーの取扱い。漏えい時は個人情報保護委員会報告義務あり。</p>
+
+      <div class="card">
+        <h3>📋 取扱いルール</h3>
+        <table>
+          <tr><th>項目</th><th>ルール</th></tr>
+          <tr><td>保管場所</td><td><span class="v todo">⚠ クラウド（暗号化）or 紙金庫</span></td></tr>
+          <tr><td>閲覧権限</td><td>あお / 空ちゃん / 税理士のみ</td></tr>
+          <tr><td>共有禁止</td><td>SNS・LINE・メール添付（暗号化なし）</td></tr>
+          <tr><td>保存期間</td><td>3年（法定）</td></tr>
+          <tr><td>廃棄方法</td><td>シュレッダー or デジタル完全消去</td></tr>
+        </table>
+      </div>
+
+      <div class="card emergency">
+        <h3>🚨 漏えい時 SOP</h3>
+        <ol style="margin-left:22px;font-size:0.84rem;line-height:1.7;">
+          <li>漏えい範囲を即特定（誰の・何件・どの項目）</li>
+          <li>該当ゲストへ72時間以内に連絡・謝罪</li>
+          <li>個人情報保護委員会へ報告（要件該当時）</li>
+          <li>原因分析 → 再発防止策</li>
+          <li><a href="#incident-log">インシデントログ</a> L3記録</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===== 💰 経費・財務 ===== -->
+    <section class="block" id="fee">
+      <h2>💰 経費・財務 <span class="ja">Finance</span></h2>
+      <div class="card">
+        <h3>📁 経費報告フォルダ</h3>
+        <p style="font-size:0.82rem;color:var(--text-light);">
+          <code>C:\Users\04kc5\Desktop\ClaudeCodePJ\神武寺民泊PJ\経費報告_2026年4月5月\</code>
+        </p>
+        <table style="margin-top:10px;">
+          <tr><th>ファイル</th><th>内容</th></tr>
+          <tr><td><code>00_経費状況報告_2026年4月16日.md</code></td><td>月次報告書</td></tr>
+          <tr><td><code>01〜05 CSV/XLSX</code></td><td>クレカ・銀行・立替・拠出</td></tr>
+          <tr><td><code>神武寺民泊_経費状況報告_v2.pptx</code></td><td>PPT共有用</td></tr>
+        </table>
+      </div>
+      <div class="card warn">
+        <h3>💸 キャッシュフロー予測</h3>
+        <table>
+          <tr><th>項目</th><th>金額</th></tr>
+          <tr><td>確定済支払予定</td><td>約¥1,500,000</td></tr>
+          <tr><td>追加拠出必要（空ちゃん）</td><td>¥1,000,000</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== 💵 税務 ===== -->
+    <section class="block" id="tax">
+      <h2>💵 税務・インボイス <span class="ja">Tax</span></h2>
+      <div class="card todo">
+        <h3>📋 税務ステータス</h3>
+        <div class="kv">
+          <div class="k">課税対象法人</div><div class="v">ブルーステージ合同会社</div>
+          <div class="k">消費税課税事業者</div><div class="v todo">⚠ 判定要</div>
+          <div class="k">インボイス登録番号</div><div class="v todo">⚠</div>
+          <div class="k">法人番号</div><div class="v todo">⚠</div>
+          <div class="k">税理士顧問</div><div class="v todo">⚠</div>
+          <div class="k">決算月</div><div class="v todo">⚠</div>
+        </div>
+      </div>
+      <div class="card info">
+        <h3>🏛 宿泊税</h3>
+        <table>
+          <tr><th>自治体</th><th>状況</th></tr>
+          <tr><td>逗子市</td><td><span class="badge good">導入予定なし</span></td></tr>
+          <tr><td>湯河原町</td><td><span class="badge warn">2026春〜</span></td></tr>
+          <tr><td>鎌倉市</td><td>検討中</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== 📊 収益KPI ===== -->
+    <section class="block" id="kpi">
+      <h2>📊 収益KPI <span class="ja">Revenue KPI</span></h2>
+      <div class="card todo">
+        <h3>⚠ 月次実績台帳（未整備）</h3>
+        <table>
+          <tr><th>指標</th><th>意味</th><th>備考</th></tr>
+          <tr><td><strong>ADR</strong></td><td>平均客室単価</td><td>シーズン別</td></tr>
+          <tr><td><strong>OCC</strong></td><td>稼働率</td><td>60%目標</td></tr>
+          <tr><td><strong>RevPAR</strong></td><td>ADR × OCC</td><td>—</td></tr>
+          <tr><td><strong>1滞在粗利</strong></td><td>売上 − 清掃 − OTA手数料 − 消耗品</td><td>Codex指摘</td></tr>
+          <tr><td><strong>修繕積立</strong></td><td>売上の5-10%確保</td><td>築59年なので多めに</td></tr>
+          <tr><td><strong>返金損失</strong></td><td>キャンセル・苦情返金合計</td><td>—</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>📈 チャネル別 手数料</h3>
+        <table>
+          <tr><th>チャネル</th><th>手数料</th><th>売上比率</th></tr>
+          <tr><td>Airbnb</td><td>3%</td><td><span class="v todo">⚠</span></td></tr>
+          <tr><td>Booking.com</td><td>15%</td><td><span class="v todo">⚠</span></td></tr>
+          <tr><td>直予約</td><td>0%</td><td>—</td></tr>
+        </table>
+      </div>
+      <div class="card warn">
+        <h3>⭐ レビュー管理</h3>
+        <div class="kv">
+          <div class="k">Airbnb スコア</div><div class="v todo">⚠ 4.8維持目標</div>
+          <div class="k">Booking スコア</div><div class="v todo">⚠</div>
+          <div class="k">返信SOP</div><div class="v">48時間以内 / 冷静 / 改善策提示</div>
+          <div class="k">スーパーホスト</div><div class="v">評価4.8+ / 評価率50%+ / 応答率90%+</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 📖 ガイド類 ===== -->
+    <section class="block" id="guides">
+      <h2>📖 ガイド・マニュアル類 <span class="ja">Guides</span></h2>
+      <div class="card good">
+        <h3>★ 最新版（公開中）</h3>
+        <table>
+          <tr><th>名称</th><th>用途</th><th>リンク</th></tr>
+          <tr><td>ハウスガイド v3</td><td>ゲスト · 17章 · 5言語</td><td><a class="link-btn guide" href="/ハウスガイド_Hilltop_Zushi_v2.html" target="_blank">開く</a></td></tr>
+          <tr><td>清掃マニュアル v2</td><td>業者 · 19章</td><td><a class="link-btn guide" href="/清掃マニュアル_Hilltop_Zushi_v2.html" target="_blank">開く</a></td></tr>
+          <tr><td>ハウスルール PPT</td><td>A4掲示用</td><td><a class="link-btn web" href="/Hilltop_Zushi_House_Rules_A4.pptx" target="_blank">DL</a></td></tr>
+          <tr><td>QRポスター</td><td>森イメージ</td><td><a class="link-btn guide" href="/signage/qr-guide-A4.html" target="_blank">開く</a></td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== 📌 掲示物 ===== -->
+    <section class="block" id="signage">
+      <h2>📌 現地掲示物（A4・5枚） <span class="ja">Signage</span></h2>
+      <div class="card">
+        <table>
+          <tr><th>#</th><th>掲示物</th><th>貼付場所</th><th>リンク</th></tr>
+          <tr><td>1</td><td>🪟 窓を開けないで</td><td>窓鍵まわり</td><td><a class="link-btn guide" href="/signage/windows-doors-A4.html" target="_blank">開く</a></td></tr>
+          <tr><td>2</td><td>⚠ 立入禁止警告</td><td>パノラマテラス</td><td><a class="link-btn guide" href="/signage/danger-warning-A4.html" target="_blank">開く</a></td></tr>
+          <tr><td>3</td><td>🚭 全館禁煙</td><td>玄関・寝室</td><td><a class="link-btn guide" href="/signage/no-smoking-A4.html" target="_blank">開く</a></td></tr>
+          <tr><td>4</td><td>🔥 BBQルール</td><td>庭BBQ</td><td><a class="link-btn guide" href="/signage/bbq-rules-A4.html" target="_blank">開く</a></td></tr>
+          <tr><td>5</td><td>🌿 自然からのお便り</td><td>サンルーム</td><td><a class="link-btn guide" href="/signage/insects-notice-A4.html" target="_blank">開く</a></td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== 👥 チーム運営 ===== -->
+    <section class="block" id="team-ops">
+      <h2>👥 チーム運営・代替要員 <span class="ja">Team Ops</span></h2>
+      <div class="card todo">
+        <h3>📋 RACI 業務分担表</h3>
+        <table>
+          <tr><th>業務</th><th>あお</th><th>空ちゃん</th></tr>
+          <tr><td>OTAメッセージ返信</td><td>R</td><td>A</td></tr>
+          <tr><td>経費管理</td><td>R</td><td>I</td></tr>
+          <tr><td>清掃業者連絡</td><td>R</td><td>I</td></tr>
+          <tr><td>定期報告（2か月毎）</td><td>R</td><td>I</td></tr>
+          <tr><td>確定申告</td><td>R</td><td>A</td></tr>
+          <tr><td>緊急時 第一対応</td><td>R</td><td>R</td></tr>
+        </table>
+      </div>
+      <div class="card emergency">
+        <h3>🆘 代替要員（今日動けるか？）</h3>
+        <table>
+          <tr><th>状況</th><th>担当</th><th>連絡経路</th></tr>
+          <tr><td>あお不在</td><td>空ちゃん</td><td>LINE / 電話</td></tr>
+          <tr><td>両者不在</td><td>黒須氏（緊急対応のみ）</td><td>090-2945-2046</td></tr>
+          <tr><td>夜間緊急</td><td>119 → 黒須氏 → あお</td><td>—</td></tr>
+        </table>
+      </div>
+      <div class="card warn">
+        <h3>📜 引継ぎ文書</h3>
+        <div class="kv">
+          <div class="k">継続運営マニュアル</div><div class="v todo">⚠ 要作成（万一の場合のため）</div>
+          <div class="k">アカウント一覧場所</div><div class="v todo">⚠ パスワード本体は別保管</div>
+          <div class="k">緊急時意思決定</div><div class="v">50万円超は両者承認</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ☁ ホスティング ===== -->
+    <section class="block" id="hosting">
+      <h2>☁ ホスティング <span class="ja">Hosting</span></h2>
+      <div class="card">
+        <div class="kv">
+          <div class="k">プロジェクト</div><div class="v"><code>hilltop-zushi</code></div>
+          <div class="k">本番URL</div><div class="v"><a href="https://hilltop-zushi.pages.dev/" target="_blank">https://hilltop-zushi.pages.dev/</a></div>
+          <div class="k">アカウント</div><div class="v">info@bluestage-lcc.com</div>
+          <div class="k">Account ID</div><div class="v"><code>9ed124d538632a4f936e77031e20c8f5</code></div>
+          <div class="k">デプロイ</div><div class="v"><code>npx wrangler pages deploy _publish --project-name=hilltop-zushi</code></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 🎨 アセット ===== -->
+    <section class="block" id="assets">
+      <h2>🎨 アセット <span class="ja">Brand Assets</span></h2>
+      <div class="card">
+        <p style="font-size:0.82rem;color:var(--text-light);"><code>神武寺民泊PJ\アイコン・ろご\</code></p>
+        <table style="margin-top:8px;">
+          <tr><th>ファイル</th><th>用途</th></tr>
+          <tr><td><code>HILLTOP_ZUSHI_wordmark_high_resolution_4x.png</code></td><td>高解像度</td></tr>
+          <tr><td><code>hilltopzushiアイコン.png</code></td><td>アイコン単体</td></tr>
+          <tr><td><code>favicon.png</code></td><td>全ページ自動適用</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== ⚠ TODO ===== -->
+    <section class="block" id="todo">
+      <h2>⚠ 要確認・TODO一覧 <span class="ja">Pending</span></h2>
+
+      <div class="card critical">
+        <h3>🚨 Critical（即対応 · 法令・安全）</h3>
+        <table>
+          <tr><th>項目</th><th>対応</th></tr>
+          <tr><td>住宅宿泊事業届出番号の確認・記録</td><td>鎌倉保健福祉事務所</td></tr>
+          <tr><td>営業形態の確定</td><td>許認可状況を確認</td></tr>
+          <tr><td>消防法令適合通知書の取得確認</td><td>逗子市消防署</td></tr>
+          <tr><td>消火器・火災警報器の位置写真・期限記録</td><td>現地撮影</td></tr>
+          <tr><td><strong>設備「止め方」写真撮影</strong>（ガス・水道・電気・給湯器）</td><td>9点 → <a href="#shutoff-map">マップ</a></td></tr>
+          <tr><td>緊急SOP（9シナリオ）の印刷・冷蔵庫掲示</td><td>本ページ #emergency-sop を印刷</td></tr>
+          <tr><td>法定標識の作成・玄関掲示</td><td>国交省様式</td></tr>
+          <tr><td>救急箱・予備キーの場所写真</td><td>現地撮影</td></tr>
+        </table>
+      </div>
+
+      <div class="card warn">
+        <h3>⚠ High（1週間以内）</h3>
+        <table>
+          <tr><th>項目</th><th>対応</th></tr>
+          <tr><td>180日カウンター 累計集計</td><td>Airbnb/Bookingカレンダー</td></tr>
+          <tr><td>2か月毎定期報告（6/15 期限・4-5月分）</td><td>minpaku電子提出</td></tr>
+          <tr><td>宿泊者名簿 運用ツール選定</td><td>Notion / freee 比較</td></tr>
+          <tr><td>火災保険の契約済プラン記録</td><td>#insurance 反映</td></tr>
+          <tr><td>OTA 2FA 有効化（Airbnb/Booking）</td><td>各アカウント</td></tr>
+          <tr><td>Tapo C660 カメラポリシー策定</td><td>設置箇所・録画期間</td></tr>
+          <tr><td>SwitchBot PIN ローテーション運用</td><td><a href="#access-log">アクセス台帳</a></td></tr>
+          <tr><td>Wi-Fi SSID/PW・ゲスト分離</td><td>ルーター設定</td></tr>
+          <tr><td>共同運営契約書の書面化</td><td>—</td></tr>
+          <tr><td>非常用備蓄の整備</td><td><a href="#disaster">災害対応</a></td></tr>
+          <tr><td>近隣自治会長 連絡先確認</td><td>—</td></tr>
+          <tr><td>近隣説明文テンプレ作成</td><td><a href="#complaint-sop">クレームSOP</a></td></tr>
+          <tr><td>BBQ消火具配置の確認・写真</td><td><a href="#bbq-sop">BBQ SOP</a></td></tr>
+          <tr><td>代替清掃業者の確保（黒須氏不在時）</td><td>—</td></tr>
+        </table>
+      </div>
+
+      <div class="card todo">
+        <h3>📋 Mid（1ヶ月以内）</h3>
+        <table>
+          <tr><th>項目</th><th>対応</th></tr>
+          <tr><td>清掃契約 署名日確認</td><td>PDF直確認</td></tr>
+          <tr><td>西崎さん・えりなちゃんの役割明文化</td><td>あおさんに確認</td></tr>
+          <tr><td>Airbnb/Booking 掲載URL記録</td><td>—</td></tr>
+          <tr><td>BBQ v4 詳細確定</td><td>xlsx読取り</td></tr>
+          <tr><td>給湯器・エアコン点検記録開始</td><td>#maintenance</td></tr>
+          <tr><td>税理士・行政書士の選定</td><td>—</td></tr>
+          <tr><td>インボイス登録判断</td><td>消費税判定込</td></tr>
+          <tr><td>ADR/OCC/RevPAR/1滞在粗利 月次台帳</td><td>Sheets or Notion</td></tr>
+          <tr><td>レビュー対応SOP明文化</td><td>48時間以内</td></tr>
+          <tr><td>苦情対応記録様式の整備</td><td>3年保管</td></tr>
+          <tr><td>インシデントログ運用ツール選定</td><td><a href="#incident-log">ログ</a></td></tr>
+          <tr><td>個人情報保管場所決定</td><td><a href="#privacy">プライバシー</a></td></tr>
+          <tr><td>継続運営マニュアル作成</td><td><a href="#team-ops">引継ぎ</a></td></tr>
+        </table>
+      </div>
+
+      <div class="card info">
+        <h3>💡 Low（運用が安定したら）</h3>
+        <table>
+          <tr><th>項目</th><th>対応</th></tr>
+          <tr><td>耐震診断（旧耐震対応）</td><td>逗子市補助制度確認</td></tr>
+          <tr><td>freee連携</td><td>MCP接続後</td></tr>
+          <tr><td>Cloudflare Access 昇格</td><td>本ダッシュボードのセキュリティ強化</td></tr>
+          <tr><td>SNS運用（IG/TikTok）</td><td>—</td></tr>
+          <tr><td>楽天Vacation / Google Vacation</td><td>Phase 4</td></tr>
+          <tr><td>マンスリー賃貸</td><td>Phase 4</td></tr>
+          <tr><td>プロカメラマン撮影</td><td>¥5〜10万</td></tr>
+          <tr><td>動的価格設定（PriceLabs）</td><td>稼働率データ蓄積後</td></tr>
+          <tr><td>シロアリ予防</td><td>湿気STEP4連動</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- 📜 改訂履歴 -->
+    <section class="block" id="changelog" style="opacity:0.75;font-size:0.82rem;">
+      <h2 style="font-size:1.1rem;">📜 改訂履歴</h2>
+      <ul style="padding-left:20px;">
+        <li><strong>2026-05-26 v3</strong> — Codex セカンドオピニオン反映: 「今日の運用」トップ画面 + 新規10セクション（設備止め方マップ / 災害対応 / ゲスト本人確認 / 近隣クレームSOP / BBQ安全SOP / インシデントログ / 鍵アクセス台帳 / 個人情報運用 / 在庫パー / 救急病院統合）+ 既存セクション改善（誰が・何分以内・通話台本）</li>
+        <li><strong>2026-05-26 v2</strong> — ClaudeCodeAgentTeam 3並列で Critical 8項目発掘 / 21セクション</li>
+        <li><strong>2026-05-26 v1</strong> — 初版 14セクション</li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<footer class="dash-footer">
+  HILLTOP ZUSHI · Internal Dashboard v3 · Updated 2026-05-26 · DO NOT SHARE EXTERNALLY
+</footer>
+
+<script>
+// ==== PIN認証 ====
+function unlock() {
+  const v = document.getElementById('pin').value.trim();
+  if (v === '0311' || v === 'hilltop0311' || v === '20260526') {
+    document.getElementById('lock').classList.add('hidden');
+    sessionStorage.setItem('hilltopIntra', '1');
+    document.getElementById('err').textContent = '';
+    loadToday();
+  } else {
+    document.getElementById('err').textContent = 'PINが違います / Invalid PIN';
+    document.getElementById('pin').value = '';
+  }
+}
+if (sessionStorage.getItem('hilltopIntra') === '1') {
+  document.getElementById('lock').classList.add('hidden');
+  setTimeout(loadToday, 100);
+}
+document.getElementById('pin').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') unlock();
+});
+document.getElementById('pin').focus();
+
+// ==== Today's Ops 一時保存 ====
+const TODAY_FIELDS = ['t-checkin','t-checkout','t-unread','t-cleaning','t-incident','t-risk'];
+function saveToday() {
+  const d = new Date().toISOString().slice(0,10);
+  const data = { date: d };
+  TODAY_FIELDS.forEach(f => {
+    const el = document.getElementById(f);
+    if (el) data[f] = el.value;
+  });
+  sessionStorage.setItem('hilltopToday', JSON.stringify(data));
+  alert('💾 保存しました（タブを閉じるまで有効）');
+}
+function loadToday() {
+  const raw = sessionStorage.getItem('hilltopToday');
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    TODAY_FIELDS.forEach(f => {
+      const el = document.getElementById(f);
+      if (el && data[f]) el.value = data[f];
+    });
+  } catch(e) {}
+}
+function clearToday() {
+  if (!confirm('Today\'s Ops の入力内容をクリアしますか？')) return;
+  sessionStorage.removeItem('hilltopToday');
+  TODAY_FIELDS.forEach(f => {
+    const el = document.getElementById(f);
+    if (el) el.value = '';
+  });
+}
+
+// サイドバー閉じる（モバイル）
+document.querySelectorAll('.sidebar a').forEach(a => {
+  a.addEventListener('click', () => {
+    if (window.innerWidth <= 880) {
+      document.querySelector('.sidebar').classList.remove('open');
+    }
+  });
+});
+
+// アクティブハイライト
+const sections = document.querySelectorAll('section.block');
+const links = document.querySelectorAll('.sidebar a[href^="#"]');
+function updateActive() {
+  let cur = '';
+  const y = window.scrollY + 80;
+  sections.forEach(s => { if (s.offsetTop <= y) cur = s.id; });
+  links.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+  });
+}
+window.addEventListener('scroll', updateActive);
+updateActive();
+</script>
+
+</body>
+</html>

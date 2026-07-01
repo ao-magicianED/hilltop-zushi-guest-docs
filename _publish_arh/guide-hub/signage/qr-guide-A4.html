@@ -1,0 +1,501 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>House Guide QR · ハウスガイド — Hilltop Zushi</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F3A34;
+    --primary-deep: #14271F;
+    --primary-mid: #2B4A3F;
+    --accent: #C9A56D;
+    --accent-light: #D4B87A;
+    --accent-deep: #A8854B;
+    --bg: #F5F3F0;
+    --bg-soft: #FAF8F4;
+    --leaf: #6B9080;
+    --text: #2C2C2C;
+    --jp-font: 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    --serif-font: 'Cormorant Garamond', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: A4 portrait; margin: 0; }
+  html, body { background: #888; }
+  body {
+    font-family: var(--jp-font);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+  }
+
+  /* ===== A4 シート ===== */
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(107,144,128,0.12) 0%, transparent 38%),
+      radial-gradient(circle at 82% 88%, rgba(201,165,109,0.15) 0%, transparent 42%),
+      linear-gradient(135deg, #FAF8F4 0%, #F5F3F0 60%, #ECE7DA 100%);
+    position: relative;
+    box-shadow: 0 8px 50px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 14mm 14mm 16mm;
+  }
+
+  /* ===== 装飾フレーム ===== */
+  .frame {
+    position: absolute;
+    top: 8mm; left: 8mm; right: 8mm; bottom: 8mm;
+    border: 1px solid rgba(201,165,109,0.5);
+    pointer-events: none;
+  }
+  .frame::before, .frame::after {
+    content: '';
+    position: absolute;
+    inset: 2mm;
+    border: 1px solid rgba(31,58,52,0.18);
+  }
+  .corner {
+    position: absolute;
+    width: 26px; height: 26px;
+    border: 2.5px solid var(--accent);
+    pointer-events: none;
+  }
+  .corner.tl { top: 7mm; left: 7mm; border-right: none; border-bottom: none; }
+  .corner.tr { top: 7mm; right: 7mm; border-left: none; border-bottom: none; }
+  .corner.bl { bottom: 7mm; left: 7mm; border-right: none; border-top: none; }
+  .corner.br { bottom: 7mm; right: 7mm; border-left: none; border-top: none; }
+
+  /* ===== 森の装飾 SVG ===== */
+  .forest-deco {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.18;
+  }
+  .forest-deco.top-left {
+    top: 16mm;
+    left: 14mm;
+    width: 50mm;
+    transform: rotate(-8deg);
+  }
+  .forest-deco.top-right {
+    top: 14mm;
+    right: 14mm;
+    width: 48mm;
+    transform: scaleX(-1) rotate(-8deg);
+  }
+  .forest-deco.bottom-left {
+    bottom: 28mm;
+    left: 10mm;
+    width: 42mm;
+    transform: scaleY(-1) rotate(8deg);
+  }
+  .forest-deco.bottom-right {
+    bottom: 30mm;
+    right: 10mm;
+    width: 44mm;
+    transform: scale(-1, -1) rotate(8deg);
+  }
+  .leaf-deco {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.22;
+  }
+  .leaf-deco.l1 { top: 60mm; left: 18mm; width: 18mm; transform: rotate(-20deg); }
+  .leaf-deco.l2 { top: 72mm; right: 20mm; width: 16mm; transform: rotate(40deg) scaleX(-1); }
+  .leaf-deco.l3 { bottom: 80mm; left: 22mm; width: 14mm; transform: rotate(60deg); }
+  .leaf-deco.l4 { bottom: 70mm; right: 18mm; width: 18mm; transform: rotate(-40deg) scaleX(-1); }
+
+  /* ===== コンテンツ ===== */
+  .content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* ヘッダー */
+  .brand-header {
+    text-align: center;
+    padding-top: 4mm;
+    margin-bottom: 6mm;
+  }
+  .brand-mark {
+    display: inline-block;
+    color: var(--leaf);
+    font-size: 1.2rem;
+    letter-spacing: 0.3em;
+    margin-bottom: 4mm;
+  }
+  .brand-mark::before, .brand-mark::after {
+    content: '';
+    display: inline-block;
+    width: 14mm;
+    height: 1px;
+    background: var(--accent);
+    vertical-align: middle;
+    margin: 0 6mm;
+  }
+  .brand-name {
+    font-family: var(--serif-font);
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.22em;
+    line-height: 1;
+    margin-bottom: 2mm;
+  }
+  .brand-sub {
+    font-family: var(--serif-font);
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--accent-deep);
+    letter-spacing: 0.08em;
+  }
+
+  /* タイトル */
+  .title-block {
+    text-align: center;
+    margin-bottom: 5mm;
+  }
+  .title-en {
+    font-family: var(--serif-font);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.12em;
+    line-height: 1.1;
+  }
+  .title-jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--accent-deep);
+    letter-spacing: 0.32em;
+    margin-top: 3mm;
+  }
+
+  /* QRコード（中央・大型） */
+  .qr-section {
+    text-align: center;
+    margin: 2mm 0 4mm;
+  }
+  .qr-frame {
+    display: inline-block;
+    background: #fff;
+    padding: 6mm;
+    border-radius: 4mm;
+    box-shadow:
+      0 10px 40px rgba(31,58,52,0.18),
+      0 0 0 1px var(--accent),
+      0 0 0 8px rgba(255,255,255,0.6),
+      0 0 0 9px var(--accent);
+    position: relative;
+  }
+  .qr-frame::before, .qr-frame::after {
+    content: '';
+    position: absolute;
+    width: 18mm;
+    height: 18mm;
+    border: 2px solid var(--accent);
+    opacity: 0.65;
+  }
+  .qr-frame::before {
+    top: -4mm;
+    left: -4mm;
+    border-right: none;
+    border-bottom: none;
+  }
+  .qr-frame::after {
+    bottom: -4mm;
+    right: -4mm;
+    border-left: none;
+    border-top: none;
+  }
+  .qr-image {
+    display: block;
+    width: 78mm;
+    height: 78mm;
+    object-fit: contain;
+  }
+  .qr-label {
+    margin-top: 5mm;
+    font-family: var(--jp-font);
+    font-size: 0.78rem;
+    color: var(--leaf);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .qr-label::before, .qr-label::after {
+    content: '✦';
+    color: var(--accent);
+    margin: 0 8mm;
+    font-size: 0.8rem;
+  }
+
+  /* 案内テキスト */
+  .invitation {
+    text-align: center;
+    margin: 2mm 0 4mm;
+    padding: 0 6mm;
+  }
+  .invitation .lead-jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.92rem;
+    color: var(--primary);
+    line-height: 1.85;
+    font-weight: 500;
+    margin-bottom: 2mm;
+  }
+  .invitation .lead-en {
+    font-family: var(--serif-font);
+    font-style: italic;
+    font-size: 0.78rem;
+    color: var(--leaf);
+    line-height: 1.7;
+  }
+  .invitation .multi {
+    margin-top: 2.5mm;
+    font-size: 0.68rem;
+    color: var(--accent-deep);
+    line-height: 1.7;
+  }
+
+  /* おもてなし締めの言葉（最重要・装飾） */
+  .closing {
+    text-align: center;
+    margin-top: auto;
+    padding: 5mm 8mm 3mm;
+    position: relative;
+  }
+  .closing::before {
+    content: '';
+    display: block;
+    width: 30mm;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--accent), transparent);
+    margin: 0 auto 5mm;
+  }
+  .closing .ornament {
+    color: var(--leaf);
+    font-size: 1rem;
+    letter-spacing: 0.4em;
+    margin-bottom: 3mm;
+    opacity: 0.85;
+  }
+  .closing .message-jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--primary);
+    line-height: 2;
+    letter-spacing: 0.06em;
+    margin-bottom: 3mm;
+  }
+  .closing .message-en {
+    font-family: var(--serif-font);
+    font-style: italic;
+    font-size: 0.82rem;
+    color: var(--accent-deep);
+    line-height: 1.7;
+    letter-spacing: 0.04em;
+  }
+
+  /* フッター */
+  .foot {
+    text-align: center;
+    padding-top: 4mm;
+    border-top: 1px dashed rgba(31,58,52,0.18);
+  }
+  .foot .signature {
+    font-family: var(--serif-font);
+    font-style: italic;
+    font-size: 0.95rem;
+    color: var(--primary);
+    margin-bottom: 1.5mm;
+  }
+  .foot .signature .ja {
+    font-family: 'Noto Serif JP', serif;
+    font-style: normal;
+    font-weight: 500;
+    margin-left: 4mm;
+  }
+  .foot .meta {
+    font-size: 0.6rem;
+    color: var(--leaf);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  /* 印刷 */
+  @media print {
+    html, body { background: #fff; overflow: hidden; }
+    html { -ms-overflow-style: none; scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+    body { padding: 0; }
+    .sheet { box-shadow: none; page-break-after: avoid; }
+  }
+
+  /* スマホ最適化 */
+  @media (max-width: 880px) {
+    html, body { margin: 0; padding: 0; background: #fff; overflow-x: hidden; overflow-y: auto; }
+    body { display: block; min-height: 0; height: calc(100vw * 1123 / 794); }
+    .sheet { transform: scale(calc(100vw / 794px)); transform-origin: top left; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <!-- 装飾フレーム -->
+  <div class="frame"></div>
+  <span class="corner tl"></span>
+  <span class="corner tr"></span>
+  <span class="corner bl"></span>
+  <span class="corner br"></span>
+
+  <!-- 森の装飾SVG（4隅） -->
+  <svg class="forest-deco top-left" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#1F3A34">
+      <path d="M40 180 L70 80 L100 180 Z" opacity="0.65"/>
+      <path d="M30 180 L55 120 L80 180 Z" opacity="0.5"/>
+      <path d="M85 180 L115 90 L145 180 Z" opacity="0.7"/>
+      <path d="M135 180 L160 110 L185 180 Z" opacity="0.55"/>
+      <circle cx="70" cy="80" r="3"/>
+      <circle cx="115" cy="90" r="3"/>
+      <circle cx="160" cy="110" r="3"/>
+    </g>
+    <g stroke="#1F3A34" stroke-width="1.5" fill="none" opacity="0.6">
+      <path d="M20 60 Q30 30 60 25 Q90 22 110 50"/>
+      <path d="M40 50 Q50 40 60 45"/>
+      <path d="M70 30 Q80 25 90 35"/>
+    </g>
+  </svg>
+
+  <svg class="forest-deco top-right" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#1F3A34">
+      <path d="M40 180 L70 80 L100 180 Z" opacity="0.65"/>
+      <path d="M30 180 L55 120 L80 180 Z" opacity="0.5"/>
+      <path d="M85 180 L115 90 L145 180 Z" opacity="0.7"/>
+      <path d="M135 180 L160 110 L185 180 Z" opacity="0.55"/>
+      <circle cx="70" cy="80" r="3"/>
+      <circle cx="115" cy="90" r="3"/>
+      <circle cx="160" cy="110" r="3"/>
+    </g>
+  </svg>
+
+  <svg class="forest-deco bottom-left" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#1F3A34">
+      <path d="M30 180 L60 100 L90 180 Z" opacity="0.5"/>
+      <path d="M85 180 L115 70 L145 180 Z" opacity="0.7"/>
+      <path d="M135 180 L160 110 L185 180 Z" opacity="0.55"/>
+    </g>
+    <g fill="#6B9080" opacity="0.6">
+      <ellipse cx="50" cy="160" rx="20" ry="8"/>
+      <ellipse cx="120" cy="170" rx="30" ry="6"/>
+    </g>
+  </svg>
+
+  <svg class="forest-deco bottom-right" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#1F3A34">
+      <path d="M30 180 L60 100 L90 180 Z" opacity="0.5"/>
+      <path d="M85 180 L115 70 L145 180 Z" opacity="0.7"/>
+      <path d="M135 180 L160 110 L185 180 Z" opacity="0.55"/>
+    </g>
+    <g fill="#6B9080" opacity="0.6">
+      <ellipse cx="50" cy="160" rx="20" ry="8"/>
+      <ellipse cx="120" cy="170" rx="30" ry="6"/>
+    </g>
+  </svg>
+
+  <!-- 葉っぱ装飾（散らし） -->
+  <svg class="leaf-deco l1" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M50 10 Q20 30 30 70 Q50 90 70 70 Q80 30 50 10 Z" fill="#6B9080" opacity="0.7"/>
+    <path d="M50 15 L50 85" stroke="#1F3A34" stroke-width="1.5" opacity="0.5"/>
+  </svg>
+  <svg class="leaf-deco l2" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M50 10 Q20 30 30 70 Q50 90 70 70 Q80 30 50 10 Z" fill="#C9A56D" opacity="0.5"/>
+    <path d="M50 15 L50 85" stroke="#A8854B" stroke-width="1.5" opacity="0.5"/>
+  </svg>
+  <svg class="leaf-deco l3" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M50 10 Q20 30 30 70 Q50 90 70 70 Q80 30 50 10 Z" fill="#6B9080" opacity="0.6"/>
+  </svg>
+  <svg class="leaf-deco l4" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <path d="M50 10 Q20 30 30 70 Q50 90 70 70 Q80 30 50 10 Z" fill="#C9A56D" opacity="0.5"/>
+  </svg>
+
+  <!-- メインコンテンツ -->
+  <div class="content">
+
+    <header class="brand-header">
+      <div class="brand-mark">✦ HIDDEN IN THE FOREST ✦</div>
+      <div class="brand-name">HILLTOP ZUSHI</div>
+      <div class="brand-sub">A Hidden Forest Retreat in Zushi</div>
+    </header>
+
+    <div class="title-block">
+      <div class="title-en">House Guide</div>
+      <div class="title-jp">ハウスガイド</div>
+    </div>
+
+    <!-- 中央 大型 QR -->
+    <section class="qr-section">
+      <div class="qr-frame">
+        <img src="assets/qr-house-guide.png" alt="House Guide QR Code" class="qr-image">
+      </div>
+      <div class="qr-label">Scan to Read · スキャンしてご覧ください</div>
+    </section>
+
+    <!-- 案内テキスト -->
+    <section class="invitation">
+      <div class="lead-jp">こちらのQRコードを読み取っていただくと、<br>ご滞在に必要な情報がすべてご覧いただけます。</div>
+      <div class="lead-en">Scan this QR code to access the complete House Guide.<br>Everything you need to know is right there.</div>
+      <div class="multi">
+        扫一扫即可查看完整指南 ・ QR코드를 스캔하여 가이드를 확인하세요 ・ Scannez pour le guide
+      </div>
+    </section>
+
+    <!-- 締め・おもてなしメッセージ -->
+    <section class="closing">
+      <div class="ornament">✦ ✦ ✦</div>
+      <div class="message-jp">
+        森の風と木漏れ日に包まれて、<br>
+        皆さまの心が安らぐひとときと<br>
+        なりますように。
+      </div>
+      <div class="message-en">
+        May the whispers of the forest<br>
+        and the gentle breeze bring peace<br>
+        to your stay with us.
+      </div>
+    </section>
+
+    <!-- フッター -->
+    <footer class="foot">
+      <div class="signature">
+        With warmth, <span class="ja">心を込めて</span>
+      </div>
+      <div class="meta">HILLTOP ZUSHI · Zushi, Kanagawa</div>
+    </footer>
+
+  </div>
+</div>
+
+</body>
+</html>

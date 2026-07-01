@@ -1,0 +1,334 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>No Smoking — Hilltop Zushi</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F3A34;
+    --accent: #C9A56D;
+    --bg: #F5F3F0;
+    --bg-soft: #FAF8F4;
+    --text: #2C2C2C;
+    --danger: #B94A48;
+    --danger-deep: #8E2C2A;
+    --neutral: #6B6B6B;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  html, body { background: #888; }
+  body {
+    font-family: 'Inter', 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    background: var(--bg);
+    position: relative;
+    padding: 16mm 14mm;
+    box-shadow: 0 8px 50px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* 装飾コーナー */
+  .frame {
+    position: absolute;
+    top: 8mm; left: 8mm; right: 8mm; bottom: 8mm;
+    border: 1px solid rgba(201,165,109,0.55);
+    pointer-events: none;
+  }
+  .frame .corner {
+    position: absolute;
+    width: 18px; height: 18px;
+    border: 2px solid var(--accent);
+  }
+  .frame .corner.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .frame .corner.tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+  .frame .corner.bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+  .frame .corner.br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  /* ブランドヘッダー */
+  .brand {
+    text-align: center;
+    margin-top: 2mm;
+    margin-bottom: 8mm;
+  }
+  .brand .brand-text {
+    font-family: 'Cormorant Garamond', 'Hiragino Mincho ProN', serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.22em;
+    margin: 0 0 2mm;
+    line-height: 1;
+  }
+  .brand .tagline {
+    font-size: 0.62rem;
+    color: var(--neutral);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+
+  /* メイン */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* 禁煙アイコン部分 */
+  .icon-stack {
+    margin-bottom: 6mm;
+    position: relative;
+  }
+  .icon-circle {
+    width: 70mm;
+    height: 70mm;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--danger) 0%, var(--danger-deep) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 14px 36px rgba(185,74,72,0.35),
+      inset 0 0 0 4px rgba(255,255,255,0.18);
+    position: relative;
+  }
+  .icon-circle::after {
+    content: '';
+    position: absolute;
+    inset: 5mm;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.4);
+  }
+  .icon-circle .symbol {
+    font-size: 8rem;
+    line-height: 1;
+    color: #fff;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.35));
+    z-index: 2;
+  }
+
+  /* 4言語タイトル */
+  .titles {
+    margin-bottom: 9mm;
+  }
+  .titles .jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2.7rem;
+    font-weight: 700;
+    color: var(--danger);
+    letter-spacing: 0.14em;
+    line-height: 1.05;
+  }
+  .titles .en {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--danger);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-top: 4mm;
+  }
+  .titles .multi {
+    display: flex;
+    justify-content: center;
+    gap: 9mm;
+    margin-top: 4mm;
+  }
+  .titles .multi .item {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--danger-deep);
+    letter-spacing: 0.18em;
+  }
+  .titles .multi .item.zh { font-family: 'Noto Sans SC', sans-serif; }
+  .titles .multi .item.ko { font-family: 'Noto Sans KR', sans-serif; }
+  .titles .multi .divider {
+    width: 1px;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  /* 補足カード */
+  .notes {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5mm;
+    margin-top: auto;
+  }
+  .note-card {
+    background: #fff;
+    border-radius: 3mm;
+    padding: 5mm 5mm 4mm;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border-left: 3px solid var(--accent);
+  }
+  .note-card.danger {
+    border-left-color: var(--danger);
+    background: #FFFAF9;
+  }
+  .note-card .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 3mm;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .note-card.danger .label { color: var(--danger); }
+  .note-card .row {
+    font-size: 0.74rem;
+    line-height: 1.55;
+    margin-bottom: 1.5mm;
+  }
+  .note-card .row.jp {
+    font-family: 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    font-weight: 500;
+    color: var(--text);
+    font-size: 0.78rem;
+  }
+  .note-card .row.en {
+    font-family: 'Inter', sans-serif;
+    color: var(--neutral);
+    font-style: italic;
+  }
+  .note-card .row.zh {
+    font-family: 'Noto Sans SC', sans-serif;
+    color: var(--neutral);
+  }
+  .note-card .row.ko {
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--neutral);
+  }
+
+  /* フッター */
+  .foot {
+    margin-top: 6mm;
+    text-align: center;
+    font-size: 0.62rem;
+    color: var(--neutral);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .foot .ja {
+    text-transform: none;
+    letter-spacing: 0.1em;
+    font-family: 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    margin-top: 2px;
+    font-size: 0.65rem;
+  }
+
+  /* 印刷時 */
+  /* スマホ最適化: A4を画面幅にフィット */
+  @media (max-width: 880px) {
+    html, body { margin: 0; padding: 0; background: #fff; overflow-x: hidden; overflow-y: auto; }
+    body {
+      display: block;
+      min-height: 0;
+      height: calc(100vw * 1123 / 794);
+    }
+    .sheet {
+      transform: scale(calc(100vw / 794px));
+      transform-origin: top left;
+      box-shadow: none;
+    }
+  }
+
+  @media print {
+    html, body { background: #fff; overflow: hidden; }
+    html { -ms-overflow-style: none; scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+    body { padding: 0; }
+    .sheet {
+      box-shadow: none;
+      page-break-after: avoid;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="frame">
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+    </div>
+
+    <header class="brand">
+      <div class="brand-text">HILLTOP ZUSHI</div>
+      <div class="tagline">House Rule · Important Notice</div>
+    </header>
+
+    <main class="main">
+      <div class="icon-stack">
+        <div class="icon-circle">
+          <span class="symbol">🚭</span>
+        </div>
+      </div>
+
+      <div class="titles">
+        <div class="jp">全館禁煙</div>
+        <div class="en">No Smoking Indoors</div>
+        <div class="multi">
+          <div class="item zh">全屋禁烟</div>
+          <div class="divider"></div>
+          <div class="item ko">전관 금연</div>
+        </div>
+      </div>
+
+      <div class="notes">
+        <div class="note-card">
+          <div class="label">🌿 Outdoor OK · 屋外は喫煙可</div>
+          <div class="row jp">プライベートガーデン・パノラマテラスでの喫煙は可能です。備え付けの灰皿をご利用ください。</div>
+          <div class="row en">Smoking is allowed in Private Garden &amp; Panorama Terrace. Please use the provided ashtrays.</div>
+          <div class="row zh">私人花园和全景露台允许吸烟。请使用配备的烟灰缸。</div>
+          <div class="row ko">프라이빗 가든・파노라마 테라스에서 흡연 가능합니다. 비치된 재떨이를 이용해 주세요.</div>
+        </div>
+        <div class="note-card danger">
+          <div class="label">⚠ If Violated · 違反時</div>
+          <div class="row jp">室内での喫煙が確認された場合、実際に発生した特殊清掃・消臭・休業相当の実費を請求する場合があります。</div>
+          <div class="row en">If indoor smoking is confirmed, the actual costs of specialist cleaning, deodorization, and lost-business equivalent may be charged.</div>
+          <div class="row zh">如确认室内吸烟，将按实际发生的特殊清洁、除臭、停业相当费用收取实费。</div>
+          <div class="row ko">실내 흡연이 확인된 경우, 실제 발생한 특수 청소・탈취・휴업 상당 비용을 실비로 청구할 수 있습니다.</div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="foot">
+      Thank you for your understanding
+      <div class="ja">ご協力ありがとうございます · Thank you · 谢谢配合 · 협조해 주셔서 감사합니다</div>
+    </footer>
+  </div>
+</body>
+</html>

@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hilltop Zushi — A Forest Retreat Above the Sea</title>
+<meta name="description" content="Hilltop Zushi: a spacious hilltop retreat in Zushi, Kanagawa. Up to 12 guests, 5 bedrooms, BBQ terrace, a 3-minute walk from Jimmuji Station (Keikyu Line).">
+<link rel="canonical" href="https://hilltop-zushi-arh.pages.dev/">
+<meta name="theme-color" content="#1F3A34">
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hilltop Zushi">
+<meta property="og:title" content="Hilltop Zushi — 海を望む、森の隠れ家｜逗子の一棟貸し">
+<meta property="og:description" content="逗子・神武寺駅から徒歩3分。最大12名・5寝室・BBQテラスの一棟貸し。公式サイト限定の直予約特典あり。">
+<meta property="og:url" content="https://hilltop-zushi-arh.pages.dev/">
+<meta property="og:image" content="https://hilltop-zushi-arh.pages.dev/images/ph-hero-living-garden.jpg">
+<meta property="og:image:alt" content="Hilltop Zushi — リビングから庭を望む">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:locale:alternate" content="en_US">
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Hilltop Zushi — 海を望む、森の隠れ家">
+<meta name="twitter:description" content="逗子・神武寺駅 徒歩3分。最大12名・5寝室・BBQテラスの一棟貸し。">
+<meta name="twitter:image" content="https://hilltop-zushi-arh.pages.dev/images/ph-hero-living-garden.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET & BASE ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#1F3A34;--secondary:#D4C5B0;--bg:#F5F3F0;--accent:#C9A56D;--text:#2C2C2C;
+  --font-heading:'Cormorant Garamond','Noto Serif JP',serif;
+  --font-body:'Inter','Noto Sans JP',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--text);background:var(--bg);line-height:1.7;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+h1,h2,h3{font-family:var(--font-heading);font-weight:600;line-height:1.3}
+.section-title{font-size:clamp(1.8rem,4vw,2.8rem);text-align:center;margin-bottom:.5em;color:var(--primary)}
+.section-subtitle{text-align:center;max-width:700px;margin:0 auto 2.5em;color:#666;font-size:.95rem}
+
+/* ===== ANIMATIONS ===== */
+.fade-in{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+/* ===== HEADER ===== */
+header{position:fixed;top:0;left:0;width:100%;z-index:1000;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;transition:background .3s,box-shadow .3s}
+header.scrolled{background:rgba(31,58,52,.97);box-shadow:0 2px 20px rgba(0,0,0,.15)}
+.logo{font-family:var(--font-heading);font-size:1.5rem;font-weight:700;color:#fff;letter-spacing:.05em}
+nav{display:flex;align-items:center;gap:1.5rem}
+nav a{color:rgba(255,255,255,.85);font-size:.85rem;font-weight:500;letter-spacing:.03em;transition:color .2s}
+nav a:hover{color:var(--accent)}
+.lang-select{background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff;padding:.3rem .5rem;border-radius:4px;font-size:.8rem;cursor:pointer}
+.lang-select option{color:#333;background:#fff}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:5px}
+.hamburger span{width:24px;height:2px;background:#fff;transition:transform .3s,opacity .3s}
+.hamburger.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px)}
+.hamburger.active span:nth-child(2){opacity:0}
+.hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px)}
+
+@media(max-width:768px){
+  nav{position:fixed;top:0;right:-100%;width:70%;height:100vh;background:var(--primary);flex-direction:column;justify-content:center;gap:2rem;transition:right .3s}
+  nav.open{right:0}
+  nav a{font-size:1.1rem}
+  .hamburger{display:flex}
+  .lang-select{position:absolute;bottom:2rem}
+}
+
+/* ===== HERO ===== */
+.hero{position:relative;height:100vh;overflow:hidden}
+.hero-slides{position:relative;width:100%;height:100%}
+.hero-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.2s ease}
+.hero-slide.active{opacity:1}
+.hero-slide img{width:100%;height:100%;object-fit:cover}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(31,58,52,.3) 0%,rgba(31,58,52,.6) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem}
+.hero-overlay h1{font-size:clamp(2.5rem,7vw,5rem);color:#fff;letter-spacing:.08em;margin-bottom:.2em;text-shadow:0 2px 30px rgba(0,0,0,.3)}
+.hero-overlay p{font-size:clamp(1rem,2.5vw,1.4rem);color:rgba(255,255,255,.9);font-family:var(--font-heading);font-style:italic;margin-bottom:2rem;letter-spacing:.05em}
+.hero-cta{display:inline-block;padding:.9rem 2.5rem;background:var(--accent);color:#fff;font-weight:600;font-size:1rem;border-radius:2px;letter-spacing:.05em;transition:background .3s,transform .2s}
+.hero-cta:hover{background:#b8944f;transform:translateY(-2px)}
+.hero-dots{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:10}
+.hero-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer;transition:background .3s,transform .3s}
+.hero-dot.active{background:#fff;transform:scale(1.3)}
+
+/* ===== ABOUT ===== */
+.about{padding:6rem 2rem;max-width:1100px;margin:0 auto}
+.about-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-top:2rem}
+.about-card{text-align:center;padding:2rem 1rem;background:#fff;border-radius:8px;box-shadow:0 2px 15px rgba(0,0,0,.05);transition:transform .3s,box-shadow .3s}
+.about-card:hover{transform:translateY(-5px);box-shadow:0 8px 25px rgba(0,0,0,.1)}
+.about-card .icon{font-size:2.5rem;margin-bottom:.7rem}
+.about-card h3{font-size:1rem;color:var(--primary);margin-bottom:.3rem}
+@media(max-width:600px){.about-cards{grid-template-columns:repeat(2,1fr)}}
+
+/* ===== GALLERY ===== */
+.gallery{padding:6rem 2rem;background:#fff}
+.gallery-inner{max-width:1200px;margin:0 auto}
+.gallery-filters{display:flex;justify-content:center;gap:.6rem;flex-wrap:wrap;margin-bottom:2rem}
+.gallery-filters button{padding:.5rem 1.2rem;border:1px solid var(--secondary);background:transparent;color:var(--text);font-family:var(--font-body);font-size:.85rem;cursor:pointer;border-radius:2px;transition:all .2s}
+.gallery-filters button.active,.gallery-filters button:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.gallery-item{overflow:hidden;border-radius:4px;cursor:pointer;position:relative;aspect-ratio:4/3}
+.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
+.gallery-item:hover img{transform:scale(1.05)}
+.gallery-item.hidden{display:none}
+
+/* ===== LIGHTBOX ===== */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;align-items:center;justify-content:center}
+.lightbox.open{display:flex}
+.lightbox img{max-width:90vw;max-height:85vh;object-fit:contain;border-radius:4px}
+.lightbox-close{position:absolute;top:1.5rem;right:2rem;color:#fff;font-size:2rem;cursor:pointer;z-index:10;width:40px;height:40px;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.lightbox-close:hover{transform:scale(1.2)}
+.lightbox-nav{position:absolute;top:50%;transform:translateY(-50%);color:#fff;font-size:2.5rem;cursor:pointer;padding:1rem;transition:opacity .2s}
+.lightbox-nav:hover{opacity:.7}
+.lightbox-prev{left:1rem}
+.lightbox-next{right:1rem}
+
+/* ===== AMENITIES ===== */
+.amenities{padding:6rem 2rem;max-width:1100px;margin:0 auto}
+.amenities-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem}
+.amenity-card{display:flex;align-items:center;gap:1rem;padding:1.2rem 1.5rem;background:#fff;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.04);transition:transform .2s}
+.amenity-card:hover{transform:translateY(-3px)}
+.amenity-card .icon{font-size:1.8rem;flex-shrink:0}
+.amenity-card span{font-size:.9rem;font-weight:500}
+@media(max-width:768px){.amenities-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.amenities-grid{grid-template-columns:1fr}}
+
+/* ===== LOCATION ===== */
+.location{padding:6rem 2rem;background:#fff}
+.location-inner{max-width:1100px;margin:0 auto}
+.location-content{display:grid;grid-template-columns:1fr 1fr;gap:3rem;margin-top:2rem}
+.location-map{border-radius:8px;overflow:hidden;min-height:350px}
+.location-map iframe{width:100%;height:100%;border:0}
+.location-info{display:flex;flex-direction:column;gap:1.5rem}
+.access-item{display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--bg);border-radius:8px}
+.access-item .icon{font-size:1.5rem}
+.access-item span{font-size:.9rem}
+.nearby-spots{margin-top:1rem}
+.nearby-spots h3{font-size:1.1rem;color:var(--primary);margin-bottom:.8rem}
+.nearby-spots ul{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.nearby-spots li{padding-left:1.2rem;position:relative;font-size:.9rem}
+.nearby-spots li::before{content:"";position:absolute;left:0;top:.55em;width:6px;height:6px;background:var(--accent);border-radius:50%}
+@media(max-width:768px){.location-content{grid-template-columns:1fr}}
+
+/* ===== BOOK NOW ===== */
+.book{padding:6rem 2rem;background:var(--primary);color:#fff;text-align:center}
+.book .section-title{color:#fff}
+.book p{color:rgba(255,255,255,.8);max-width:600px;margin:0 auto 2rem;font-size:.95rem}
+.book-buttons{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap}
+.book-btn{padding:.9rem 2.2rem;border-radius:2px;font-weight:600;font-size:.95rem;transition:all .3s;display:inline-block}
+.book-btn.primary{background:var(--accent);color:#fff}
+.book-btn.primary:hover{background:#b8944f}
+.book-btn.secondary{background:transparent;border:2px solid rgba(255,255,255,.5);color:#fff}
+.book-btn.secondary:hover{border-color:#fff;background:rgba(255,255,255,.1)}
+.book-contact{margin-top:1.5rem}
+.book-contact a{color:var(--accent);font-weight:500;transition:color .2s}
+.book-contact a:hover{color:#e0bf7a}
+
+/* ===== FOOTER ===== */
+footer{padding:3rem 2rem;background:#1a302b;color:rgba(255,255,255,.6);text-align:center;font-size:.85rem}
+footer .footer-inner{max-width:800px;margin:0 auto}
+footer .footer-brand{font-family:var(--font-heading);font-size:1.3rem;color:#fff;margin-bottom:.5rem}
+footer .footer-social{display:flex;justify-content:center;gap:1.5rem;margin:1rem 0}
+footer .footer-social a{color:rgba(255,255,255,.5);font-size:1.2rem;transition:color .2s}
+footer .footer-social a:hover{color:var(--accent)}
+
+/* ===== STICKY FLOATING CTA ===== */
+.sticky-cta{position:fixed;right:1.6rem;bottom:1.6rem;z-index:999;opacity:0;visibility:hidden;transform:translateY(18px);transition:opacity .35s ease,transform .35s ease,visibility .35s}
+.sticky-cta.show{opacity:1;visibility:visible;transform:translateY(0)}
+.sticky-cta a{display:inline-flex;align-items:center;gap:.55rem;padding:.95rem 1.9rem;background:var(--accent);color:#fff;font-weight:700;font-size:.95rem;letter-spacing:.02em;border-radius:40px;box-shadow:0 12px 32px rgba(201,165,109,.55)}
+.sticky-cta a:hover{background:var(--accent-d)}
+.sticky-cta .pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;animation:ctaPulse 2s infinite}
+@keyframes ctaPulse{0%{box-shadow:0 0 0 0 rgba(255,255,255,.6)}70%{box-shadow:0 0 0 8px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+@media(max-width:768px){.sticky-cta{left:1rem;right:1rem;bottom:1rem}.sticky-cta a{justify-content:center;width:100%;padding:1.05rem;font-size:1.02rem}footer{padding-bottom:6rem}}
+
+/* ===================== REFINED v2 ===================== */
+:root{--accent-d:#b8944f;--muted:#6f6f68}
+body{-webkit-font-smoothing:antialiased;background:#F6F4F0}
+.eyebrow{display:block;text-align:center;font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;color:var(--accent);font-weight:600;margin-bottom:.8rem}
+.section-title{font-size:clamp(2rem,4.5vw,3rem);letter-spacing:.01em}
+.section-subtitle{font-size:1rem;line-height:1.95;margin-bottom:3.2rem;color:var(--muted)}
+.icon-svg{width:28px;height:28px;stroke:var(--accent);stroke-width:1.4;fill:none;stroke-linecap:round;stroke-linejoin:round;display:block}
+.icon-wrap{display:flex;align-items:center;justify-content:center}
+.about{padding:6.5rem 2rem 5rem}
+.about-card{padding:2.4rem 1.2rem;border:1px solid rgba(31,58,52,.07);box-shadow:0 8px 30px rgba(20,40,30,.06)}
+.about-card .icon-wrap{width:58px;height:58px;margin:0 auto 1rem;border-radius:50%;background:rgba(201,165,109,.13)}
+.about-card .icon-svg{width:26px;height:26px}
+.about-card h3{font-family:var(--font-heading);font-size:1.18rem;letter-spacing:.02em;font-weight:600}
+.hero-slide img{transform:scale(1.02)}
+.hero-slide.active img{animation:kenburns 18s ease-out forwards}
+@keyframes kenburns{from{transform:scale(1.02)}to{transform:scale(1.12)}}
+.hero-overlay{background:linear-gradient(180deg,rgba(22,41,31,.28) 0%,rgba(22,41,31,.40) 55%,rgba(22,41,31,.68) 100%)}
+.hero-overlay h1{font-weight:600;letter-spacing:.07em}
+.hero-overlay p{letter-spacing:.09em}
+.hero-cta{box-shadow:0 10px 34px rgba(201,165,109,.42);border-radius:3px}
+.gallery-grid{gap:14px}
+.gallery-item{border-radius:8px;box-shadow:0 3px 16px rgba(20,40,30,.07)}
+.gallery-filters button{border-radius:30px;padding:.5rem 1.4rem;letter-spacing:.02em}
+.amenity-card{gap:.9rem;padding:1.25rem 1.35rem;border:1px solid rgba(31,58,52,.07);box-shadow:0 5px 20px rgba(20,40,30,.05);border-radius:12px}
+.amenity-card .icon-wrap{width:44px;height:44px;flex-shrink:0;border-radius:11px;background:rgba(201,165,109,.13)}
+.amenity-card .icon-svg{width:22px;height:22px}
+.amenity-card span{font-size:.92rem;font-weight:500}
+.floorplan{padding:6.5rem 2rem;max-width:1040px;margin:0 auto;text-align:center;background:var(--bg)}
+.floorplan img{width:100%;max-width:840px;margin:1rem auto 0;border-radius:10px;border:1px solid rgba(31,58,52,.1);box-shadow:0 10px 34px rgba(20,40,30,.09);background:#fff;padding:14px}
+.fp-meta{display:flex;gap:2.4rem;justify-content:center;flex-wrap:wrap;margin-top:2rem}
+.fp-meta .n{font-family:var(--font-heading);font-size:1.9rem;color:var(--primary);font-weight:600;line-height:1}
+.fp-meta .l{font-size:.74rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:.3rem}
+.book{background:linear-gradient(160deg,#1F3A34 0%,#16291f 100%)}
+
+/* ===================== BOOKING v3 ===================== */
+/* hero下の予約バー */
+.book-bar{position:relative;z-index:20;width:min(960px,92%);margin:-2.6rem auto 0;background:#fff;border-radius:16px;box-shadow:0 18px 50px rgba(20,40,30,.18);padding:1.1rem 1.2rem;display:grid;grid-template-columns:1fr 1fr .8fr auto;gap:.8rem;align-items:end;border:1px solid rgba(31,58,52,.06)}
+.bb-field{display:flex;flex-direction:column;gap:.3rem}
+.bb-field label{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.bb-field input,.bb-field select{padding:.62rem .7rem;border:1px solid rgba(31,58,52,.18);border-radius:8px;font-family:var(--font-body);font-size:.92rem;color:var(--text);background:#fff}
+.bb-cta{padding:.78rem 1.6rem;background:var(--accent);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:.92rem;cursor:pointer;letter-spacing:.02em;transition:background .25s;white-space:nowrap}
+.bb-cta:hover{background:var(--accent-d)}
+@media(max-width:768px){.book-bar{grid-template-columns:1fr 1fr;margin-top:-2rem}.bb-cta{grid-column:1/-1}}
+
+/* 直予約バッジ・特典 */
+.direct-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(201,165,109,.18);color:#f1e0c2;border:1px solid rgba(201,165,109,.55);padding:.5rem 1.25rem;border-radius:30px;font-size:.84rem;font-weight:600;letter-spacing:.03em;margin-bottom:1.3rem}
+.direct-perks{display:flex;gap:1.6rem;justify-content:center;flex-wrap:wrap;margin:0 auto 2.4rem;max-width:720px;padding:0}
+.direct-perks li{list-style:none;font-size:.85rem;color:rgba(255,255,255,.82);display:flex;align-items:center;gap:.4rem}
+.direct-perks li::before{content:"✓";color:var(--accent);font-weight:700}
+
+/* 予約2カラム(カレンダー / フォーム) */
+.booking-wrap{display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:980px;margin:0 auto;text-align:left}
+@media(max-width:860px){.booking-wrap{grid-template-columns:1fr}}
+.cal{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:14px;padding:1.2rem}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.cal-head button{background:rgba(255,255,255,.1);border:none;color:#fff;width:34px;height:34px;border-radius:8px;cursor:pointer;font-size:1.05rem;line-height:1}
+.cal-head button:hover{background:rgba(201,165,109,.4)}
+.cal-title{font-family:var(--font-heading);font-size:1.12rem}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-dow{text-align:center;font-size:.64rem;color:rgba(255,255,255,.5);padding:.3rem 0;letter-spacing:.04em}
+.cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:.8rem;border-radius:7px;color:#fff;cursor:pointer;transition:background .15s;position:relative}
+.cal-day.empty{visibility:hidden;cursor:default}
+.cal-day.past{color:rgba(255,255,255,.22);cursor:default}
+.cal-day.blocked{background:rgba(255,255,255,.04);color:rgba(255,255,255,.28);cursor:not-allowed}
+.cal-day.open:hover{background:rgba(201,165,109,.32)}
+.cal-day.sel{background:var(--accent);color:#16291f;font-weight:700}
+.cal-day.inrange{background:rgba(201,165,109,.26)}
+.cal-legend{display:flex;gap:1.3rem;margin-top:.9rem;font-size:.72rem;color:rgba(255,255,255,.7)}
+.cal-legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:.35rem;vertical-align:-1px}
+.cal-note{font-size:.7rem;color:rgba(255,255,255,.5);margin-top:.75rem;line-height:1.65}
+.cal-msg{font-size:.82rem;color:rgba(255,255,255,.65);text-align:center;padding:2rem 1rem;line-height:1.7}
+
+/* リクエストフォーム */
+.req-form{display:flex;flex-direction:column;gap:.8rem}
+.req-form .row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.req-field{display:flex;flex-direction:column;gap:.3rem}
+.req-field label{font-size:.7rem;letter-spacing:.07em;color:rgba(255,255,255,.72);font-weight:600}
+.req-field input,.req-field select,.req-field textarea{padding:.65rem .75rem;border:1px solid rgba(255,255,255,.22);border-radius:8px;background:rgba(255,255,255,.96);color:var(--text);font-family:var(--font-body);font-size:.9rem;width:100%}
+.req-field textarea{resize:vertical;min-height:72px}
+.req-submit{padding:.92rem;background:var(--accent);color:#16291f;border:none;border-radius:8px;font-weight:700;font-size:.98rem;cursor:pointer;letter-spacing:.02em;transition:background .25s}
+.req-submit:hover{background:#e0bf7a}
+.req-submit:disabled{opacity:.55;cursor:default}
+.req-note{font-size:.71rem;color:rgba(255,255,255,.58);line-height:1.65}
+.req-status{font-size:.88rem;padding:.7rem;border-radius:8px;text-align:center;display:none}
+.req-status.ok{display:block;background:rgba(134,239,172,.16);color:#bff0cf}
+.req-status.ng{display:block;background:rgba(254,202,202,.14);color:#fecaca}
+.book-or{margin:2.4rem 0 1.1rem;color:rgba(255,255,255,.5);font-size:.78rem;letter-spacing:.1em}
+
+/* FAQ */
+.faq{padding:6rem 2rem;max-width:840px;margin:0 auto}
+.faq-list{margin-top:2rem}
+.faq-item{border-bottom:1px solid rgba(31,58,52,.12)}
+.faq-q{width:100%;text-align:left;background:none;border:none;padding:1.15rem .2rem;font-family:var(--font-body);font-size:1rem;font-weight:600;color:var(--primary);cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.faq-q::after{content:"+";font-size:1.35rem;color:var(--accent);transition:transform .25s;flex-shrink:0}
+.faq-item.open .faq-q::after{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .3s ease;color:var(--muted);font-size:.92rem;line-height:1.8}
+.faq-item.open .faq-a{max-height:320px}
+.faq-a div{padding:0 .2rem 1.15rem}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header id="header">
+  <a href="#" class="logo">Hilltop Zushi</a>
+  <div class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </div>
+  <nav id="nav">
+    <a href="#about" data-i18n="nav_about">About</a>
+    <a href="#gallery" data-i18n="nav_gallery">Gallery</a>
+    <a href="#amenities" data-i18n="nav_amenities">Amenities</a>
+    <a href="#location" data-i18n="nav_location">Location</a>
+    <a href="#book" data-i18n="nav_book">Book Now</a>
+    <select class="lang-select" id="langSelect" aria-label="Language">
+      <option value="en">EN</option>
+      <option value="ja">JA</option>
+      <option value="fr">FR</option>
+      <option value="es">ES</option>
+      <option value="ko">KO</option>
+      <option value="zh">ZH</option>
+    </select>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-slides">
+    <div class="hero-slide active"><img src="images/ph-hero-living-garden.jpg" alt="Living room opening to the private garden"></div>
+    <div class="hero-slide"><img src="images/ph-hero-exterior.jpg" alt="Modern hilltop house exterior"></div>
+    <div class="hero-slide"><img src="images/ph-hero-bedroom-glass.jpg" alt="Bedroom with full forest view"></div>
+    <div class="hero-slide"><img src="images/ph-hero-bbq-terrace.jpg" alt="Garden BBQ terrace"></div>
+    <div class="hero-slide"><img src="images/ph-hero-living-dining.jpg" alt="Spacious living and dining room"></div>
+  </div>
+  <div class="hero-overlay">
+    <h1 data-i18n="hero_title">Hilltop Zushi</h1>
+    <p data-i18n="hero_subtitle">A Forest Retreat Above the Sea</p>
+    <a href="#book" class="hero-cta" data-i18n="hero_cta">Book Your Stay</a>
+  </div>
+  <div class="hero-dots"></div>
+</section>
+
+<!-- BOOKING BAR (under hero) -->
+<div class="book-bar fade-in" id="bookBar">
+  <div class="bb-field">
+    <label data-i18n="form_checkin">Check-in</label>
+    <input type="date" id="bbIn">
+  </div>
+  <div class="bb-field">
+    <label data-i18n="form_checkout">Check-out</label>
+    <input type="date" id="bbOut">
+  </div>
+  <div class="bb-field">
+    <label data-i18n="form_guests">Guests</label>
+    <select id="bbGuests"></select>
+  </div>
+  <button class="bb-cta" id="bbCheck" data-i18n="bb_check">Check availability</button>
+</div>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="fade-in">
+    <h2 class="section-title" data-i18n="about_title">Welcome to Hilltop Zushi</h2>
+    <p class="section-subtitle" data-i18n="about_desc">Nestled on a verdant hilltop in Zushi, just a 3-minute walk from Jimmuji Station (Keikyu Line), Hilltop Zushi is a spacious retreat that blends Japanese warmth with modern comfort. Surrounded by lush greenery and offering panoramic views, this hidden gem accommodates up to 12 guests across 5 beautifully appointed bedrooms. Whether you're planning a family gathering, a friends' getaway, or a creative retreat, Hilltop Zushi provides the perfect sanctuary between the mountains and the sea.</p>
+  </div>
+  <div class="about-cards fade-in">
+    <div class="about-card">
+      <div class="icon-wrap"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <h3 data-i18n="about_guests">Up to 12 Guests</h3>
+    </div>
+    <div class="about-card">
+      <div class="icon-wrap"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M3 18v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5M3 18v2M21 18v2M3 13V7M7 11V9a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2"/></svg></div>
+      <h3 data-i18n="about_bedrooms">5 Bedrooms</h3>
+    </div>
+    <div class="about-card">
+      <div class="icon-wrap"><svg class="icon-svg" viewBox="0 0 24 24"><path d="m3 20 5.5-8 4 5.5M12.5 17.5 16 12l5 8M3 20h18"/><circle cx="8" cy="7" r="1.4"/></svg></div>
+      <h3 data-i18n="about_view">Hilltop View</h3>
+    </div>
+    <div class="about-card">
+      <div class="icon-wrap"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 10h14a6 6 0 0 1-6 6h-2a6 6 0 0 1-6-6ZM8 10V7M12 10V7M16 10V7M10 22h4M12 16v3M18 12h2a2 2 0 0 1 0 4h-1.2"/></svg></div>
+      <h3 data-i18n="about_bbq">BBQ Terrace</h3>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery" id="gallery">
+  <div class="gallery-inner">
+    <h2 class="section-title fade-in" data-i18n="gallery_title">Gallery</h2>
+    <div class="gallery-filters fade-in">
+      <button class="active" data-filter="all" data-i18n="gallery_all">All</button>
+      <button data-filter="exterior" data-i18n="gallery_exterior">Exterior</button>
+      <button data-filter="interior" data-i18n="gallery_interior">Interior</button>
+      <button data-filter="garden" data-i18n="gallery_garden">Garden</button>
+      <button data-filter="view">View</button>
+    </div>
+    <div style="text-align:center;margin:-0.5rem 0 2rem;">
+      <a href="360/" style="display:inline-flex;align-items:center;gap:.55rem;padding:.78rem 2rem;background:var(--primary);color:#fff;border-radius:30px;font-size:.92rem;font-weight:600;letter-spacing:.02em;box-shadow:0 8px 22px rgba(31,58,52,.28);">🌐 360°バーチャル内見をはじめる</a>
+    </div>
+    <div class="gallery-grid" id="galleryGrid">
+      <!-- Exterior -->
+      <div class="gallery-item" data-category="exterior"><img src="images/ph-hero-exterior.jpg" alt="House exterior" loading="lazy"></div>
+      <div class="gallery-item" data-category="exterior"><img src="images/ph-approach.jpg" alt="Entrance approach steps" loading="lazy"></div>
+      <div class="gallery-item" data-category="exterior"><img src="images/ph-garden-path.jpg" alt="Garden path" loading="lazy"></div>
+      <div class="gallery-item" data-category="exterior"><img src="images/ph-station.jpg" alt="Jimmuji Station" loading="lazy"></div>
+      <!-- Interior -->
+      <div class="gallery-item" data-category="interior"><img src="images/ph-hero-living-dining.jpg" alt="Living and dining" loading="lazy"></div>
+      <div class="gallery-item" data-category="interior"><img src="images/ph-living-sofa.jpg" alt="Living with sofa" loading="lazy"></div>
+      <div class="gallery-item" data-category="interior"><img src="images/ph-dining-kitchen.jpg" alt="Dining and kitchen" loading="lazy"></div>
+      <div class="gallery-item" data-category="interior"><img src="images/ph-kitchen.jpg" alt="Kitchen" loading="lazy"></div>
+      <div class="gallery-item" data-category="interior"><img src="images/ph-bedroom-king.jpg" alt="King bedroom" loading="lazy"></div>
+      <div class="gallery-item" data-category="interior"><img src="images/ph-hero-bedroom-glass.jpg" alt="Bedroom with forest view" loading="lazy"></div>
+      <div class="gallery-item" data-category="interior"><img src="images/ph-bedroom-twin.jpg" alt="Twin bedroom" loading="lazy"></div>
+      <div class="gallery-item" data-category="interior"><img src="images/ph-bedroom-wood.jpg" alt="Wood-walled bedroom" loading="lazy"></div>
+      <div class="gallery-item" data-category="interior"><img src="images/ph-bedroom-night.jpg" alt="Bedroom in the evening" loading="lazy"></div>
+      <div class="gallery-item" data-category="interior"><img src="images/ph-tatami.jpg" alt="Tatami room" loading="lazy"></div>
+      <div class="gallery-item" data-category="interior"><img src="images/ph-kids.jpg" alt="Kids play space" loading="lazy"></div>
+      <div class="gallery-item" data-category="interior"><img src="images/ph-bath.jpg" alt="Bathroom" loading="lazy"></div>
+      <div class="gallery-item" data-category="interior"><img src="images/ph-sanitary.jpg" alt="Washroom and laundry" loading="lazy"></div>
+      <div class="gallery-item" data-category="interior"><img src="images/ph-washbasin.jpg" alt="Hand basin" loading="lazy"></div>
+      <!-- Garden -->
+      <div class="gallery-item" data-category="garden"><img src="images/ph-hero-bbq-terrace.jpg" alt="BBQ terrace" loading="lazy"></div>
+      <div class="gallery-item" data-category="garden"><img src="images/ph-hammock.jpg" alt="Garden hammock" loading="lazy"></div>
+      <div class="gallery-item" data-category="garden"><img src="images/ph-bbq-grill.jpg" alt="BBQ grill" loading="lazy"></div>
+      <div class="gallery-item" data-category="garden"><img src="images/ph-hero-living-garden.jpg" alt="Living opening to the garden" loading="lazy"></div>
+      <!-- View -->
+      <div class="gallery-item" data-category="view"><img src="images/ph-view-town.jpg" alt="View over the town" loading="lazy"></div>
+      <div class="gallery-item" data-category="view"><img src="images/ph-view-hills.jpg" alt="Surrounding wooded hills" loading="lazy"></div>
+      <div class="gallery-item" data-category="view"><img src="images/ph-terrace-view.jpg" alt="Terrace with a glimpse of the town" loading="lazy"></div>
+    </div>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-close" id="lightboxClose">&#x2715;</div>
+  <div class="lightbox-nav lightbox-prev" id="lightboxPrev">&#x276E;</div>
+  <div class="lightbox-nav lightbox-next" id="lightboxNext">&#x276F;</div>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- AMENITIES -->
+<section class="amenities" id="amenities">
+  <h2 class="section-title fade-in" data-i18n="amenities_title">Amenities &amp; Features</h2>
+  <div class="amenities-grid fade-in">
+    <div class="amenity-card"><div class="icon-wrap"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 10h14a6 6 0 0 1-6 6h-2a6 6 0 0 1-6-6ZM8 10V7M12 10V7M16 10V7M10 22h4M12 16v3"/></svg></div><span data-i18n="amenity_bbq">BBQ Grill</span></div>
+    <div class="amenity-card"><div class="icon-wrap"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M12 19.5h.01"/></svg></div><span data-i18n="amenity_wifi">Free Wi-Fi</span></div>
+    <div class="amenity-card"><div class="icon-wrap"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 3h16v6H4zM7 3v6M4 13h16v8H4zM9 13v8"/></svg></div><span data-i18n="amenity_kitchen">Full Kitchen</span></div>
+    <div class="amenity-card"><div class="icon-wrap"><svg class="icon-svg" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M8 6h.01M12 6h.01"/></svg></div><span data-i18n="amenity_laundry">Washer &amp; Dryer</span></div>
+    <div class="amenity-card"><div class="icon-wrap"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20M5 5l3 3M19 5l-3 3M5 19l3-3M19 19l-3-3"/></svg></div><span data-i18n="amenity_ac">Air Conditioning</span></div>
+    <div class="amenity-card"><div class="icon-wrap"><svg class="icon-svg" viewBox="0 0 24 24"><path d="M5 17V9l3-4h8l3 4v8M5 17h14M5 17v2M19 17v2"/><circle cx="8" cy="13" r="1.2"/><circle cx="16" cy="13" r="1.2"/></svg></div><span data-i18n="amenity_parking">Coin Parking Nearby</span></div>
+    <div class="amenity-card"><div class="icon-wrap"><svg class="icon-svg" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.1"/></svg></div><span data-i18n="amenity_lock">Smart Lock Entry</span></div>
+    <div class="amenity-card"><div class="icon-wrap"><svg class="icon-svg" viewBox="0 0 24 24"><path d="m3 20 5.5-8 4 5.5M12.5 17.5 16 12l5 8M3 20h18"/><circle cx="8" cy="7" r="1.4"/></svg></div><span data-i18n="amenity_view">Mountain View</span></div>
+  </div>
+</section>
+
+<!-- FLOOR PLAN -->
+<section class="floorplan" id="floorplan">
+  <span class="eyebrow fade-in">Floor Plan</span>
+  <h2 class="section-title fade-in">5SLDK ・ 118㎡</h2>
+  <p class="section-subtitle fade-in">5 bedrooms plus a large LDK across two floors — comfortably sleeps up to 12 guests.</p>
+  <div class="fade-in"><img src="images/ph-floorplan.png" alt="Hilltop Zushi floor plan — 5SLDK, 118 square meters"></div>
+  <div class="fp-meta fade-in">
+    <div><div class="n">12</div><div class="l">Guests</div></div>
+    <div><div class="n">5</div><div class="l">Bedrooms</div></div>
+    <div><div class="n">9</div><div class="l">Beds</div></div>
+    <div><div class="n">118㎡</div><div class="l">Floor Area</div></div>
+  </div>
+</section>
+
+<!-- LOCATION -->
+<section class="location" id="location">
+  <div class="location-inner">
+    <h2 class="section-title fade-in" data-i18n="location_title">Location &amp; Access</h2>
+    <div class="location-content fade-in">
+      <div class="location-map">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3258.5!2d139.5847!3d35.3103!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzXCsDE4JzM3LjEiTiAxMznCsDM1JzA0LjkiRQ!5e0!3m2!1sen!2sjp!4v1" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <div class="location-info">
+        <div class="access-item"><div class="icon">&#x1F6B6;</div><span data-i18n="location_station">Jimmuji Station (Keikyu) — 3 min walk</span></div>
+        <div class="access-item"><div class="icon">&#x1F3EF;</div><span data-i18n="location_kamakura">Kamakura — 20 min away</span></div>
+        <div class="access-item"><div class="icon">&#x1F685;</div><span data-i18n="location_shinagawa">Shinagawa — 45 min by train</span></div>
+        <div class="nearby-spots">
+          <h3 data-i18n="location_nearby_title">Nearby Attractions</h3>
+          <ul>
+            <li data-i18n="location_buddha">Great Buddha of Kamakura</li>
+            <li data-i18n="location_enoshima">Enoshima Island</li>
+            <li data-i18n="location_hayama">Hayama Marina</li>
+            <li data-i18n="location_zushi_beach">Zushi Beach</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOK NOW -->
+<section class="book" id="book">
+  <span class="eyebrow fade-in" style="color:var(--accent)" data-i18n="book_eyebrow">Direct Booking</span>
+  <h2 class="section-title fade-in" data-i18n="book_title">Ready to Experience Hilltop Zushi?</h2>
+  <div class="fade-in"><span class="direct-badge" data-i18n="direct_badge">★ Official site exclusive — 5% OFF (Best Direct Rate)</span></div>
+  <ul class="direct-perks fade-in">
+    <li data-i18n="perk_rate">Best direct rate</li>
+    <li data-i18n="perk_flex">Flexible &amp; long-stay friendly</li>
+    <li data-i18n="perk_whole">Whole house, up to 12</li>
+    <li data-i18n="perk_direct">Talk directly with the host</li>
+  </ul>
+
+  <div class="booking-wrap fade-in">
+    <!-- 空き状況カレンダー -->
+    <div>
+      <div class="cal" id="cal">
+        <div class="cal-head">
+          <button type="button" id="calPrev" aria-label="Prev">‹</button>
+          <span class="cal-title" id="calTitle">—</span>
+          <button type="button" id="calNext" aria-label="Next">›</button>
+        </div>
+        <div class="cal-grid" id="calDow"></div>
+        <div class="cal-grid" id="calBody"></div>
+        <div class="cal-legend">
+          <span><i style="background:rgba(201,165,109,.5)"></i><span data-i18n="legend_open">Available</span></span>
+          <span><i style="background:rgba(255,255,255,.12)"></i><span data-i18n="legend_blocked">Booked</span></span>
+        </div>
+      </div>
+      <p class="cal-note" data-i18n="avail_note">Availability is synced from our Airbnb calendar as a guide. Your dates are confirmed after we check.</p>
+    </div>
+
+    <!-- 予約リクエストフォーム -->
+    <form class="req-form" id="reqForm">
+      <h3 style="font-family:var(--font-heading);font-size:1.3rem;color:#fff" data-i18n="form_title">Request to Book</h3>
+      <div class="row">
+        <div class="req-field"><label data-i18n="form_checkin">Check-in</label><input type="date" name="checkin" id="rfIn" required></div>
+        <div class="req-field"><label data-i18n="form_checkout">Check-out</label><input type="date" name="checkout" id="rfOut" required></div>
+      </div>
+      <div class="row">
+        <div class="req-field"><label data-i18n="form_guests">Guests</label><select name="guests" id="rfGuests"></select></div>
+        <div class="req-field"><label data-i18n="form_name">Name</label><input type="text" name="name" required></div>
+      </div>
+      <div class="row">
+        <div class="req-field"><label data-i18n="form_email">Email</label><input type="email" name="email" required></div>
+        <div class="req-field"><label data-i18n="form_phone">Phone (optional)</label><input type="tel" name="phone"></div>
+      </div>
+      <div class="req-field"><label data-i18n="form_message">Questions / Requests</label><textarea name="message" maxlength="2000"></textarea></div>
+      <div class="row">
+        <div class="req-field"><label data-i18n="form_bbq">BBQ</label><select name="bbq"><option value="なし" data-i18n="form_no">No</option><option value="あり" data-i18n="form_yes">Yes</option></select></div>
+        <div class="req-field"><label data-i18n="form_pet">Pet</label><select name="pet"><option value="なし" data-i18n="form_no">No</option><option value="あり" data-i18n="form_yes">Yes</option></select></div>
+      </div>
+      <input type="hidden" name="lang" id="rfLang" value="en">
+      <!-- honeypot: ボットが埋めると送信を破棄(人間には不可視) -->
+      <input type="text" name="company" id="rfCompany" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+      <button type="submit" class="req-submit" id="reqSubmit" data-i18n="form_submit">Send request</button>
+      <div class="req-status" id="reqStatus"></div>
+      <p class="req-note" data-i18n="form_note">This is a request, not a confirmed booking. We'll check availability and reply within 24 hours.</p>
+      <p class="req-note" data-i18n="form_privacy">Your details are used only to check availability and reply, and are stored in Google Sheets / Gmail. We never share them with third parties.</p>
+    </form>
+  </div>
+
+  <div class="book-or fade-in" data-i18n="book_or">— or —</div>
+  <div class="book-buttons fade-in">
+    <a href="https://www.airbnb.jp/h/hilltopzushi" target="_blank" rel="noopener" class="book-btn secondary" data-i18n="book_airbnb">Book on Airbnb</a>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <span class="eyebrow fade-in">FAQ</span>
+  <h2 class="section-title fade-in" data-i18n="faq_title">Frequently Asked Questions</h2>
+  <div class="faq-list fade-in">
+    <div class="faq-item">
+      <button type="button" class="faq-q" data-i18n="faq_q1">What are the check-in / check-out times?</button>
+      <div class="faq-a"><div data-i18n="faq_a1">Check-in is from 3:00 PM and check-out is by 10:00 AM. Self check-in with a smart lock — we'll send the code before arrival.</div></div>
+    </div>
+    <div class="faq-item">
+      <button type="button" class="faq-q" data-i18n="faq_q2">How many guests can stay?</button>
+      <div class="faq-a"><div data-i18n="faq_a2">Up to 12 guests across 5 bedrooms (9 beds). Great for families and groups. Let us know your group size and we'll advise the best layout.</div></div>
+    </div>
+    <div class="faq-item">
+      <button type="button" class="faq-q" data-i18n="faq_q3">Is there parking?</button>
+      <div class="faq-a"><div data-i18n="faq_a3">There is coin parking nearby. The house is a 3-minute walk from Jimmuji Station (Keikyu Line), so train access is very easy.</div></div>
+    </div>
+    <div class="faq-item">
+      <button type="button" class="faq-q" data-i18n="faq_q4">What is the cancellation policy?</button>
+      <div class="faq-a"><div data-i18n="faq_a4">For direct bookings we offer flexible terms — please ask when you send your request. We'll confirm the details together with your quote.</div></div>
+    </div>
+    <div class="faq-item">
+      <button type="button" class="faq-q" data-i18n="faq_q5">How do I pay for a direct booking?</button>
+      <div class="faq-a"><div data-i18n="faq_a5">After we confirm your dates, we'll send a secure payment link or bank transfer details. Your request is not charged until then.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">Hilltop Zushi</div>
+    <p data-i18n="footer_address">Ikego, Zushi, Kanagawa, Japan</p>
+    <div class="footer-social">
+      <a href="#" aria-label="Instagram">&#x1F4F7;</a>
+      <a href="#" aria-label="Airbnb">&#x1F3E0;</a>
+    </div>
+    <p data-i18n="footer_copyright">&copy; 2026 Hilltop Zushi. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- STICKY FLOATING CTA -->
+<div class="sticky-cta" id="stickyCta">
+  <a href="#book"><span class="pulse"></span><span data-i18n="nav_book">Book Now</span></a>
+</div>
+
+<script>
+/* ===== I18N DATA ===== */
+const i18nData = {
+  en: {
+    nav_about:"About",nav_gallery:"Gallery",nav_amenities:"Amenities",nav_location:"Location",nav_book:"Book Now",
+    hero_title:"Hilltop Zushi",hero_subtitle:"A Forest Retreat Above the Sea",hero_cta:"Book Your Stay",
+    about_title:"Welcome to Hilltop Zushi",
+    about_desc:"Nestled on a verdant hilltop in Zushi, just a 3-minute walk from Jimmuji Station (Keikyu Line), Hilltop Zushi is a spacious retreat that blends Japanese warmth with modern comfort. Surrounded by lush greenery and offering panoramic views, this hidden gem accommodates up to 12 guests across 5 beautifully appointed bedrooms. Whether you\u2019re planning a family gathering, a friends\u2019 getaway, or a creative retreat, Hilltop Zushi provides the perfect sanctuary between the mountains and the sea.",
+    about_guests:"Up to 12 Guests",about_bedrooms:"5 Bedrooms",about_view:"Hilltop View",about_bbq:"BBQ Terrace",
+    gallery_title:"Gallery",gallery_all:"All",gallery_exterior:"Exterior",gallery_interior:"Interior",gallery_garden:"Garden",gallery_renders:"Design Renders",
+    amenities_title:"Amenities & Features",amenity_bbq:"BBQ Grill",amenity_wifi:"Free Wi-Fi",amenity_kitchen:"Full Kitchen",amenity_laundry:"Washer & Dryer",amenity_ac:"Air Conditioning",amenity_parking:"Coin Parking Nearby",amenity_lock:"Smart Lock Entry",amenity_view:"Mountain View",
+    location_title:"Location & Access",location_station:"Jimmuji Station (Keikyu) \u2014 3 min walk",location_kamakura:"Kamakura \u2014 20 min away",location_shinagawa:"Shinagawa \u2014 45 min by train",location_nearby_title:"Nearby Attractions",location_buddha:"Great Buddha of Kamakura",location_enoshima:"Enoshima Island",location_hayama:"Hayama Marina",location_zushi_beach:"Zushi Beach",
+    book_title:"Ready to Experience Hilltop Zushi?",book_desc:"Book your stay through our trusted partners or contact us directly for inquiries.",book_airbnb:"Book on Airbnb",book_booking:"Book on Booking.com",book_contact:"Contact Us",
+    book_eyebrow:"Direct Booking",direct_badge:"\u2605 Official site exclusive \u2014 5% OFF (Best Direct Rate)",perk_rate:"Best direct rate",perk_flex:"Flexible & long-stay friendly",perk_whole:"Whole house, up to 12",perk_direct:"Talk directly with the host",bb_check:"Check availability",avail_note:"Availability is synced from our Airbnb calendar as a guide. Your dates are confirmed after we check.",avail_unconfigured:"Availability calendar is being set up. Please enter your dates and send a request.",legend_open:"Available",legend_blocked:"Booked",form_title:"Request to Book",form_checkin:"Check-in",form_checkout:"Check-out",form_guests:"Guests",form_name:"Name",form_email:"Email",form_phone:"Phone (optional)",form_message:"Questions / Requests",form_bbq:"BBQ",form_pet:"Pet",form_yes:"Yes",form_no:"No",form_submit:"Send request",form_sending:"Sending\u2026",form_success:"Thank you! Your request has been received — we'll reply after checking availability. If you don't hear back, please also reach us via Airbnb.",form_invalid:"Please check your dates: check-out must be after check-in, and the dates must be available.",form_privacy:"Your details are used only to check availability and reply, and are stored in Google Sheets / Gmail. We never share them with third parties.",form_error:"Sending failed. Please try again later.",form_unconfigured:"The request form is being set up. Please book via Airbnb for now.",form_note:"This is a request, not a confirmed booking. We'll check availability and reply within 24 hours.",book_or:"\u2014 or \u2014",faq_title:"Frequently Asked Questions",faq_q1:"What are the check-in / check-out times?",faq_a1:"Check-in is from 3:00 PM and check-out is by 10:00 AM. Self check-in with a smart lock \u2014 we'll send the code before arrival.",faq_q2:"How many guests can stay?",faq_a2:"Up to 12 guests across 5 bedrooms (9 beds). Perfect for families and groups.",faq_q3:"Is there parking?",faq_a3:"There is coin parking nearby. The house is a 3-minute walk from Jimmuji Station (Keikyu Line).",faq_q4:"What is the cancellation policy?",faq_a4:"For direct bookings we offer flexible terms \u2014 please ask when you send your request.",faq_q5:"How do I pay for a direct booking?",faq_a5:"After we confirm your dates, we'll send a secure payment link or bank transfer details.",
+    footer_address:"Ikego, Zushi, Kanagawa, Japan",footer_copyright:"\u00a9 2026 Hilltop Zushi. All rights reserved."
+  },
+  ja: {
+    nav_about:"\u65bd\u8a2d\u306b\u3064\u3044\u3066",nav_gallery:"\u30ae\u30e3\u30e9\u30ea\u30fc",nav_amenities:"\u8a2d\u5099\u30fb\u30a2\u30e1\u30cb\u30c6\u30a3",nav_location:"\u30a2\u30af\u30bb\u30b9",nav_book:"\u4e88\u7d04\u3059\u308b",
+    hero_title:"Hilltop Zushi",hero_subtitle:"\u6d77\u3092\u671b\u3080\u3001\u68ee\u306e\u96a0\u308c\u5bb6",hero_cta:"\u3054\u4e88\u7d04\u306f\u3053\u3061\u3089",
+    about_title:"Hilltop Zushi \u3078\u3088\u3046\u3053\u305d",
+    about_desc:"\u4eac\u6025\u795e\u6b66\u5bfa\u99c5\u304b\u3089\u5f92\u6b69\u308f\u305a\u304b3\u5206\u3001\u7dd1\u8c4a\u304b\u306a\u4e18\u306e\u4e0a\u306b\u305f\u305f\u305a\u3080 Hilltop Zushi \u306f\u3001\u65e5\u672c\u306e\u6e29\u304b\u307f\u3068\u30e2\u30c0\u30f3\u306a\u5feb\u9069\u3055\u304c\u878d\u5408\u3057\u305f\u8d05\u6ca2\u306a\u6ede\u5728\u7a7a\u9593\u3067\u3059\u3002\u56db\u5b63\u6298\u3005\u306e\u6728\u3005\u306b\u56f2\u307e\u308c\u3001\u958b\u653e\u7684\u306a\u30d1\u30ce\u30e9\u30de\u30d3\u30e5\u30fc\u3092\u697d\u3057\u3081\u308b\u3053\u306e\u96a0\u308c\u5bb6\u306f\u30015\u3064\u306e\u8da3\u3042\u308b\u5bdd\u5ba4\u306b\u6700\u592712\u540d\u69d8\u3092\u304a\u8fce\u3048\u3067\u304d\u307e\u3059\u3002\u5bb6\u65cf\u306e\u96c6\u3044\u3001\u53cb\u4eba\u3068\u306e\u3072\u3068\u3068\u304d\u306b\u3001\u3042\u308b\u3044\u306f\u30a4\u30f3\u30b9\u30d4\u30ec\u30fc\u30b7\u30e7\u30f3\u3092\u6c42\u3081\u308b\u30af\u30ea\u30a8\u30a4\u30c6\u30a3\u30d6\u306a\u5408\u5bbf\u306b\u2014\u2014\u5c71\u3068\u6d77\u306e\u9593\u306b\u5e83\u304c\u308b\u3001\u65e5\u5e38\u304b\u3089\u96e2\u308c\u305f\u7279\u5225\u306a\u3072\u3068\u3068\u304d\u3092\u3054\u63d0\u4f9b\u3057\u307e\u3059\u3002",
+    about_guests:"\u6700\u592712\u540d\u69d8",about_bedrooms:"\u5bdd\u5ba45\u5ba4",about_view:"\u4e18\u304b\u3089\u306e\u7730\u671b",about_bbq:"BBQ\u30c6\u30e9\u30b9",
+    gallery_title:"\u30ae\u30e3\u30e9\u30ea\u30fc",gallery_all:"\u3059\u3079\u3066",gallery_exterior:"\u5916\u89b3",gallery_interior:"\u5ba4\u5185",gallery_garden:"\u5ead\u30fb\u30c6\u30e9\u30b9",gallery_renders:"\u30c7\u30b6\u30a4\u30f3\u30d1\u30fc\u30b9",
+    amenities_title:"\u8a2d\u5099\u30fb\u30a2\u30e1\u30cb\u30c6\u30a3",amenity_bbq:"BBQ\u30b0\u30ea\u30eb",amenity_wifi:"\u7121\u6599Wi-Fi",amenity_kitchen:"\u30d5\u30eb\u30ad\u30c3\u30c1\u30f3",amenity_laundry:"\u6d17\u6fef\u6a5f\u30fb\u4e7e\u71e5\u6a5f",amenity_ac:"\u30a8\u30a2\u30b3\u30f3\u5b8c\u5099",amenity_parking:"\u8fd1\u96a3\u306b\u30b3\u30a4\u30f3P",amenity_lock:"\u30b9\u30de\u30fc\u30c8\u30ed\u30c3\u30af",amenity_view:"\u5c71\u306e\u666f\u8272",
+    location_title:"\u30a2\u30af\u30bb\u30b9\u30fb\u5468\u8fba\u60c5\u5831",location_station:"\u4eac\u6025\u795e\u6b66\u5bfa\u99c5 \u2014 \u5f92\u6b693\u5206",location_kamakura:"\u938c\u5009 \u2014 \u7d0420\u5206",location_shinagawa:"\u54c1\u5ddd \u2014 \u96fb\u8eca\u3067\u7d0445\u5206",location_nearby_title:"\u5468\u8fba\u306e\u304a\u3059\u3059\u3081\u30b9\u30dd\u30c3\u30c8",location_buddha:"\u938c\u5009\u5927\u4ecf",location_enoshima:"\u6c5f\u306e\u5cf6",location_hayama:"\u8449\u5c71\u30de\u30ea\u30fc\u30ca",location_zushi_beach:"\u9017\u5b50\u6d77\u5cb8",
+    book_title:"Hilltop Zushi \u3067\u7279\u5225\u306a\u4f53\u9a13\u3092",book_desc:"\u63d0\u643a\u4e88\u7d04\u30b5\u30a4\u30c8\u304b\u3089\u3054\u4e88\u7d04\u3044\u305f\u3060\u304f\u304b\u3001\u304a\u6c17\u8efd\u306b\u76f4\u63a5\u304a\u554f\u3044\u5408\u308f\u305b\u304f\u3060\u3055\u3044\u3002",book_airbnb:"Airbnb\u3067\u4e88\u7d04\u3059\u308b",book_booking:"Booking.com\u3067\u4e88\u7d04\u3059\u308b",book_contact:"\u304a\u554f\u3044\u5408\u308f\u305b",
+    book_eyebrow:"\u516c\u5f0f\u30b5\u30a4\u30c8\u304b\u3089\u76f4\u63a5\u4e88\u7d04",direct_badge:"\u2605 \u516c\u5f0f\u30b5\u30a4\u30c8\u9650\u5b9a 5% OFF\uff08\u6700\u3082\u304a\u5f97\u306a\u76f4\u4e88\u7d04\uff09",perk_rate:"\u516c\u5f0f\u304c\u6700\u5b89\u5024",perk_flex:"\u67d4\u8edf\u30fb\u9577\u671f\u6ede\u5728\u3082\u6b53\u8fce",perk_whole:"\u4e00\u68df\u8cb8\u3057\u30fb\u6700\u592712\u540d",perk_direct:"\u30aa\u30fc\u30ca\u30fc\u3068\u76f4\u63a5\u3084\u308a\u3068\u308a",bb_check:"\u7a7a\u304d\u3092\u78ba\u8a8d",avail_note:"\u7a7a\u304d\u72b6\u6cc1\u306fAirbnb\u30ab\u30ec\u30f3\u30c0\u30fc\u9023\u643a\u306b\u57fa\u3065\u304f\u76ee\u5b89\u3067\u3059\u3002\u3054\u4e88\u7d04\u306f\u7a7a\u304d\u78ba\u8a8d\u5f8c\u306b\u78ba\u5b9a\u3057\u307e\u3059\u3002",avail_unconfigured:"\u7a7a\u304d\u72b6\u6cc1\u30ab\u30ec\u30f3\u30c0\u30fc\u306f\u6e96\u5099\u4e2d\u3067\u3059\u3002\u65e5\u7a0b\u3092\u3054\u8a18\u5165\u306e\u3046\u3048\u30ea\u30af\u30a8\u30b9\u30c8\u304f\u3060\u3055\u3044\u3002",legend_open:"\u7a7a\u304d",legend_blocked:"\u4e88\u7d04\u6e08\u307f",form_title:"\u4e88\u7d04\u30ea\u30af\u30a8\u30b9\u30c8",form_checkin:"\u30c1\u30a7\u30c3\u30af\u30a4\u30f3",form_checkout:"\u30c1\u30a7\u30c3\u30af\u30a2\u30a6\u30c8",form_guests:"\u4eba\u6570",form_name:"\u304a\u540d\u524d",form_email:"\u30e1\u30fc\u30eb",form_phone:"\u96fb\u8a71\uff08\u4efb\u610f\uff09",form_message:"\u3054\u8cea\u554f\u30fb\u3054\u8981\u671b",form_bbq:"BBQ\u5229\u7528",form_pet:"\u30da\u30c3\u30c8\u540c\u4f34",form_yes:"\u3042\u308a",form_no:"\u306a\u3057",form_submit:"\u30ea\u30af\u30a8\u30b9\u30c8\u3092\u9001\u4fe1",form_sending:"\u9001\u4fe1\u4e2d\u2026",form_success:"\u9001\u4fe1\u3092\u53d7\u3051\u4ed8\u3051\u307e\u3057\u305f\u3002\u7a7a\u304d\u72b6\u6cc1\u3092\u78ba\u8a8d\u306e\u3046\u3048\u3054\u9023\u7d61\u3057\u307e\u3059\u3002\u4e07\u4e00\u8fd4\u4fe1\u304c\u306a\u3044\u5834\u5408\u306fAirbnb\u304b\u3089\u3082\u3054\u9023\u7d61\u304f\u3060\u3055\u3044\u3002",form_invalid:"\u65e5\u7a0b\u3092\u3054\u78ba\u8a8d\u304f\u3060\u3055\u3044\uff08\u30c1\u30a7\u30c3\u30af\u30a2\u30a6\u30c8\u306f\u30c1\u30a7\u30c3\u30af\u30a4\u30f3\u3088\u308a\u5f8c\uff0f\u7a7a\u3044\u3066\u3044\u308b\u65e5\u7a0b\u3092\u304a\u9078\u3073\u304f\u3060\u3055\u3044\uff09\u3002",form_privacy:"\u3054\u5165\u529b\u60c5\u5831\u306f\u7a7a\u304d\u78ba\u8a8d\u30fb\u3054\u8fd4\u4fe1\u306e\u305f\u3081\u306e\u307f\u306b\u5229\u7528\u3057\u3001Google\u30b9\u30d7\u30ec\u30c3\u30c9\u30b7\u30fc\u30c8\uff0fGmail\u3067\u4fdd\u7ba1\u3057\u307e\u3059\u3002\u7b2c\u4e09\u8005\u306b\u306f\u63d0\u4f9b\u3057\u307e\u305b\u3093\u3002",form_error:"\u9001\u4fe1\u306b\u5931\u6557\u3057\u307e\u3057\u305f\u3002\u6642\u9593\u3092\u304a\u3044\u3066\u518d\u5ea6\u304a\u8a66\u3057\u304f\u3060\u3055\u3044\u3002",form_unconfigured:"\u4e88\u7d04\u30d5\u30a9\u30fc\u30e0\u306f\u6e96\u5099\u4e2d\u3067\u3059\u3002\u307e\u305a\u306fAirbnb\u304b\u3089\u3054\u4e88\u7d04\u304f\u3060\u3055\u3044\u3002",form_note:"\u3053\u306e\u6642\u70b9\u3067\u306f\u4e88\u7d04\u306f\u78ba\u5b9a\u3057\u307e\u305b\u3093\u3002\u7a7a\u304d\u72b6\u6cc1\u3092\u78ba\u8a8d\u306e\u3046\u304824\u6642\u9593\u4ee5\u5185\u306b\u3054\u9023\u7d61\u3057\u307e\u3059\u3002",book_or:"\u2014 \u307e\u305f\u306f \u2014",faq_title:"\u3088\u304f\u3042\u308b\u3054\u8cea\u554f",faq_q1:"\u30c1\u30a7\u30c3\u30af\u30a4\u30f3\uff0f\u30c1\u30a7\u30c3\u30af\u30a2\u30a6\u30c8\u306e\u6642\u9593\u306f\uff1f",faq_a1:"\u30c1\u30a7\u30c3\u30af\u30a4\u30f3\u306f15:00\u304b\u3089\u3001\u30c1\u30a7\u30c3\u30af\u30a2\u30a6\u30c8\u306f10:00\u307e\u3067\u3067\u3059\u3002\u30b9\u30de\u30fc\u30c8\u30ed\u30c3\u30af\u3067\u30bb\u30eb\u30d5\u30c1\u30a7\u30c3\u30af\u30a4\u30f3\u3002\u5230\u7740\u524d\u306b\u6697\u8a3c\u756a\u53f7\u3092\u304a\u9001\u308a\u3057\u307e\u3059\u3002",faq_q2:"\u4f55\u540d\u307e\u3067\u5bbf\u6cca\u3067\u304d\u307e\u3059\u304b\uff1f",faq_a2:"5\u5bdd\u5ba4\uff089\u30d9\u30c3\u30c9\uff09\u306b\u6700\u592712\u540d\u3002\u3054\u5bb6\u65cf\u3084\u30b0\u30eb\u30fc\u30d7\u306b\u6700\u9069\u3067\u3059\u3002",faq_q3:"\u99d0\u8eca\u5834\u306f\u3042\u308a\u307e\u3059\u304b\uff1f",faq_a3:"\u8fd1\u96a3\u306b\u30b3\u30a4\u30f3\u30d1\u30fc\u30ad\u30f3\u30b0\u304c\u3042\u308a\u307e\u3059\u3002\u4eac\u6025\u30fb\u795e\u6b66\u5bfa\u99c5\u304b\u3089\u5f92\u6b693\u5206\u3067\u96fb\u8eca\u3082\u4fbf\u5229\u3067\u3059\u3002",faq_q4:"\u30ad\u30e3\u30f3\u30bb\u30eb\u30dd\u30ea\u30b7\u30fc\u306f\uff1f",faq_a4:"\u76f4\u4e88\u7d04\u306f\u67d4\u8edf\u306b\u5bfe\u5fdc\u3057\u307e\u3059\u3002\u30ea\u30af\u30a8\u30b9\u30c8\u9001\u4fe1\u6642\u306b\u304a\u6c17\u8efd\u306b\u304a\u5c0b\u306d\u304f\u3060\u3055\u3044\u3002",faq_q5:"\u76f4\u4e88\u7d04\u306e\u652f\u6255\u3044\u65b9\u6cd5\u306f\uff1f",faq_a5:"\u65e5\u7a0b\u78ba\u5b9a\u5f8c\u306b\u5b89\u5168\u306a\u6c7a\u6e08\u30ea\u30f3\u30af\u307e\u305f\u306f\u632f\u8fbc\u5148\u3092\u304a\u9001\u308a\u3057\u307e\u3059\u3002\u78ba\u5b9a\u307e\u3067\u306f\u8ab2\u91d1\u3055\u308c\u307e\u305b\u3093\u3002",
+    footer_address:"\u795e\u5948\u5ddd\u770c\u9017\u5b50\u5e02\u6c60\u5b50",footer_copyright:"\u00a9 2026 Hilltop Zushi. All rights reserved."
+  },
+  fr: {
+    book_eyebrow:"Réservation directe",direct_badge:"★ Exclusivité site officiel — 5% DE RÉDUCTION (meilleur tarif direct)",perk_rate:"Meilleur tarif en direct",perk_flex:"Flexible & séjours longue durée",perk_whole:"Maison entière, jusqu'à 12",perk_direct:"Échangez directement avec l'hôte",bb_check:"Voir les disponibilités",avail_note:"Les disponibilités sont synchronisées avec notre calendrier Airbnb à titre indicatif. Vos dates sont confirmées après vérification.",avail_unconfigured:"Le calendrier des disponibilités est en cours de configuration. Indiquez vos dates et envoyez une demande.",legend_open:"Disponible",legend_blocked:"Réservé",form_title:"Demande de réservation",form_checkin:"Arrivée",form_checkout:"Départ",form_guests:"Voyageurs",form_name:"Nom",form_email:"E-mail",form_phone:"Téléphone (facultatif)",form_message:"Questions / demandes",form_submit:"Envoyer la demande",form_sending:"Envoi…",form_success:"Merci ! Nous vous répondrons sous peu.",form_error:"Échec de l'envoi. Veuillez réessayer plus tard.",form_unconfigured:"Le formulaire est en cours de configuration. Veuillez réserver via Airbnb pour le moment.",form_note:"Il s'agit d'une demande, et non d'une réservation confirmée. Nous vérifions les disponibilités et répondons sous 24 heures.",book_or:"— ou —",faq_title:"Questions fréquentes",faq_q1:"Quels sont les horaires d'arrivée / de départ ?",faq_a1:"L'arrivée se fait à partir de 15h00 et le départ avant 10h00. Arrivée autonome avec serrure connectée — nous envoyons le code avant votre venue.",faq_q2:"Combien de personnes peuvent séjourner ?",faq_a2:"Jusqu'à 12 voyageurs dans 5 chambres (9 lits). Idéal pour les familles et les groupes.",faq_q3:"Y a-t-il un parking ?",faq_a3:"Un parking payant se trouve à proximité. La maison est à 3 minutes à pied de la gare Jimmuji (ligne Keikyu).",faq_q4:"Quelle est la politique d'annulation ?",faq_a4:"Pour les réservations directes, nous proposons des conditions flexibles — n'hésitez pas à nous interroger lors de votre demande.",faq_q5:"Comment payer une réservation directe ?",faq_a5:"Après confirmation de vos dates, nous envoyons un lien de paiement sécurisé ou un RIB. Aucun débit avant cela.",
+    nav_about:"\u00c0 propos",nav_gallery:"Galerie",nav_amenities:"\u00c9quipements",nav_location:"Acc\u00e8s",nav_book:"R\u00e9server",
+    hero_title:"Hilltop Zushi",hero_subtitle:"Un refuge forestier face \u00e0 la mer",hero_cta:"R\u00e9server votre s\u00e9jour",
+    about_title:"Bienvenue \u00e0 Hilltop Zushi",
+    about_desc:"Perch\u00e9 sur un \u00e9crin de verdure \u00e0 Zushi, \u00e0 seulement 3 minutes \u00e0 pied de la gare Jimmuji (ligne Keikyu), Hilltop Zushi est un havre de paix alliant la chaleur du Japon au confort contemporain. Entour\u00e9 d\u2019une nature luxuriante et offrant une vue panoramique \u00e9poustouflante, ce joyau cach\u00e9 peut accueillir jusqu\u2019\u00e0 12 h\u00f4tes dans 5 chambres finement d\u00e9cor\u00e9es. Que vous organisiez un rassemblement en famille, une escapade entre amis ou une retraite cr\u00e9ative, Hilltop Zushi vous offre un sanctuaire id\u00e9al, suspendu entre la montagne et la mer.",
+    about_guests:"Jusqu\u2019\u00e0 12 personnes",about_bedrooms:"5 chambres",about_view:"Vue panoramique",about_bbq:"Terrasse barbecue",
+    gallery_title:"Galerie",gallery_all:"Tout",gallery_exterior:"Ext\u00e9rieur",gallery_interior:"Int\u00e9rieur",gallery_garden:"Jardin",gallery_renders:"Rendus architecturaux",
+    amenities_title:"\u00c9quipements & Services",amenity_bbq:"Barbecue",amenity_wifi:"Wi-Fi gratuit",amenity_kitchen:"Cuisine \u00e9quip\u00e9e",amenity_laundry:"Lave-linge & s\u00e8che-linge",amenity_ac:"Climatisation",amenity_parking:"Parking payant \u00e0 proximit\u00e9",amenity_lock:"Serrure connect\u00e9e",amenity_view:"Vue sur la montagne",
+    location_title:"Situation & Acc\u00e8s",location_station:"Gare Jimmuji (Keikyu) \u2014 3 min \u00e0 pied",location_kamakura:"Kamakura \u2014 20 min",location_shinagawa:"Shinagawa \u2014 45 min en train",location_nearby_title:"Attractions \u00e0 proximit\u00e9",location_buddha:"Grand Bouddha de Kamakura",location_enoshima:"\u00cele d\u2019Enoshima",location_hayama:"Marina de Hayama",location_zushi_beach:"Plage de Zushi",
+    book_title:"Pr\u00eat \u00e0 vivre l\u2019exp\u00e9rience Hilltop Zushi ?",book_desc:"R\u00e9servez votre s\u00e9jour via nos partenaires de confiance ou contactez-nous directement pour toute demande.",book_airbnb:"R\u00e9server sur Airbnb",book_booking:"R\u00e9server sur Booking.com",book_contact:"Nous contacter",
+    footer_address:"Ikego, Zushi, Kanagawa, Japon",footer_copyright:"\u00a9 2026 Hilltop Zushi. Tous droits r\u00e9serv\u00e9s."
+  },
+  es: {
+    book_eyebrow:"Reserva directa",direct_badge:"★ Exclusivo del sitio oficial — 5% DE DESCUENTO (mejor tarifa directa)",perk_rate:"Mejor tarifa directa",perk_flex:"Flexible y apto para estancias largas",perk_whole:"Casa entera, hasta 12",perk_direct:"Habla directamente con el anfitrión",bb_check:"Ver disponibilidad",avail_note:"La disponibilidad se sincroniza con nuestro calendario de Airbnb a modo orientativo. Tus fechas se confirman tras la verificación.",avail_unconfigured:"El calendario de disponibilidad se está configurando. Indica tus fechas y envía una solicitud.",legend_open:"Disponible",legend_blocked:"Reservado",form_title:"Solicitud de reserva",form_checkin:"Entrada",form_checkout:"Salida",form_guests:"Huéspedes",form_name:"Nombre",form_email:"Correo electrónico",form_phone:"Teléfono (opcional)",form_message:"Preguntas / solicitudes",form_submit:"Enviar solicitud",form_sending:"Enviando…",form_success:"¡Gracias! Te responderemos en breve.",form_error:"Error al enviar. Inténtalo de nuevo más tarde.",form_unconfigured:"El formulario se está configurando. Reserva por Airbnb por ahora.",form_note:"Esto es una solicitud, no una reserva confirmada. Comprobaremos la disponibilidad y responderemos en 24 horas.",book_or:"— o —",faq_title:"Preguntas frecuentes",faq_q1:"¿Cuáles son los horarios de entrada / salida?",faq_a1:"La entrada es a partir de las 15:00 y la salida antes de las 10:00. Auto check-in con cerradura inteligente: enviamos el código antes de tu llegada.",faq_q2:"¿Cuántos huéspedes pueden alojarse?",faq_a2:"Hasta 12 huéspedes en 5 habitaciones (9 camas). Perfecto para familias y grupos.",faq_q3:"¿Hay aparcamiento?",faq_a3:"Hay aparcamiento de pago cerca. La casa está a 3 minutos a pie de la estación Jimmuji (línea Keikyu).",faq_q4:"¿Cuál es la política de cancelación?",faq_a4:"Para reservas directas ofrecemos condiciones flexibles; pregúntanos al enviar tu solicitud.",faq_q5:"¿Cómo se paga una reserva directa?",faq_a5:"Tras confirmar tus fechas, enviamos un enlace de pago seguro o los datos para transferencia. No se cobra nada hasta entonces.",
+    nav_about:"Acerca de",nav_gallery:"Galer\u00eda",nav_amenities:"Servicios",nav_location:"Ubicaci\u00f3n",nav_book:"Reservar ahora",
+    hero_title:"Hilltop Zushi",hero_subtitle:"Un retiro en el bosque sobre el mar",hero_cta:"Reserva tu estancia",
+    about_title:"Bienvenido a Hilltop Zushi",
+    about_desc:"Ubicado en lo alto de una colina de exuberante vegetaci\u00f3n en Zushi, a tan solo 3 minutos a pie de la estaci\u00f3n Jimmuji (l\u00ednea Keikyu), Hilltop Zushi es un amplio refugio que fusiona la calidez japonesa con el confort moderno. Rodeado de naturaleza y con vistas panor\u00e1micas que quitan el aliento, este tesoro escondido tiene capacidad para hasta 12 hu\u00e9spedes en 5 habitaciones cuidadosamente decoradas. Ya sea que planees una reuni\u00f3n familiar, una escapada con amigos o un retiro creativo, Hilltop Zushi es el santuario perfecto entre la monta\u00f1a y el mar.",
+    about_guests:"Hasta 12 hu\u00e9spedes",about_bedrooms:"5 habitaciones",about_view:"Vistas desde la colina",about_bbq:"Terraza con BBQ",
+    gallery_title:"Galer\u00eda",gallery_all:"Todo",gallery_exterior:"Exterior",gallery_interior:"Interior",gallery_garden:"Jard\u00edn",gallery_renders:"Renders de dise\u00f1o",
+    amenities_title:"Servicios e Instalaciones",amenity_bbq:"Parrilla BBQ",amenity_wifi:"Wi-Fi gratuito",amenity_kitchen:"Cocina completa",amenity_laundry:"Lavadora y secadora",amenity_ac:"Aire acondicionado",amenity_parking:"Aparcamiento de pago cercano",amenity_lock:"Entrada con cerradura inteligente",amenity_view:"Vistas a la monta\u00f1a",
+    location_title:"Ubicaci\u00f3n y Acceso",location_station:"Estaci\u00f3n Jimmuji (Keikyu) \u2014 3 min a pie",location_kamakura:"Kamakura \u2014 20 min",location_shinagawa:"Shinagawa \u2014 45 min en tren",location_nearby_title:"Atracciones cercanas",location_buddha:"Gran Buda de Kamakura",location_enoshima:"Isla de Enoshima",location_hayama:"Marina de Hayama",location_zushi_beach:"Playa de Zushi",
+    book_title:"\u00bfListo para vivir la experiencia Hilltop Zushi?",book_desc:"Reserva tu estancia a trav\u00e9s de nuestros socios de confianza o cont\u00e1ctanos directamente para cualquier consulta.",book_airbnb:"Reservar en Airbnb",book_booking:"Reservar en Booking.com",book_contact:"Cont\u00e1ctanos",
+    footer_address:"Ikego, Zushi, Kanagawa, Jap\u00f3n",footer_copyright:"\u00a9 2026 Hilltop Zushi. Todos los derechos reservados."
+  },
+  ko: {
+    book_eyebrow:"공식 사이트 직접 예약",direct_badge:"★ 공식 사이트 한정 — 5% 할인 (최저 직접 예약가)",perk_rate:"공식 최저가",perk_flex:"유연한 일정·장기 숙박 환영",perk_whole:"독채 전체, 최대 12명",perk_direct:"호스트와 직접 소통",bb_check:"예약 가능 확인",avail_note:"예약 가능 여부는 Airbnb 캘린더 연동 기준의 참고 정보입니다. 날짜는 확인 후 확정됩니다.",avail_unconfigured:"예약 가능 캘린더를 준비 중입니다. 날짜를 입력하고 요청을 보내주세요.",legend_open:"예약 가능",legend_blocked:"예약 완료",form_title:"예약 요청",form_checkin:"체크인",form_checkout:"체크아웃",form_guests:"인원",form_name:"이름",form_email:"이메일",form_phone:"전화 (선택)",form_message:"문의 / 요청사항",form_submit:"요청 보내기",form_sending:"전송 중…",form_success:"감사합니다! 곧 연락드리겠습니다.",form_error:"전송에 실패했습니다. 잠시 후 다시 시도해 주세요.",form_unconfigured:"예약 폼을 준비 중입니다. 지금은 Airbnb로 예약해 주세요.",form_note:"이 단계에서는 예약이 확정되지 않습니다. 예약 가능 여부를 확인한 뒤 24시간 이내에 연락드립니다.",book_or:"— 또는 —",faq_title:"자주 묻는 질문",faq_q1:"체크인 / 체크아웃 시간은?",faq_a1:"체크인은 오후 3시부터, 체크아웃은 오전 10시까지입니다. 스마트락 셀프 체크인 — 도착 전에 비밀번호를 보내드립니다.",faq_q2:"몇 명까지 숙박할 수 있나요?",faq_a2:"5개 침실(침대 9개)에 최대 12명. 가족과 단체에 적합합니다.",faq_q3:"주차장이 있나요?",faq_a3:"인근에 코인 주차장이 있습니다. 게이큐 진무지역에서 도보 3분 거리입니다.",faq_q4:"취소 정책은 어떻게 되나요?",faq_a4:"직접 예약은 유연하게 안내해 드립니다. 요청 시 편하게 문의해 주세요.",faq_q5:"직접 예약은 어떻게 결제하나요?",faq_a5:"날짜 확정 후 안전한 결제 링크 또는 계좌 정보를 보내드립니다. 그 전까지는 청구되지 않습니다.",
+    nav_about:"\uc18c\uac1c",nav_gallery:"\uac24\ub7ec\ub9ac",nav_amenities:"\ud3b8\uc758\uc2dc\uc124",nav_location:"\uc624\uc2dc\ub294 \uae38",nav_book:"\uc608\uc57d\ud558\uae30",
+    hero_title:"Hilltop Zushi",hero_subtitle:"\ubc14\ub2e4 \uc704 \uc219\uc18d \ud790\ub9c1 \ub9ac\ud2b8\ub9bf",hero_cta:"\uc9c0\uae08 \uc608\uc57d\ud558\uae30",
+    about_title:"Hilltop Zushi\uc5d0 \uc624\uc2e0 \uac83\uc744 \ud658\uc601\ud569\ub2c8\ub2e4",
+    about_desc:"\uac8c\uc774\ud050 \uc9c4\ubb34\uc9c0\uc5ed\uc5d0\uc11c \ub3c4\ubcf4 3\ubd84, \uc2f1\uadf8\ub7ec\uc6b4 \uc5b8\ub355 \uc704\uc5d0 \uc790\ub9ac\ud55c Hilltop Zushi\ub294 \uc77c\ubcf8 \ud2b9\uc720\uc758 \ub530\ub73b\ud568\uacfc \ud604\ub300\uc801\uc778 \ud3b8\uc548\ud568\uc774 \uc5b4\uc6b0\ub7ec\uc9c4 \ud2b9\ubcc4\ud55c \uacf5\uac04\uc785\ub2c8\ub2e4. \uc6b8\ucc3d\ud55c \ub179\uc74c\uc5d0 \ub458\ub7ec\uc2f8\uc5ec \ud0c1 \ud2b8\uc778 \ud30c\ub178\ub77c\ub9c8 \ubdf0\ub97c \uc790\ub791\ud558\ub294 \uc774 \uc228\uc740 \uba85\uc18c\ub294 \uc544\ub984\ub2f5\uac8c \uafb8\uba70\uc9c4 5\uac1c\uc758 \uce68\uc2e4\uc5d0 \ucd5c\ub300 12\uba85\uc744 \ubaa8\uc2e4 \uc218 \uc788\uc2b5\ub2c8\ub2e4.",
+    about_guests:"\ucd5c\ub300 12\uba85",about_bedrooms:"\uce68\uc2e4 5\uac1c",about_view:"\uc5b8\ub355 \uc804\ub9dd",about_bbq:"BBQ \ud14c\ub77c\uc2a4",
+    gallery_title:"\uac24\ub7ec\ub9ac",gallery_all:"\uc804\uccb4",gallery_exterior:"\uc678\uad00",gallery_interior:"\ub0b4\ubd80",gallery_garden:"\uc815\uc6d0",gallery_renders:"\ub514\uc790\uc778 \ub80c\ub354\ub9c1",
+    amenities_title:"\ud3b8\uc758\uc2dc\uc124 \ubc0f \ud2b9\uc9d5",amenity_bbq:"BBQ \uadf8\ub9b4",amenity_wifi:"\ubb34\ub8cc Wi-Fi",amenity_kitchen:"\ud480 \ud0a4\uce5c",amenity_laundry:"\uc138\ud0c1\uae30 & \uac74\uc870\uae30",amenity_ac:"\uc5d0\uc5b4\ucee8",amenity_parking:"\uc778\uadfc \ucf54\uc778 \uc8fc\ucc28\uc7a5",amenity_lock:"\uc2a4\ub9c8\ud2b8 \ub3c4\uc5b4\ub77d",amenity_view:"\uc0b0 \ubdf0",
+    location_title:"\uc704\uce58 \ubc0f \uad50\ud1b5",location_station:"\uac8c\uc774\ud050 \uc9c4\ubb34\uc9c0\uc5ed \u2014 \ub3c4\ubcf4 3\ubd84",location_kamakura:"\uac00\ub9c8\ucfe0\ub77c \u2014 \uc57d 20\ubd84",location_shinagawa:"\uc2dc\ub098\uac00\uc640 \u2014 \uc804\ucca0\ub85c 45\ubd84",location_nearby_title:"\uc8fc\ubcc0 \uba85\uc18c",location_buddha:"\uac00\ub9c8\ucfe0\ub77c \ub300\ubd88",location_enoshima:"\uc5d0\ub178\uc2dc\ub9c8 \uc12c",location_hayama:"\ud558\uc57c\ub9c8 \ub9c8\ub9ac\ub098",location_zushi_beach:"\uc988\uc2dc \ud574\ubcc0",
+    book_title:"Hilltop Zushi\uc758 \ud2b9\ubcc4\ud55c \uacbd\ud5d8, \uc9c0\uae08 \ubc14\ub85c \uc2dc\uc791\ud558\uc138\uc694",book_desc:"\ubbff\uc744 \uc218 \uc788\ub294 \ud30c\ud2b8\ub108 \ud50c\ub7ab\ud3fc\uc744 \ud1b5\ud574 \uc608\uc57d\ud558\uc2dc\uac70\ub098, \ubb38\uc758 \uc0ac\ud56d\uc740 \uc9c1\uc811 \uc5f0\ub77d \uc8fc\uc138\uc694.",book_airbnb:"Airbnb\uc5d0\uc11c \uc608\uc57d",book_booking:"Booking.com\uc5d0\uc11c \uc608\uc57d",book_contact:"\ubb38\uc758\ud558\uae30",
+    footer_address:"\uc77c\ubcf8 \uac00\ub098\uac00\uc640\ud604 \uc988\uc2dc\uc2dc \uc774\ucf00\uace0",footer_copyright:"\u00a9 2026 Hilltop Zushi. All rights reserved."
+  },
+  zh: {
+    book_eyebrow:"官网直接预订",direct_badge:"★ 官网专享 — 5% 优惠（最佳直订价）",perk_rate:"官网最优价",perk_flex:"灵活·欢迎长期入住",perk_whole:"整栋出租，最多12人",perk_direct:"与房东直接沟通",bb_check:"查看空房",avail_note:"空房情况依据 Airbnb 日历同步，仅供参考。您的日期将在确认后正式生效。",avail_unconfigured:"空房日历正在设置中。请填写日期并发送预订请求。",legend_open:"空房",legend_blocked:"已订",form_title:"预订请求",form_checkin:"入住",form_checkout:"退房",form_guests:"人数",form_name:"姓名",form_email:"邮箱",form_phone:"电话（选填）",form_message:"问题 / 需求",form_submit:"发送请求",form_sending:"发送中…",form_success:"感谢！我们会尽快与您联系。",form_error:"发送失败，请稍后再试。",form_unconfigured:"预订表单正在设置中。请暂时通过 Airbnb 预订。",form_note:"这是预订请求，并非已确认的预订。我们将确认空房后在24小时内回复。",book_or:"— 或 —",faq_title:"常见问题",faq_q1:"入住 / 退房时间是几点？",faq_a1:"入住时间为下午3:00起，退房时间为上午10:00前。智能门锁自助入住——我们会在您到达前发送密码。",faq_q2:"最多可入住几人？",faq_a2:"5间卧室（9张床）最多入住12人。非常适合家庭和团体。",faq_q3:"有停车场吗？",faq_a3:"附近有收费停车场。房屋距京急·神武寺站步行3分钟。",faq_q4:"取消政策是怎样的？",faq_a4:"直接预订提供灵活的条款——发送请求时欢迎咨询。",faq_q5:"直接预订如何付款？",faq_a5:"确认日期后，我们会发送安全的支付链接或银行转账信息。在此之前不会收费。",
+    nav_about:"\u5173\u4e8e\u6211\u4eec",nav_gallery:"\u56fe\u5e93",nav_amenities:"\u8bbe\u65bd",nav_location:"\u4f4d\u7f6e\u4ea4\u901a",nav_book:"\u7acb\u5373\u9884\u8ba2",
+    hero_title:"Hilltop Zushi",hero_subtitle:"\u5c71\u6d77\u4e4b\u95f4\uff0c\u68ee\u6797\u5ea6\u5047\u80dc\u5730",hero_cta:"\u9884\u8ba2\u60a8\u7684\u4f4f\u5bbf",
+    about_title:"\u6b22\u8fce\u6765\u5230 Hilltop Zushi",
+    about_desc:"Hilltop Zushi \u5750\u843d\u4e8e\u9017\u5b50\u90c1\u90c1\u8471\u8471\u7684\u5c71\u4e18\u4e4b\u4e0a\uff0c\u8ddd\u4eac\u6025\u795e\u6b66\u5bfa\u7ad9\u4ec5\u9700\u6b65\u884c3\u5206\u949f\u3002\u8fd9\u91cc\u5c06\u65e5\u5f0f\u6e29\u60c5\u4e0e\u73b0\u4ee3\u8212\u9002\u5b8c\u7f8e\u878d\u5408\uff0c\u662f\u4e00\u5904\u4ee4\u4eba\u5fc3\u65f7\u795e\u6021\u7684\u5ea6\u5047\u80dc\u5730\u3002\u56db\u5468\u7eff\u610f\u76ce\u7136\uff0c\u5750\u62e5\u5f00\u9614\u7684\u5168\u666f\u89c6\u91ce\uff0c\u8fd9\u9897\u9690\u79d8\u7684\u660e\u73e0\u62e5\u67095\u95f4\u7cbe\u5fc3\u5e03\u7f6e\u7684\u5367\u5ba4\uff0c\u53ef\u5bb9\u7eb3\u591a\u8fbe12\u4f4d\u5bbe\u5ba2\u3002",
+    about_guests:"\u6700\u591a\u53ef\u4f4f12\u4eba",about_bedrooms:"5\u95f4\u5367\u5ba4",about_view:"\u5c71\u4e18\u5168\u666f",about_bbq:"BBQ\u9732\u53f0",
+    gallery_title:"\u56fe\u5e93",gallery_all:"\u5168\u90e8",gallery_exterior:"\u5916\u89c2",gallery_interior:"\u5ba4\u5185",gallery_garden:"\u5ead\u9662",gallery_renders:"\u8bbe\u8ba1\u6548\u679c\u56fe",
+    amenities_title:"\u8bbe\u65bd\u4e0e\u7279\u8272",amenity_bbq:"BBQ\u70e7\u70e4\u7089",amenity_wifi:"\u514d\u8d39Wi-Fi",amenity_kitchen:"\u5b8c\u6574\u53a8\u623f",amenity_laundry:"\u6d17\u8863\u673a\u548c\u70d8\u5e72\u673a",amenity_ac:"\u7a7a\u8c03",amenity_parking:"\u9644\u8fd1\u6709\u6536\u8d39\u505c\u8f66\u573a",amenity_lock:"\u667a\u80fd\u95e8\u9501",amenity_view:"\u5c71\u666f",
+    location_title:"\u4f4d\u7f6e\u4e0e\u4ea4\u901a",location_station:"\u4eac\u6025\u795e\u6b66\u5bfa\u7ad9 \u2014 \u6b65\u884c3\u5206\u949f",location_kamakura:"\u9570\u4ed3 \u2014 \u7ea620\u5206\u949f",location_shinagawa:"\u54c1\u5ddd \u2014 \u4e58\u706b\u8f66\u7ea645\u5206\u949f",location_nearby_title:"\u5468\u8fb9\u666f\u70b9",location_buddha:"\u9570\u4ed3\u5927\u4f5b",location_enoshima:"\u6c5f\u4e4b\u5c9b",location_hayama:"\u53f6\u5c71\u6e38\u8247\u6e2f",location_zushi_beach:"\u9017\u5b50\u6d77\u6ee9",
+    book_title:"\u51c6\u5907\u597d\u4f53\u9a8c Hilltop Zushi \u4e86\u5417\uff1f",book_desc:"\u901a\u8fc7\u6211\u4eec\u7684\u5408\u4f5c\u5e73\u53f0\u9884\u8ba2\uff0c\u6216\u76f4\u63a5\u4e0e\u6211\u4eec\u8054\u7cfb\u54a8\u8be2\u3002",book_airbnb:"\u5728Airbnb\u4e0a\u9884\u8ba2",book_booking:"\u5728Booking.com\u4e0a\u9884\u8ba2",book_contact:"\u8054\u7cfb\u6211\u4eec",
+    footer_address:"\u65e5\u672c\u795e\u5948\u5ddd\u53bf\u9017\u5b50\u5e02\u6c60\u5b50",footer_copyright:"\u00a9 2026 Hilltop Zushi. \u4fdd\u7559\u6240\u6709\u6743\u5229\u3002"
+  }
+};
+
+/* ===== LANGUAGE SWITCHER ===== */
+function setLanguage(lang) {
+  const data = i18nData[lang];
+  if (!data) return;
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (data[key]) el.textContent = data[key];
+  });
+  localStorage.setItem('hilltop-lang', lang);
+  document.getElementById('langSelect').value = lang;
+}
+
+document.getElementById('langSelect').addEventListener('change', function() {
+  setLanguage(this.value);
+});
+
+/* ===== HEADER SCROLL ===== */
+const header = document.getElementById('header');
+const stickyCta = document.getElementById('stickyCta');
+const bookSection = document.getElementById('book');
+window.addEventListener('scroll', () => {
+  header.classList.toggle('scrolled', window.scrollY > 50);
+  /* 追従CTA: ヒーローを過ぎたら表示。予約セクション自体が見えている間は隠す(ボタン重複回避) */
+  const past = window.scrollY > window.innerHeight * 0.5;
+  const bookTop = bookSection.getBoundingClientRect().top;
+  const inBook = bookTop < window.innerHeight * 0.9 && bookTop > -bookSection.offsetHeight;
+  stickyCta.classList.toggle('show', past && !inBook);
+});
+
+/* ===== HAMBURGER MENU ===== */
+const hamburger = document.getElementById('hamburger');
+const nav = document.getElementById('nav');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('active');
+  nav.classList.toggle('open');
+});
+nav.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    hamburger.classList.remove('active');
+    nav.classList.remove('open');
+  });
+});
+
+/* ===== HERO SLIDESHOW ===== */
+const slides = document.querySelectorAll('.hero-slide');
+const dotsContainer = document.querySelector('.hero-dots');
+let currentSlide = 0;
+let slideInterval;
+
+slides.forEach((_, i) => {
+  const dot = document.createElement('div');
+  dot.classList.add('hero-dot');
+  if (i === 0) dot.classList.add('active');
+  dot.addEventListener('click', () => goToSlide(i));
+  dotsContainer.appendChild(dot);
+});
+
+function goToSlide(n) {
+  slides[currentSlide].classList.remove('active');
+  dotsContainer.children[currentSlide].classList.remove('active');
+  currentSlide = n;
+  slides[currentSlide].classList.add('active');
+  dotsContainer.children[currentSlide].classList.add('active');
+  resetInterval();
+}
+
+function nextSlide() {
+  goToSlide((currentSlide + 1) % slides.length);
+}
+
+function resetInterval() {
+  clearInterval(slideInterval);
+  slideInterval = setInterval(nextSlide, 6000);
+}
+resetInterval();
+
+/* ===== GALLERY FILTER ===== */
+const filterBtns = document.querySelectorAll('.gallery-filters button');
+const galleryItems = document.querySelectorAll('.gallery-item');
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.getAttribute('data-filter');
+    galleryItems.forEach(item => {
+      if (filter === 'all' || item.getAttribute('data-category') === filter) {
+        item.classList.remove('hidden');
+      } else {
+        item.classList.add('hidden');
+      }
+    });
+  });
+});
+
+/* ===== LIGHTBOX ===== */
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+let lightboxIndex = 0;
+let visibleItems = [];
+
+function updateVisibleItems() {
+  visibleItems = Array.from(galleryItems).filter(item => !item.classList.contains('hidden'));
+}
+
+galleryItems.forEach(item => {
+  item.addEventListener('click', () => {
+    updateVisibleItems();
+    lightboxIndex = visibleItems.indexOf(item);
+    lightboxImg.src = item.querySelector('img').src;
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  });
+});
+
+document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+
+function closeLightbox() {
+  lightbox.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('lightboxPrev').addEventListener('click', (e) => {
+  e.stopPropagation();
+  lightboxIndex = (lightboxIndex - 1 + visibleItems.length) % visibleItems.length;
+  lightboxImg.src = visibleItems[lightboxIndex].querySelector('img').src;
+});
+
+document.getElementById('lightboxNext').addEventListener('click', (e) => {
+  e.stopPropagation();
+  lightboxIndex = (lightboxIndex + 1) % visibleItems.length;
+  lightboxImg.src = visibleItems[lightboxIndex].querySelector('img').src;
+});
+
+document.addEventListener('keydown', (e) => {
+  if (!lightbox.classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowLeft') document.getElementById('lightboxPrev').click();
+  if (e.key === 'ArrowRight') document.getElementById('lightboxNext').click();
+});
+
+/* ===== SCROLL ANIMATIONS ===== */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+/* ===================== BOOKING ===================== */
+/* GASのウェブアプリURLを設定すると予約リクエスト送信が有効化される */
+const FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyYd45JxCIOIoD8ulPaccUbUfqOa9lC9Qxlifyu217jHocvS1lujM4ZpC374s-9iuZq9w/exec';
+
+function t(k){const d=i18nData[document.documentElement.lang]||i18nData.en;return d[k]||i18nData.en[k]||'';}
+function pad(n){return String(n).padStart(2,'0');}
+function ymd(y,m,d){return `${y}-${pad(m+1)}-${pad(d)}`;}
+function nextDay(ds){const [y,m,d]=ds.split('-').map(Number);const dt=new Date(y,m-1,d);dt.setDate(dt.getDate()+1);return ymd(dt.getFullYear(),dt.getMonth(),dt.getDate());}
+const todayStr = (()=>{const n=new Date();return ymd(n.getFullYear(),n.getMonth(),n.getDate());})();
+
+/* 人数プルダウン(1-12)・日付min */
+(function(){
+  let o='';for(let i=1;i<=12;i++)o+=`<option value="${i}">${i}</option>`;
+  ['bbGuests','rfGuests'].forEach(id=>{const el=document.getElementById(id);if(el){el.innerHTML=o;el.value='2';}});
+  ['bbIn','bbOut','rfIn','rfOut'].forEach(id=>{const el=document.getElementById(id);if(el)el.min=todayStr;});
+})();
+
+/* hero予約バー → フォームへスクロール+反映 */
+document.getElementById('bbCheck').addEventListener('click',()=>{
+  const i=document.getElementById('bbIn').value,oo=document.getElementById('bbOut').value,g=document.getElementById('bbGuests').value;
+  if(i)document.getElementById('rfIn').value=i;
+  if(oo)document.getElementById('rfOut').value=oo;
+  document.getElementById('rfGuests').value=g;
+  syncRangeFromInputs();
+  document.getElementById('book').scrollIntoView({behavior:'smooth'});
+});
+
+/* ===== 空き状況カレンダー ===== */
+const calBody=document.getElementById('calBody'),calDow=document.getElementById('calDow'),calTitle=document.getElementById('calTitle');
+const DOW_KEYS=['S','M','T','W','T','F','S'];
+let viewYear,viewMonth,blockedSet=new Set(),availConfigured=null,selIn=null,selOut=null;
+
+function buildBlockedSet(ranges){
+  const set=new Set();
+  (ranges||[]).forEach(r=>{let cur=r.start;while(cur&&r.end&&cur<r.end){set.add(cur);cur=nextDay(cur);}});
+  return set;
+}
+async function loadAvailability(){
+  try{
+    const res=await fetch('/availability',{cache:'no-store'});
+    const data=await res.json();
+    availConfigured=!!data.configured;
+    blockedSet=buildBlockedSet(data.blocked);
+  }catch(e){availConfigured=false;blockedSet=new Set();}
+  renderCal();
+}
+function renderCal(){
+  const first=new Date(viewYear,viewMonth,1);
+  const lang=document.documentElement.lang||'en';
+  calTitle.textContent=first.toLocaleDateString(lang,{year:'numeric',month:'long'});
+  if(availConfigured===false){
+    calDow.innerHTML='';
+    calBody.innerHTML=`<div class="cal-msg" style="grid-column:1/-1">${t('avail_unconfigured')}</div>`;
+    return;
+  }
+  calDow.innerHTML=DOW_KEYS.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  const startDow=first.getDay();
+  const days=new Date(viewYear,viewMonth+1,0).getDate();
+  let html='';
+  for(let i=0;i<startDow;i++)html+='<div class="cal-day empty"></div>';
+  for(let d=1;d<=days;d++){
+    const ds=ymd(viewYear,viewMonth,d);
+    let cls='cal-day';
+    if(ds<todayStr)cls+=' past';
+    else if(blockedSet.has(ds))cls+=' blocked';
+    else{cls+=' open';if(ds===selIn||ds===selOut)cls+=' sel';else if(selIn&&selOut&&ds>selIn&&ds<selOut)cls+=' inrange';}
+    html+=`<div class="${cls}" data-d="${ds}">${d}</div>`;
+  }
+  calBody.innerHTML=html;
+  calBody.querySelectorAll('.cal-day.open').forEach(el=>el.addEventListener('click',()=>onPickDate(el.getAttribute('data-d'))));
+}
+function onPickDate(ds){
+  if(!selIn||(selIn&&selOut)){selIn=ds;selOut=null;}
+  else if(ds<=selIn){selIn=ds;selOut=null;}
+  else{let ok=true,cur=nextDay(selIn);while(cur<ds){if(blockedSet.has(cur)){ok=false;break;}cur=nextDay(cur);}if(ok)selOut=ds;else{selIn=ds;selOut=null;}}
+  document.getElementById('rfIn').value=selIn||'';
+  document.getElementById('rfOut').value=selOut||'';
+  renderCal();
+}
+function syncRangeFromInputs(){selIn=document.getElementById('rfIn').value||null;selOut=document.getElementById('rfOut').value||null;renderCal();}
+document.getElementById('rfIn').addEventListener('change',syncRangeFromInputs);
+document.getElementById('rfOut').addEventListener('change',syncRangeFromInputs);
+document.getElementById('calPrev').addEventListener('click',()=>{viewMonth--;if(viewMonth<0){viewMonth=11;viewYear--;}renderCal();});
+document.getElementById('calNext').addEventListener('click',()=>{viewMonth++;if(viewMonth>11){viewMonth=0;viewYear++;}renderCal();});
+document.getElementById('langSelect').addEventListener('change',()=>renderCal());
+(function(){const n=new Date();viewYear=n.getFullYear();viewMonth=n.getMonth();renderCal();loadAvailability();})();
+
+/* ===== 予約リクエスト送信 ===== */
+const reqForm=document.getElementById('reqForm'),reqStatus=document.getElementById('reqStatus'),reqSubmit=document.getElementById('reqSubmit');
+reqForm.addEventListener('submit',async(e)=>{
+  e.preventDefault();
+  // honeypot: ボットが隠しフィールドを埋めたら、送信せず成功風に見せて破棄
+  if(document.getElementById('rfCompany').value){reqStatus.className='req-status ok';reqStatus.textContent=t('form_success');return;}
+  // 日付バリデーション(チェックアウト>チェックイン, 過去日不可, ブロック日跨ぎ不可)
+  const ci=document.getElementById('rfIn').value,co=document.getElementById('rfOut').value;
+  if(!ci||!co||ci<todayStr||co<=ci){reqStatus.className='req-status ng';reqStatus.textContent=t('form_invalid');return;}
+  for(let cur=ci;cur<co;cur=nextDay(cur)){if(blockedSet.has(cur)){reqStatus.className='req-status ng';reqStatus.textContent=t('form_invalid');return;}}
+  document.getElementById('rfLang').value=document.documentElement.lang||'en';
+  if(!FORM_ENDPOINT){reqStatus.className='req-status ng';reqStatus.textContent=t('form_unconfigured');return;}
+  reqSubmit.disabled=true;reqSubmit.textContent=t('form_sending');
+  try{
+    await fetch(FORM_ENDPOINT,{method:'POST',mode:'no-cors',body:new URLSearchParams(new FormData(reqForm))});
+    reqStatus.className='req-status ok';reqStatus.textContent=t('form_success');
+    reqForm.reset();selIn=null;selOut=null;renderCal();
+  }catch(err){reqStatus.className='req-status ng';reqStatus.textContent=t('form_error');}
+  finally{reqSubmit.disabled=false;reqSubmit.textContent=t('form_submit');}
+});
+
+/* ===== FAQ アコーディオン ===== */
+document.querySelectorAll('.faq-q').forEach(q=>q.addEventListener('click',()=>q.parentElement.classList.toggle('open')));
+
+/* ===== INIT LANGUAGE ===== */
+const savedLang = localStorage.getItem('hilltop-lang') || (navigator.language.startsWith('ja') ? 'ja' : navigator.language.startsWith('ko') ? 'ko' : navigator.language.startsWith('zh') ? 'zh' : navigator.language.startsWith('fr') ? 'fr' : navigator.language.startsWith('es') ? 'es' : 'en');
+setLanguage(savedLang);
+</script>
+</body>
+</html>

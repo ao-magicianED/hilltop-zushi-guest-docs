@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hilltop Zushi｜360°バーチャル内見</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css">
+<script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
+
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; background: #16291f; color: #fff; }
+  body { font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic UI", sans-serif; display: flex; flex-direction: column; }
+
+  header {
+    padding: 0.9rem 1.5rem;
+    background: linear-gradient(160deg, #1F3A34 0%, #16291f 100%);
+    border-bottom: 1px solid rgba(201,165,109,0.25);
+    flex-shrink: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  header .brand { font-family: "Cormorant Garamond", "Noto Serif JP", serif; font-size: 1.25rem; font-weight: 600; letter-spacing: .04em; }
+  header h1 { margin: 0; font-size: 1.05rem; font-weight: 600; color: #C9A56D; }
+  header p { margin: 0; font-size: 0.8rem; opacity: 0.8; }
+  header a.back { margin-left: auto; font-size: 0.8rem; color: rgba(255,255,255,.8); text-decoration: none; border: 1px solid rgba(255,255,255,.3); padding: .35rem .9rem; border-radius: 30px; }
+  header a.back:hover { color: #fff; border-color: #C9A56D; }
+
+  #viewer { flex: 1; min-height: 0; width: 100%; background: #000; }
+
+  .gallery {
+    flex-shrink: 0;
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.8rem 1rem;
+    overflow-x: auto;
+    background: rgba(0,0,0,0.65);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    scrollbar-width: thin;
+  }
+  .gallery::-webkit-scrollbar { height: 8px; }
+  .gallery::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 4px; }
+
+  .chip {
+    flex: 0 0 auto;
+    min-width: 96px;
+    height: 46px;
+    padding: 0 1.1rem;
+    border-radius: 24px;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.06);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.84rem; white-space: nowrap; color: rgba(255,255,255,0.9);
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+  .chip:hover { background: rgba(201,165,109,0.18); border-color: rgba(201,165,109,0.5); }
+  .chip.active { background: #C9A56D; border-color: #C9A56D; color: #16291f; font-weight: 600; }
+
+  @media (max-width: 600px) {
+    header .brand { font-size: 1.05rem; }
+    header h1 { font-size: 0.92rem; }
+    header p { font-size: 0.68rem; width: 100%; }
+    .chip { min-width: 84px; height: 42px; font-size: 0.78rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="brand">Hilltop Zushi</span>
+  <h1>360°バーチャル内見</h1>
+  <p>ドラッグで見渡す／下のボタンで部屋を切替</p>
+  <a class="back" href="../index.html">← サイトに戻る</a>
+</header>
+
+<div id="viewer"></div>
+
+<div class="gallery" id="gallery"></div>
+
+<script>
+  const photos = [
+    { file: 'R0011162', name: '玄関・廊下' },
+    { file: 'R0011156', name: '和室リビング' },
+    { file: 'R0011160', name: 'キッチン' },
+    { file: 'R0011161', name: '寝室A（キング）' },
+    { file: 'R0011163', name: '寝室B（ツイン）' },
+    { file: 'R0011165', name: '寝室C（和室）' },
+    { file: 'R0011157', name: 'キッズルーム' },
+    { file: 'R0011158', name: '洗面・脱衣所' },
+    { file: 'R0011159', name: '浴室' },
+    { file: 'R0011164', name: 'トイレ' }
+  ];
+
+  let viewer = null;
+
+  function loadPanorama(index) {
+    const p = photos[index];
+    const ext = p.ext || 'JPG';
+    if (viewer) { viewer.destroy(); }
+    viewer = pannellum.viewer('viewer', {
+      type: 'equirectangular',
+      panorama: p.file + '.' + ext,
+      autoLoad: true,
+      autoRotate: -2,
+      compass: false,
+      showFullscreenCtrl: true,
+      showZoomCtrl: true,
+      mouseZoom: true,
+      hfov: 120,
+      minHfov: 50,
+      maxHfov: 120
+    });
+    document.querySelectorAll('.chip').forEach((el, i) => {
+      el.classList.toggle('active', i === index);
+    });
+  }
+
+  const gallery = document.getElementById('gallery');
+  photos.forEach((p, i) => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip' + (i === 0 ? ' active' : '');
+    chip.textContent = p.name;
+    chip.addEventListener('click', () => loadPanorama(i));
+    gallery.appendChild(chip);
+  });
+
+  loadPanorama(0);
+</script>
+
+</body>
+</html>

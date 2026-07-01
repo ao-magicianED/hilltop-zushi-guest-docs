@@ -1,0 +1,386 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DANGER · 立入禁止 — Hilltop Zushi</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;900&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Sans+KR:wght@400;700;900&family=Noto+Sans+SC:wght@400;700;900&family=Noto+Serif+JP:wght@600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F3A34;
+    --accent: #C9A56D;
+    --bg: #F5F3F0;
+    --text: #2C2C2C;
+    --danger: #C8242A;
+    --danger-deep: #8E1418;
+    --danger-bg: #FFF1F0;
+    --neutral: #6B6B6B;
+    --warning-yellow: #FFCC00;
+    --black: #1A1A1A;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  html, body { background: #888; }
+  body {
+    font-family: 'Inter', 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    background: var(--bg);
+    position: relative;
+    padding: 14mm 14mm 24mm;
+    box-shadow: 0 8px 50px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ハッシュ枠（警告らしさを出す） */
+  .frame {
+    position: absolute;
+    top: 6mm; left: 6mm; right: 6mm; bottom: 6mm;
+    border: 4px solid var(--danger);
+    pointer-events: none;
+  }
+  .frame::before {
+    content: '';
+    position: absolute;
+    inset: 3mm;
+    border: 2px solid var(--danger);
+    opacity: 0.4;
+  }
+
+  /* 黄黒ストライプ（最警告レベル） */
+  .stripe-top, .stripe-bottom {
+    position: absolute;
+    left: 6mm; right: 6mm;
+    height: 8mm;
+    background: repeating-linear-gradient(
+      45deg,
+      var(--warning-yellow) 0,
+      var(--warning-yellow) 8mm,
+      var(--black) 8mm,
+      var(--black) 16mm
+    );
+    z-index: 1;
+  }
+  .stripe-top { top: 6mm; }
+  .stripe-bottom { bottom: 6mm; }
+
+  /* ブランドヘッダー */
+  .brand {
+    text-align: center;
+    margin-top: 12mm;
+    margin-bottom: 5mm;
+    position: relative;
+    z-index: 2;
+  }
+  .brand .brand-text {
+    font-family: 'Cormorant Garamond', 'Hiragino Mincho ProN', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.22em;
+    margin: 0 0 1mm;
+    line-height: 1;
+  }
+  .brand .tagline {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.62rem;
+    color: var(--danger);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  /* メイン */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* 巨大警告アイコン */
+  .icon-stack {
+    margin-bottom: 4mm;
+  }
+  .icon-circle {
+    width: 60mm;
+    height: 60mm;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--danger) 0%, var(--danger-deep) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 16px 40px rgba(200,36,42,0.45),
+      inset 0 0 0 6px rgba(255,255,255,0.18);
+    position: relative;
+  }
+  .icon-circle .symbol {
+    font-size: 7rem;
+    line-height: 1;
+    color: #fff;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
+    font-weight: 900;
+  }
+
+  /* 4言語タイトル */
+  .titles {
+    margin-bottom: 5mm;
+  }
+  .titles .jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 2.6rem;
+    font-weight: 900;
+    color: var(--danger);
+    letter-spacing: 0.18em;
+    line-height: 1;
+    text-shadow: 0 2px 4px rgba(200,36,42,0.15);
+  }
+  .titles .en {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--danger-deep);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-top: 3mm;
+  }
+  .titles .multi {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7mm;
+    margin-top: 3mm;
+  }
+  .titles .multi .item {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--danger-deep);
+    letter-spacing: 0.18em;
+  }
+  .titles .multi .item.zh { font-family: 'Noto Sans SC', sans-serif; }
+  .titles .multi .item.ko { font-family: 'Noto Sans KR', sans-serif; }
+  .titles .multi .divider {
+    width: 1px;
+    height: 18px;
+    background: var(--danger);
+    opacity: 0.5;
+  }
+
+  /* メッセージカード */
+  .message-card {
+    background: #fff;
+    border: 2px solid var(--danger);
+    border-radius: 3mm;
+    padding: 5mm 6mm;
+    margin-bottom: 4mm;
+    width: 100%;
+    box-shadow: 0 2px 12px rgba(200,36,42,0.12);
+  }
+  .message-card .row {
+    line-height: 1.55;
+    padding: 1mm 0;
+    border-bottom: 1px dashed rgba(200,36,42,0.2);
+  }
+  .message-card .row:last-child { border-bottom: none; }
+  .message-card .row.jp {
+    font-family: 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    font-size: 0.92rem;
+    color: var(--text);
+    font-weight: 700;
+  }
+  .message-card .row.en {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    color: var(--danger-deep);
+    font-weight: 600;
+    font-style: italic;
+  }
+  .message-card .row.zh {
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 0.78rem;
+    color: var(--danger-deep);
+    font-weight: 600;
+  }
+  .message-card .row.ko {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 0.78rem;
+    color: var(--danger-deep);
+    font-weight: 600;
+  }
+  .message-card .row strong {
+    background: var(--warning-yellow);
+    padding: 1px 6px;
+    color: var(--black);
+    font-weight: 900;
+  }
+
+  /* 責任免除（最大強調） */
+  .liability {
+    background: var(--danger);
+    color: #fff;
+    padding: 5mm 6mm;
+    border-radius: 3mm;
+    text-align: center;
+    width: 100%;
+    margin-top: 4mm;
+    margin-bottom: 4mm;
+    box-shadow: 0 6px 20px rgba(200,36,42,0.4);
+  }
+  .liability .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.62rem;
+    color: var(--warning-yellow);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 900;
+    margin-bottom: 2mm;
+  }
+  .liability .jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.7rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+    margin-bottom: 2.5mm;
+  }
+  .liability .en {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 2mm;
+  }
+  .liability .multi {
+    font-size: 0.78rem;
+    font-weight: 700;
+    opacity: 0.95;
+  }
+  .liability .multi .zh { font-family: 'Noto Sans SC', sans-serif; }
+  .liability .multi .ko { font-family: 'Noto Sans KR', sans-serif; }
+
+  /* フッター */
+  .foot {
+    margin-top: 2mm;
+    margin-bottom: 4mm;
+    text-align: center;
+    font-size: 0.6rem;
+    color: var(--neutral);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    position: relative;
+    z-index: 2;
+  }
+  .foot .ja {
+    text-transform: none;
+    letter-spacing: 0.1em;
+    font-family: 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    margin-top: 2px;
+    font-size: 0.64rem;
+  }
+
+  /* スマホ最適化: A4を画面幅にフィット */
+  @media (max-width: 880px) {
+    html, body { margin: 0; padding: 0; background: #fff; overflow-x: hidden; overflow-y: auto; }
+    body {
+      display: block;
+      min-height: 0;
+      height: calc(100vw * 1123 / 794);
+    }
+    .sheet {
+      transform: scale(calc(100vw / 794px));
+      transform-origin: top left;
+      box-shadow: none;
+    }
+  }
+
+  @media print {
+    html, body { background: #fff; overflow: hidden; }
+    html { -ms-overflow-style: none; scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+    body { padding: 0; }
+    .sheet {
+      box-shadow: none;
+      page-break-after: avoid;
+    }
+    .icon-circle { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="stripe-top"></div>
+    <div class="frame"></div>
+
+    <header class="brand">
+      <div class="brand-text">HILLTOP ZUSHI</div>
+      <div class="tagline">⚠ Safety Notice · 重要警告 ⚠</div>
+    </header>
+
+    <main class="main">
+      <div class="icon-stack">
+        <div class="icon-circle">
+          <span class="symbol">⚠</span>
+        </div>
+      </div>
+
+      <div class="titles">
+        <div class="jp">立入禁止</div>
+        <div class="en">DANGER · KEEP OUT</div>
+        <div class="multi">
+          <div class="item zh">禁止入内</div>
+          <div class="divider"></div>
+          <div class="item ko">출입 금지</div>
+        </div>
+      </div>
+
+      <div class="message-card">
+        <div class="row jp"><strong>この先</strong>は柵がなく、<strong>転落のおそれ</strong>があります。花壇内・柵外・立入禁止表示のある範囲には入らないでください。お子さまは必ず保護者同伴で、夜間・雨天・飲酒後は近づかないでください。</div>
+        <div class="row en"><strong>Beyond this point</strong> has no fence — <strong>risk of falling</strong>. Do not enter the flowerbed, unfenced areas, or any area marked Keep Out. Children must be accompanied by an adult. Avoid the edge at night, in rain, or after drinking.</div>
+        <div class="row zh"><strong>此处前方</strong>无围栏，<strong>有坠落危险</strong>。请勿进入花坛、无围栏区域或禁止入内区域。儿童须有监护人陪同。夜间、雨天、饮酒后请远离边缘。</div>
+        <div class="row ko"><strong>이 앞쪽</strong>은 울타리가 없어 <strong>추락 위험</strong>이 있습니다. 화단・울타리 없는 구역・출입금지 표시 구역에 들어가지 마십시오. 어린이는 보호자 동반 필수. 야간・우천・음주 후에는 가까이 가지 마세요.</div>
+      </div>
+
+      <div class="liability">
+        <div class="jp">こちらは <strong style="color:#FFCC00">崖</strong> です。転落事故防止のため <strong style="color:#FFCC00">立入禁止</strong> です</div>
+        <div class="en">This is a <strong style="color:#FFCC00">cliff area</strong> &middot; <strong style="color:#FFCC00">Keep out</strong> to prevent falling accidents</div>
+        <div class="multi">
+          <span class="zh">此处为<strong style="color:#FFCC00">悬崖</strong> · <strong style="color:#FFCC00">禁止入内</strong>以防坠落</span> &nbsp;·&nbsp; <span class="ko"><strong style="color:#FFCC00">절벽</strong> · 추락 방지 <strong style="color:#FFCC00">출입 금지</strong></span>
+        </div>
+      </div>
+    </main>
+
+    <footer class="foot">
+      Please respect this notice for everyone's safety
+      <div class="ja">皆様の安全のためご協力をお願いします</div>
+    </footer>
+
+    <div class="stripe-bottom"></div>
+  </div>
+</body>
+</html>
