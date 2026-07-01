@@ -329,9 +329,11 @@ export function formPage(
 
 // 国籍・国内住所の選択、および「クーポン希望」チェックに応じて、各欄の表示/必須マークをその場で
 // 切り替える（独自ルール）。JS未実行時はサーバ側で判定した初期表示のまま（安全側＝旅券欄等は表示）。
-// reqMark/optMarkは自前のi18n辞書由来の固定文字列（ユーザー入力ではない）のためそのまま埋め込む。
+// reqMark/optMarkは自前のi18n辞書由来の固定文字列（ユーザー入力ではない）だが、JS文字列リテラルへの
+// 埋め込みは手動エスケープ(バックスラッシュ/クォートのみ)では</script>によるタグ脱出を防げないため、
+// JSON.stringify+<のunicode化で安全に埋め込む（将来i18n文言が変わっても壊れない）。
 function fieldToggleJs(reqMarkHtml: string, optMarkHtml: string, isRep: boolean): string {
-  const esc1 = (s: string) => s.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  const jsLit = (s: string) => JSON.stringify(s).replace(/</g, "\\u003c");
   return `<script>
 (function(){
   var form=document.getElementById('gform'); if(!form) return;
@@ -341,7 +343,7 @@ function fieldToggleJs(reqMarkHtml: string, optMarkHtml: string, isRep: boolean)
   var stayHistSec=document.getElementById('stay-history-section');
   var purpSec=document.getElementById('purpose-section');
   var natOtherSec=document.getElementById('nationality-other-section');
-  var REQ='${esc1(reqMarkHtml)}', OPT='${esc1(optMarkHtml)}';
+  var REQ=${jsLit(reqMarkHtml)}, OPT=${jsLit(optMarkHtml)};
   function isJapanese(){ return !!nat && nat.value==='JP'; }
   function isDomestic(){
     if(!isJapanese()) return false;
@@ -349,9 +351,10 @@ function fieldToggleJs(reqMarkHtml: string, optMarkHtml: string, isRep: boolean)
     return false;
   }
   function sync(){
-    var foreign=!isJapanese(), d=isDomestic();
-    if(passSec) passSec.style.display = foreign ? '' : 'none';
-    if(stayHistSec) stayHistSec.style.display = foreign ? '' : 'none';
+    // 旅券写真・前泊地の要否は「国内住所のある日本国籍」以外の全員が対象（外国籍はもちろん、海外在住の日本国籍も含む）
+    var d=isDomestic(), needsPassport=!d;
+    if(passSec) passSec.style.display = needsPassport ? '' : 'none';
+    if(stayHistSec) stayHistSec.style.display = needsPassport ? '' : 'none';
     if(purpSec) purpSec.style.display = d ? '' : 'none';
     if(natOtherSec) natOtherSec.style.display = (nat && nat.value==='OTHER') ? '' : 'none';
   }
@@ -411,6 +414,18 @@ export function messagePage(
     <div class="notice ${opts.kind}">${opts.message}</div>
     ${opts.backHref ? html`<a class="btn secondary" href="${opts.backHref}">${opts.backLabel ?? t(lang, "back_to_progress")}</a>` : ""}
     ${opts.secondaryHref ? html`<a class="btn secondary" href="${opts.secondaryHref}">${opts.secondaryLabel ?? t(lang, "progress_title")}</a>` : ""}
+  </div>`;
+}
+
+// 暗証番号の閲覧確認画面（GETでは表示せず、ボタン押下のPOSTで初めて消費・表示する）
+export function pinConfirmPage(lang: Lang, opts: { token: string }): HE {
+  return html`
+  <div class="card">
+    <h1>${t(lang, "pin_title")}</h1>
+    <p>${t(lang, "pin_confirm_body")}</p>
+    <form method="post" action="/pin/${opts.token}?lang=${lang}">
+      <button class="btn" type="submit">${t(lang, "pin_confirm_btn")}</button>
+    </form>
   </div>`;
 }
 

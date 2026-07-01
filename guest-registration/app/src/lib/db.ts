@@ -24,6 +24,8 @@ export type Reservation = {
   channel: string;
   source: string;
   notes: string | null;
+  rep_email_hint: string | null;
+  completion_notified_at: string | null;
   created_at: string;
   updated_at: string;
 };

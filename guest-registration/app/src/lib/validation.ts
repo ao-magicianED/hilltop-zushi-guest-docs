@@ -32,20 +32,26 @@ export function isDomesticJapanese(input: Pick<GuestInput, "nationality" | "has_
   return isJapanese(input) && input.has_jp_address === "1";
 }
 
-/** 旅券写真・前泊地/後泊地が必要な人（独自ルール：日本国籍以外は全員対象。国内住所の有無は問わない）。
+/** 旅券写真・前泊地/後泊地が必要な人（独自ルール：日本国内に住所が無い人は全員対象。
+ * 外国籍は住所の有無を問わず対象、日本国籍でも海外在住（国内住所なし）なら対象）。
  * 旅券番号は法定でも求めておらず廃止済み。 */
-export function needsPassportPhoto(input: Pick<GuestInput, "nationality">): boolean {
-  return !isJapanese(input);
+export function needsPassportPhoto(input: Pick<GuestInput, "nationality" | "has_jp_address">): boolean {
+  return !isDomesticJapanese(input);
 }
 
 // メール形式の最小チェック（厳密RFCではなく実用十分）
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** メール形式の最小チェック（管理画面のrep_email_hint等、GuestInput以外からも使う） */
+export function isValidEmailFormat(s: string): boolean {
+  return EMAIL_RE.test(s);
+}
+
 export function validateGuest(input: GuestInput): { ok: boolean; errors: FieldErrors } {
   const e: FieldErrors = {};
   const isRep = input.member_role === "representative";
   const domestic = isDomesticJapanese(input);
-  const foreignBucket = needsPassportPhoto(input); // 旅券写真・前泊地の要否と共通（=日本国籍以外）
+  const foreignBucket = needsPassportPhoto(input); // 旅券写真・前泊地の要否と共通（=国内住所のある日本国籍以外）
 
   if (!input.full_name.trim()) e.full_name = true;
   if (input.has_jp_address !== "0" && input.has_jp_address !== "1") e.has_jp_address = true;

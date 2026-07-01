@@ -208,6 +208,22 @@ export const T: Dict = {
   back_to_progress: { ja: "進捗一覧へ戻る", en: "Back to progress", "zh-CN": "返回进度", "zh-TW": "返回進度" },
   fix_errors: { ja: "未入力・誤りの項目があります。赤い箇所をご確認ください。", en: "Some fields are missing or invalid. Please check the highlighted items.", "zh-CN": "有未填写或错误的项目，请检查标红处。", "zh-TW": "有未填寫或錯誤的項目，請檢查標紅處。" },
   expired: { ja: "このリンクは有効期限が切れています。ホストにご連絡ください。", en: "This link has expired. Please contact the host.", "zh-CN": "此链接已过期，请联系房东。", "zh-TW": "此連結已過期，請聯絡房東。" },
+  pin_title: { ja: "チェックイン情報", en: "Check-in information", "zh-CN": "入住信息", "zh-TW": "入住資訊" },
+  pin_not_set: {
+    ja: "暗証番号がまだ設定されていません。ホストにご連絡ください。",
+    en: "The door code hasn't been set yet. Please contact the host.",
+    "zh-CN": "门锁密码尚未设置，请联系房东。",
+    "zh-TW": "門鎖密碼尚未設定，請聯絡房東。",
+  },
+  pin_confirm_body: {
+    ja: "このリンクは一度だけ開くことができます。ボタンを押すと暗証番号が表示されます。",
+    en: "This link can only be opened once. Press the button below to reveal your door code.",
+    "zh-CN": "此链接仅可打开一次。点击下方按钮查看门锁密码。",
+    "zh-TW": "此連結僅可開啟一次。點擊下方按鈕查看門鎖密碼。",
+  },
+  pin_confirm_btn: { ja: "暗証番号を表示する", en: "Reveal door code", "zh-CN": "查看密码", "zh-TW": "查看密碼" },
+  copy_link: { ja: "コピー", en: "Copy", "zh-CN": "复制", "zh-TW": "複製" },
+  copied: { ja: "コピーしました", en: "Copied", "zh-CN": "已复制", "zh-TW": "已複製" },
 };
 
 export function t(lang: Lang, key: string, vars?: Record<string, string | number>): string {

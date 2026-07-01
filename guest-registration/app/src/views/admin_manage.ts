@@ -67,7 +67,15 @@ export function reservationsPage(opts: {
   </div>`;
 }
 
-export function reservationForm(opts: { nav: HE; res?: Reservation; error?: string; groupUrl?: string }): HE {
+export function reservationForm(opts: {
+  nav: HE;
+  res?: Reservation;
+  error?: string;
+  groupUrl?: string;
+  groupEmailStatus?: "sent" | "no_email" | "failed";
+  groupMessageText?: string;
+  lastLinkIssuedAt?: string | null;
+}): HE {
   const r = opts.res;
   const v = (x: unknown) => (x == null ? "" : esc(String(x)));
   const langOpt = (code: string, label: string) =>
@@ -75,21 +83,47 @@ export function reservationForm(opts: { nav: HE; res?: Reservation; error?: stri
   const chOpt = (code: string, label: string) =>
     `<option value="${code}" ${r?.channel === code ? "selected" : ""}>${label}</option>`;
   const action = r ? `/admin/reservations/${r.id}` : "/admin/reservations";
+  const fmtDt = (iso: string) => iso.slice(0, 16).replace("T", " ");
   return html`
   <div class="card">
     ${opts.nav}
     <h1>${r ? "予約の編集" : "新規予約"}</h1>
     ${opts.error ? html`<div class="notice err">${opts.error}</div>` : ""}
     ${opts.groupUrl
-      ? html`<div class="notice ok"><strong>ゲスト用リンク（代表者へ送ってください）</strong><br>
-          <code style="word-break:break-all">${opts.groupUrl}</code><br>
-          代表者がこのリンクで人数を申告→各自入力できます。</div>`
+      ? html`<div class="notice ok">
+          <strong>ゲスト用リンク</strong>
+          ${opts.groupEmailStatus === "sent"
+            ? html`<p class="muted">代表者のメールアドレスへ自動送信しました（hilltop.zushi@gmail.comをBCC）。</p>`
+            : opts.groupEmailStatus === "failed"
+              ? html`<p class="muted">代表者のメールアドレスは登録済みですが、送信に失敗しました。アドレスをご確認のうえ、下記のリンクか文案をコピーしてお送りください。</p>`
+              : html`<p class="muted">代表者のメールアドレスが未登録のため自動送信していません。下記のリンクか文案をコピーして、Airbnbメッセージ等でお送りください。</p>`}
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <code id="groupUrlCode" style="word-break:break-all;flex:1">${opts.groupUrl}</code>
+            <button type="button" class="btn secondary" style="width:auto" onclick="hzCopy('groupUrlCode',this)">コピー</button>
+          </div>
+          ${opts.groupMessageText
+            ? html`<label style="margin-top:10px">送付用の案内文案（コピーしてご利用ください）</label>
+                <textarea id="groupMsgText" readonly rows="5" style="width:100%">${opts.groupMessageText}</textarea>
+                <button type="button" class="btn secondary" style="width:auto;margin-top:6px" onclick="hzCopy('groupMsgText',this)">文案をコピー</button>`
+            : ""}
+        </div>`
+      : ""}
+    ${r
+      ? html`<form method="post" action="/admin/reservations/${r.id}/link" style="margin-bottom:4px">
+          <button class="btn secondary" style="width:auto">グループリンクを発行する</button>
+          <span class="muted">（代表者メール登録済みなら自動送信もされます。押すたびに送信されるため連打注意）</span>
+        </form>
+        <p class="muted" style="margin-top:0;margin-bottom:14px">
+          ${opts.lastLinkIssuedAt ? `前回発行：${fmtDt(opts.lastLinkIssuedAt)}` : "まだ発行されていません"}
+        </p>`
       : ""}
     <form method="post" action="${action}">
       <label>予約番号（Airbnb確認コード等・任意）</label>
       <input type="text" name="airbnb_reservation_code" value="${v(r?.airbnb_reservation_code)}">
       <label>代表者の姓（ローマ字／/start照合に使用・任意）</label>
       <input type="text" name="match_last_name" value="${v(r?.match_last_name)}">
+      <label>代表者のメールアドレス（分かれば・督促リマインド/暗証番号送付に使用）</label>
+      <input type="email" name="rep_email_hint" value="${v(r?.rep_email_hint)}">
       <label>チェックイン日 <span class="req">*</span></label>
       <input type="date" name="check_in_date" value="${v(r?.check_in_date)}" required>
       <label>チェックアウト日 <span class="req">*</span></label>
@@ -112,8 +146,24 @@ export function reservationForm(opts: { nav: HE; res?: Reservation; error?: stri
       ? html`<form method="post" action="/admin/reservations/${r.id}/cancel" style="margin-top:10px">
           <button class="btn secondary" style="width:auto">この予約を取消にする</button></form>`
       : ""}
-  </div>`;
+  </div>
+  ${opts.groupUrl ? raw(COPY_JS) : ""}`;
 }
+
+// リンク・文案のクリップボードコピー（要素IDを渡して呼ぶ、複数箇所で共用）
+const COPY_JS = `<script>
+function hzCopy(id, btn){
+  var el = document.getElementById(id);
+  if (!el) return;
+  var text = (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') ? el.value : el.textContent;
+  if (!navigator.clipboard || !navigator.clipboard.writeText) { return; }
+  navigator.clipboard.writeText(text).then(function(){
+    var orig = btn.textContent;
+    btn.textContent = 'コピーしました';
+    setTimeout(function(){ btn.textContent = orig; }, 1500);
+  }).catch(function(){});
+}
+</script>`;
 
 function kpi(label: string, value: string, sub?: string): string {
   return `<div class="card" style="margin:0;padding:14px">

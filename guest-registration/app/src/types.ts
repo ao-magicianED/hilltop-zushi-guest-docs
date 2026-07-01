@@ -15,6 +15,7 @@ export type Env = {
   MASTER_KEY: string; // base64 32 bytes（機微情報の暗号化マスター鍵）
   SLACK_WEBHOOK_URL?: string;
   ICAL_URL?: string; // AirbnbカレンダーのエクスポートURL（予約自動取込）
+  RESEND_API_KEY?: string; // 通知メール送信用（Resend）。未設定時は送信をスキップ
 };
 
 // 対応言語

@@ -4,7 +4,7 @@ import { html, raw } from "hono/html";
 import type { Env, Lang } from "./types";
 import { normalizeLang } from "./types";
 import { layout } from "./views/layout";
-import { startPage, channelChooserPage, declarePage, progressPage, formPage, messagePage, type StartChannel } from "./views/guest";
+import { startPage, channelChooserPage, declarePage, progressPage, formPage, messagePage, pinConfirmPage, type StartChannel } from "./views/guest";
 import { privacyPolicyPage } from "./views/privacy";
 import {
   verifyReservation,
@@ -30,12 +30,14 @@ import {
   hasSubmittedGuests,
   recentSelfReportCount,
   addDays,
+  jstTodayYmd,
+  daysFromYmd,
   type Guest,
   type Reservation,
 } from "./lib/db";
 import { encryptField, decryptField, encryptBytes, decryptBytes } from "./lib/crypto";
 import { hashToken, sha256Hex, timingSafeEqual, generateToken, newId } from "./lib/tokens";
-import { validateGuest, isDomesticJapanese, needsPassportPhoto, SUBMIT_RULE_VERSION, type GuestInput, type FieldErrors } from "./lib/validation";
+import { validateGuest, isDomesticJapanese, needsPassportPhoto, isValidEmailFormat, SUBMIT_RULE_VERSION, type GuestInput, type FieldErrors } from "./lib/validation";
 import { t, optLabel, OCCUPATIONS, NATIONALITIES, GENDERS, CHOOSE_REASONS, STAY_PURPOSES } from "./lib/i18n";
 import { getCookie, setCookie, deleteCookie } from "hono/cookie";
 import {
@@ -63,8 +65,19 @@ import { normalizeName, addYears, laterIso } from "./lib/db";
 import { computeMonthly, type ResForMetrics } from "./lib/metrics";
 import { parseIcal, reservedEvents } from "./lib/ical";
 import { reservationsPage, reservationForm, metricsPage, adminNav } from "./views/admin_manage";
+import { sendEmail } from "./lib/email";
+import {
+  pinNotificationEmail,
+  reminderEmail,
+  completionNotificationEmail,
+  zeroSubmissionAlertEmail,
+  groupLinkEmail,
+  completionConfirmEmail,
+  guestLinkMessageText,
+} from "./lib/emailTemplates";
 
 const app = new Hono<{ Bindings: Env; Variables: { admin: Session } }>();
+const OWNER_EMAIL = "hilltop.zushi@gmail.com";
 
 function pickLang(c: any, fallback?: string): Lang {
   const q = c.req.query("lang");
@@ -308,19 +321,35 @@ app.get("/g/:token/edit/:guestId", async (c) => {
 
 function linksPage(lang: Lang, base: string, groupToken: string, created: { slotNo: number; role: string; token: string }[]) {
   const rows = created
-    .map((x) => {
+    .map((x, i) => {
       const url = `${base}/p/${x.token}?lang=${lang}`;
       const who = x.role === "representative" ? `👑 ${t(lang, "representative_label")}` : `#${x.slotNo}`;
-      return `<li><span>${who}</span><a class="muted" href="${url}">${t(lang, "edit_link")}</a></li>`;
+      const id = `plink${i}`;
+      return `<li><span>${who}</span> <a id="${id}" class="muted" href="${url}">${t(lang, "edit_link")}</a> <button type="button" class="btn secondary" style="width:auto;padding:4px 10px" onclick="hzCopyLink('${id}',this)">${t(lang, "copy_link")}</button></li>`;
     })
     .join("");
+  // JS文字列リテラルへの埋め込みは手動エスケープ(バックスラッシュ/クォートのみ)では</script>によるタグ脱出を
+  // 防げない。i18n辞書は現状固定文字列だが、将来の文言変更でも安全なようJSON.stringify+<のunicode化で埋め込む。
+  const copiedLiteral = JSON.stringify(t(lang, "copied")).replace(/</g, "\\u003c");
   return html`
   <div class="card">
     <h1>${t(lang, "share_links")}</h1>
     <p class="muted">${t(lang, "links_note")}</p>
     <ul class="list">${raw(rows)}</ul>
     <a class="btn secondary" href="/g/${groupToken}?lang=${lang}">← ${t(lang, "progress_title")}</a>
-  </div>`;
+  </div>
+  ${raw(`<script>
+function hzCopyLink(id, btn){
+  var el = document.getElementById(id);
+  if (!el || !navigator.clipboard || !navigator.clipboard.writeText) return;
+  var text = el.tagName === 'A' ? el.href : el.textContent;
+  navigator.clipboard.writeText(text).then(function(){
+    var orig = btn.textContent;
+    btn.textContent = ${copiedLiteral};
+    setTimeout(function(){ btn.textContent = orig; }, 1500);
+  }).catch(function(){});
+}
+</script>`)}`;
 }
 
 // 個人トークンから進捗ページへ戻る導線。生のグループトークンはハッシュ化され保存されていないため
@@ -527,6 +556,41 @@ app.post("/p/:token", async (c) => {
     await promoteSelfReportRetention(c.env, resv, parseInt(c.env.DATA_RETENTION_YEARS || "5", 10));
   }
 
+  // 全員分の提出が完了したタイミングでオーナーへ通知。
+  // ほぼ同時提出（代表者と同行者が同時にボタンを押す等）でのレースを防ぐため、
+  // 送信前に completion_notified_at を条件付きUPDATEで「先取り」し、更新0件（他リクエストが既に取得済み）なら送らない。
+  if (resv && !resv.completion_notified_at) {
+    const allGuests = await getGuestsByReservation(c.env, guest.reservation_id);
+    const { done, total } = computeProgress(allGuests, resv.expected_guests);
+    if (total > 0 && done >= total) {
+      const claim = await c.env.DB.prepare(
+        "UPDATE reservations SET completion_notified_at=? WHERE id=? AND completion_notified_at IS NULL"
+      ).bind(nowIso(), guest.reservation_id).run();
+      if (claim.meta.changes) {
+        const mail = completionNotificationEmail({
+          code: resv.airbnb_reservation_code ?? guest.reservation_id.slice(0, 8),
+          checkIn: resv.check_in_date, checkOut: resv.check_out_date,
+          guestCount: total, adminUrl: `${c.env.APP_BASE_URL}/admin/r/${guest.reservation_id}`,
+        });
+        const result = await sendEmail(c.env, { to: OWNER_EMAIL, subject: mail.subject, html: mail.html });
+        await appendAudit(c.env, { reservationId: guest.reservation_id, actorType: "system", action: "send_completion_email", detail: { ok: result.ok } });
+
+        // 代表者へも完了確認メールを送る（オーナー宛通知とは別物）。代表者の提出済みメールを優先し、
+        // 万一空なら予約作成時のヒントで代用。宛先が無ければ静かにスキップ。
+        const rep = allGuests.find((g) => g.member_role === "representative");
+        const repEmail = rep?.email?.trim() || resv.rep_email_hint?.trim() || "";
+        if (repEmail) {
+          const repMail = completionConfirmEmail(normalizeLang(resv.preferred_lang), {
+            code: resv.airbnb_reservation_code ?? guest.reservation_id.slice(0, 8),
+            checkIn: resv.check_in_date, checkOut: resv.check_out_date,
+          });
+          const repResult = await sendEmail(c.env, { to: repEmail, subject: repMail.subject, html: repMail.html, bcc: OWNER_EMAIL });
+          await appendAudit(c.env, { reservationId: guest.reservation_id, actorType: "system", action: "send_completion_confirm_email", detail: { ok: repResult.ok, to_hash: await sha256Hex(repEmail) } });
+        }
+      }
+    }
+  }
+
   return c.html(layout({
     title: t(lang, "submitted_ok"), lang, path: `/p/${token}`,
     body: messagePage(lang, {
@@ -585,7 +649,7 @@ app.post("/p/:token/draft", async (c) => {
   const now = nowIso();
   // 前泊地・後泊地は日本国籍なら項目自体を出していない（独自ルール）。改ざん送信で値が来ても
   // 表示条件と保存内容を一致させるため、非表示対象（日本国籍）なら保存時に強制的にnull化する。
-  const needsStayHistory = needsPassportPhoto({ nationality: get("nationality") });
+  const needsStayHistory = needsPassportPhoto({ nationality: get("nationality"), has_jp_address: get("has_jp_address") });
   const prevStayToSave = needsStayHistory ? getOrNull("prev_stay") : null;
   const nextStayToSave = needsStayHistory ? getOrNull("next_stay") : null;
 
@@ -657,7 +721,7 @@ function renderFormError(
     stay_purpose: input.stay_purpose,
     stay_purpose_other: input.stay_purpose_other,
   };
-  const showPassport = needsPassportPhoto({ nationality: input.nationality });
+  const showPassport = needsPassportPhoto({ nationality: input.nationality, has_jp_address: input.has_jp_address });
   const showStayPurpose = isDomesticJapanese({ nationality: input.nationality, has_jp_address: input.has_jp_address });
   const body = [
     banner ? html`<div class="card"><div class="notice err">${banner}</div></div>` : html``,
@@ -890,6 +954,36 @@ function navFor(c: any, active: string) {
   return adminNav(active, s.isMaster, s.email);
 }
 
+type GroupEmailStatus = "sent" | "no_email" | "failed";
+
+// 代表者メールが分かっていればグループリンク案内を自動送信する（予約作成時・リンク再発行時の両方から呼ぶ）。
+// hilltop.zushi@gmail.com を必ずBCCに入れ、オーナー側でも送付内容を把握できるようにする。
+// 戻り値は「未登録なので送っていない」と「登録済みだが送信に失敗した」を画面上で区別するための状態。
+async function sendGroupLinkEmailIfKnown(
+  env: Env,
+  res: Reservation,
+  groupUrl: string
+): Promise<GroupEmailStatus> {
+  const toEmail = res.rep_email_hint?.trim() || "";
+  if (!toEmail) return "no_email";
+  const lang = normalizeLang(res.preferred_lang);
+  const mail = groupLinkEmail(lang, {
+    code: res.airbnb_reservation_code ?? res.id.slice(0, 8),
+    checkIn: res.check_in_date, checkOut: res.check_out_date, groupUrl,
+  });
+  const result = await sendEmail(env, { to: toEmail, subject: mail.subject, html: mail.html, bcc: OWNER_EMAIL });
+  await appendAudit(env, { reservationId: res.id, actorType: "system", action: "send_group_link_email", detail: { ok: result.ok, to_hash: await sha256Hex(toEmail) } });
+  return result.ok ? "sent" : "failed";
+}
+
+// グループリンクの直近発行日時（連打防止用に画面へ表示する）
+async function getLastGroupLinkIssuedAt(env: Env, reservationId: string): Promise<string | null> {
+  const row = await env.DB.prepare(
+    "SELECT created_at FROM audit_logs WHERE reservation_id=? AND action='issue_group_link' ORDER BY created_at DESC LIMIT 1"
+  ).bind(reservationId).first<{ created_at: string }>();
+  return row?.created_at ?? null;
+}
+
 app.get("/admin/reservations", async (c) => {
   const rs = (await c.env.DB.prepare("SELECT * FROM reservations ORDER BY check_in_date DESC LIMIT 200").all<any>()).results ?? [];
   const counts = (await c.env.DB.prepare("SELECT reservation_id, SUM(CASE WHEN submit_status='submitted' THEN 1 ELSE 0 END) AS done FROM guests GROUP BY reservation_id").all<{ reservation_id: string; done: number }>()).results ?? [];
@@ -912,20 +1006,25 @@ app.post("/admin/reservations", async (c) => {
   if (!ci || !co || n <= 0) {
     return c.html(layout({ title: "新規予約", lang: "ja", path: "/admin/reservations/new", showLangs: false, body: reservationForm({ nav: navFor(c, "res"), error: "チェックイン/アウト日を正しく入力してください（アウトはイン以降）。" }) }));
   }
+  const repEmailInput = String(b.rep_email_hint ?? "").trim();
+  if (repEmailInput && !isValidEmailFormat(repEmailInput)) {
+    return c.html(layout({ title: "新規予約", lang: "ja", path: "/admin/reservations/new", showLangs: false, body: reservationForm({ nav: navFor(c, "res"), error: "代表者のメールアドレスの形式が正しくありません。" }) }));
+  }
   const id = newId("r_");
   const now = nowIso();
   const lang = String(b.preferred_lang ?? "ja");
   const expected = parseInt(String(b.expected_guests ?? "0"), 10) || 0;
   const purge = addYears(laterIso(now, co + "T00:00:00Z"), parseInt(c.env.DATA_RETENTION_YEARS || "5", 10));
   await c.env.DB.prepare(
-    `INSERT INTO reservations (id, airbnb_reservation_code, property_name, check_in_date, check_out_date, nights, expected_guests, preferred_lang, match_last_name, status, review_status, total_amount, cleaning_fee, currency, channel, source, notes, created_at, updated_at, data_purge_at)
-     VALUES (?,?,?,?,?,?,?,?,?, 'open','pending', ?,?, 'JPY', ?, 'manual', ?, ?, ?, ?)`
+    `INSERT INTO reservations (id, airbnb_reservation_code, property_name, check_in_date, check_out_date, nights, expected_guests, preferred_lang, match_last_name, rep_email_hint, status, review_status, total_amount, cleaning_fee, currency, channel, source, notes, created_at, updated_at, data_purge_at)
+     VALUES (?,?,?,?,?,?,?,?,?,?, 'open','pending', ?,?, 'JPY', ?, 'manual', ?, ?, ?, ?)`
   ).bind(
     id,
     String(b.airbnb_reservation_code ?? "").trim() ? normalizeOtaCode(String(b.airbnb_reservation_code)) : null,
     c.env.PROPERTY_NAME || "Hilltop Zushi",
     ci, co, n, expected, lang,
     String(b.match_last_name ?? "").trim() ? normalizeName(String(b.match_last_name)) : null,
+    repEmailInput || null,
     parseInt(String(b.total_amount ?? ""), 10) || null,
     parseInt(String(b.cleaning_fee ?? ""), 10) || null,
     String(b.channel ?? "airbnb"),
@@ -935,14 +1034,18 @@ app.post("/admin/reservations", async (c) => {
   await appendAudit(c.env, { reservationId: id, actorType: "admin", actorId: sess.email, action: "create_reservation" });
   const token = await createGroupToken(c.env, id, checkoutExpiry(co));
   const groupUrl = `${c.env.APP_BASE_URL}/g/${token}?lang=${lang}`;
+  await appendAudit(c.env, { reservationId: id, actorType: "admin", actorId: sess.email, action: "issue_group_link" });
   const res = await getReservation(c.env, id);
-  return c.html(layout({ title: "予約を作成", lang: "ja", path: "/admin/reservations", showLangs: false, body: reservationForm({ nav: navFor(c, "res"), res: res!, groupUrl }) }));
+  const groupEmailStatus = res ? await sendGroupLinkEmailIfKnown(c.env, res, groupUrl) : "no_email";
+  const groupMessageText = guestLinkMessageText(normalizeLang(lang), { checkIn: ci, checkOut: co, groupUrl });
+  return c.html(layout({ title: "予約を作成", lang: "ja", path: "/admin/reservations", showLangs: false, body: reservationForm({ nav: navFor(c, "res"), res: res!, groupUrl, groupEmailStatus, groupMessageText, lastLinkIssuedAt: now }) }));
 });
 
 app.get("/admin/reservations/:id", async (c) => {
   const res = await getReservation(c.env, c.req.param("id"));
   if (!res) return c.notFound();
-  return c.html(layout({ title: "予約の編集", lang: "ja", path: `/admin/reservations/${res.id}`, showLangs: false, body: reservationForm({ nav: navFor(c, "res"), res }) }));
+  const lastLinkIssuedAt = await getLastGroupLinkIssuedAt(c.env, res.id);
+  return c.html(layout({ title: "予約の編集", lang: "ja", path: `/admin/reservations/${res.id}`, showLangs: false, body: reservationForm({ nav: navFor(c, "res"), res, lastLinkIssuedAt }) }));
 });
 
 app.post("/admin/reservations/:id", async (c) => {
@@ -957,11 +1060,16 @@ app.post("/admin/reservations/:id", async (c) => {
   if (!ci || !co || n <= 0) {
     return c.html(layout({ title: "予約の編集", lang: "ja", path: `/admin/reservations/${id}`, showLangs: false, body: reservationForm({ nav: navFor(c, "res"), res, error: "日付を正しく入力してください。" }) }));
   }
+  const repEmailInput = String(b.rep_email_hint ?? "").trim();
+  if (repEmailInput && !isValidEmailFormat(repEmailInput)) {
+    return c.html(layout({ title: "予約の編集", lang: "ja", path: `/admin/reservations/${id}`, showLangs: false, body: reservationForm({ nav: navFor(c, "res"), res, error: "代表者のメールアドレスの形式が正しくありません。" }) }));
+  }
   await c.env.DB.prepare(
-    `UPDATE reservations SET airbnb_reservation_code=?, match_last_name=?, check_in_date=?, check_out_date=?, nights=?, expected_guests=?, preferred_lang=?, channel=?, total_amount=?, cleaning_fee=?, notes=?, updated_at=? WHERE id=?`
+    `UPDATE reservations SET airbnb_reservation_code=?, match_last_name=?, rep_email_hint=?, check_in_date=?, check_out_date=?, nights=?, expected_guests=?, preferred_lang=?, channel=?, total_amount=?, cleaning_fee=?, notes=?, updated_at=? WHERE id=?`
   ).bind(
     String(b.airbnb_reservation_code ?? "").trim() ? normalizeOtaCode(String(b.airbnb_reservation_code)) : null,
     String(b.match_last_name ?? "").trim() ? normalizeName(String(b.match_last_name)) : null,
+    repEmailInput || null,
     ci, co, n,
     parseInt(String(b.expected_guests ?? "0"), 10) || 0,
     String(b.preferred_lang ?? "ja"),
@@ -981,6 +1089,28 @@ app.post("/admin/reservations/:id/cancel", async (c) => {
   await c.env.DB.prepare("UPDATE reservations SET status='cancelled', updated_at=? WHERE id=?").bind(nowIso(), id).run();
   await appendAudit(c.env, { reservationId: id, actorType: "admin", actorId: sess.email, action: "cancel_reservation" });
   return c.redirect("/admin/reservations?flash=" + encodeURIComponent("予約を取消にしました。"));
+});
+
+// グループリンクを(再)発行して表示。代表者メールが登録済みなら案内メールも自動送信する。
+// 生トークンはハッシュ化保存のため「前回と同じリンク」は再現できず、都度新規発行になる（旧リンクも失効はしない）。
+// 連打・多重タブ等での意図しない重複メール送信を防ぐため、予約単位で軽くレート制限する。
+app.post("/admin/reservations/:id/link", async (c) => {
+  const sess = c.get("admin");
+  const id = c.req.param("id");
+  const res = await getReservation(c.env, id);
+  if (!res) return c.notFound();
+  if (!(await rateLimit(c.env, `grouplink:${id}`, 5, 600))) {
+    const lastLinkIssuedAt = await getLastGroupLinkIssuedAt(c.env, id);
+    return c.html(layout({ title: "予約の編集", lang: "ja", path: `/admin/reservations/${id}`, showLangs: false, body: reservationForm({ nav: navFor(c, "res"), res, lastLinkIssuedAt, error: "短時間に発行しすぎです。しばらく待ってから再度お試しください。" }) }));
+  }
+  const token = await createGroupToken(c.env, id, checkoutExpiry(res.check_out_date));
+  const lang = normalizeLang(res.preferred_lang);
+  const groupUrl = `${c.env.APP_BASE_URL}/g/${token}?lang=${lang}`;
+  const issuedAt = nowIso();
+  await appendAudit(c.env, { reservationId: id, actorType: "admin", actorId: sess.email, action: "issue_group_link" });
+  const groupEmailStatus = await sendGroupLinkEmailIfKnown(c.env, res, groupUrl);
+  const groupMessageText = guestLinkMessageText(lang, { checkIn: res.check_in_date, checkOut: res.check_out_date, groupUrl });
+  return c.html(layout({ title: "予約の編集", lang: "ja", path: `/admin/reservations/${id}`, showLangs: false, body: reservationForm({ nav: navFor(c, "res"), res, groupUrl, groupEmailStatus, groupMessageText, lastLinkIssuedAt: issuedAt }) }));
 });
 
 // 指標ダッシュボード
@@ -1140,6 +1270,7 @@ app.get("/admin/r/:id", async (c) => {
   if (!res) return c.notFound();
   const guests = await getGuestsByReservation(c.env, id);
   const { done, total } = computeProgress(guests, res.expected_guests);
+  const keybox = await c.env.DB.prepare("SELECT id FROM keybox_codes WHERE reservation_id=? AND active=1 AND code_enc IS NOT NULL").bind(id).first<{ id: string }>();
 
   // 機微情報の閲覧を監査ログに記録（誰が＝操作者メール）
   await appendAudit(c.env, { reservationId: id, actorType: "admin", actorId: c.get("admin").email, action: "view_guest_pii", detail: { guest_count: guests.length } });
@@ -1178,9 +1309,20 @@ app.get("/admin/r/:id", async (c) => {
       <tbody>${raw(rows.join(""))}</tbody></table>
       </div>
       <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-        <form method="post" action="/admin/r/${id}/approve"><button class="btn" style="width:auto">承認</button></form>
-        <form method="post" action="/admin/r/${id}/send-pin"><button class="btn secondary" style="width:auto">暗証番号リンク発行</button></form>
+        <form method="post" action="/admin/r/${id}/approve"><button class="btn" style="width:auto">承認（承認時に暗証番号を自動メール送付）</button></form>
+        <form method="post" action="/admin/r/${id}/send-pin"><button class="btn secondary" style="width:auto">暗証番号リンクを手動発行</button></form>
         <a class="btn secondary" style="width:auto" href="/admin/r/${id}/export.csv">CSV出力</a>
+      </div>
+      <div class="card" style="margin-top:14px;padding:14px">
+        <h2 style="margin-top:0">スマートロック暗証番号</h2>
+        <p class="muted">現在の状態：${keybox ? "設定済み" : "未設定"}（承認時に代表者メールが分かれば自動送信されます）</p>
+        <form method="post" action="/admin/r/${id}/set-pin" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+          <div>
+            <label>${keybox ? "暗証番号を変更する" : "暗証番号を設定する"}</label>
+            <input type="text" name="code" placeholder="例）1234#" required>
+          </div>
+          <button class="btn secondary" style="width:auto" type="submit">保存</button>
+        </form>
       </div>
     </div>`,
   }));
@@ -1197,25 +1339,77 @@ app.get("/admin/img/:guestId", async (c) => {
   return new Response(dec as BodyInit, { headers: { "Content-Type": g.passport_img_mime ?? "image/jpeg", "Cache-Control": "no-store" } });
 });
 
+// 暗証番号の閲覧リンクを発行（token生成→pin_view_tokensへ登録）。承認時の自動送信と手動発行の両方から呼ぶ共通処理。
+async function issuePinViewToken(env: Env, reservationId: string): Promise<string> {
+  const tk = generateToken();
+  const th = await hashToken(tk);
+  const exp = new Date(Date.now() + 24 * 3600 * 1000).toISOString();
+  await env.DB.prepare("INSERT INTO pin_view_tokens (id, reservation_id, token_hash, expires_at, created_at) VALUES (?,?,?,?,?)").bind(newId("pv_"), reservationId, th, exp, nowIso()).run();
+  return tk;
+}
+
+// 暗証番号が設定済み・代表者メールが分かっていればPIN案内メールを送る共通処理。
+// 承認時の自動送信と、承認後に暗証番号を(再)設定した時の自動送信の両方から呼ぶ。
+async function sendPinEmailIfReady(env: Env, res: Reservation): Promise<void> {
+  const keybox = await env.DB.prepare("SELECT id FROM keybox_codes WHERE reservation_id=? AND active=1 AND code_enc IS NOT NULL").bind(res.id).first<{ id: string }>();
+  const toEmail = res.rep_email_hint?.trim() || "";
+  if (!keybox || !toEmail) return;
+  const tk = await issuePinViewToken(env, res.id);
+  const lang = normalizeLang(res.preferred_lang);
+  const pinUrl = `${env.APP_BASE_URL}/pin/${tk}?lang=${lang}`;
+  const mail = pinNotificationEmail(lang, {
+    code: res.airbnb_reservation_code ?? res.id.slice(0, 8),
+    checkIn: res.check_in_date, checkOut: res.check_out_date, pinUrl,
+  });
+  const result = await sendEmail(env, { to: toEmail, subject: mail.subject, html: mail.html });
+  await appendAudit(env, { reservationId: res.id, actorType: "system", action: "send_pin_email", detail: { ok: result.ok, to_hash: await sha256Hex(toEmail) } });
+}
+
+app.post("/admin/r/:id/set-pin", async (c) => {
+  const id = c.req.param("id");
+  const res = await getReservation(c.env, id);
+  if (!res) return c.notFound();
+  const b = await c.req.parseBody();
+  const code = String(b.code ?? "").trim();
+  if (!code) return c.redirect(`/admin/r/${id}`);
+  const codeEnc = await encryptField(c.env.MASTER_KEY, code);
+  // 旧active行の失効と新規行の追加を1トランザクションにまとめ、途中失敗でactiveなPINが0件/複数件になるのを防ぐ。
+  await c.env.DB.batch([
+    c.env.DB.prepare("UPDATE keybox_codes SET active=0 WHERE reservation_id=? AND active=1").bind(id),
+    c.env.DB.prepare(
+      "INSERT INTO keybox_codes (id, reservation_id, code_enc, active, changed_by, changed_at) VALUES (?,?,?,1,?,?)"
+    ).bind(newId("kb_"), id, codeEnc, c.get("admin").email, nowIso()),
+  ]);
+  await appendAudit(c.env, { reservationId: id, actorType: "admin", actorId: c.get("admin").email, action: "set_keybox_code" });
+  // 承認済みの予約なら、暗証番号の(再)設定をトリガーに改めてPIN案内メールを送る
+  // （承認が先・暗証番号設定が後、というありがちな運用順序でもゲストにメールが届くように）。
+  if (res.review_status === "approved") await sendPinEmailIfReady(c.env, res);
+  return c.redirect(`/admin/r/${id}`);
+});
+
 app.post("/admin/r/:id/approve", async (c) => {
   const id = c.req.param("id");
+  const before = await getReservation(c.env, id);
+  const wasApproved = before?.review_status === "approved";
   await c.env.DB.prepare("UPDATE reservations SET review_status='approved', updated_at=? WHERE id=?").bind(nowIso(), id).run();
   // 承認＝正式予約として確定。自己申告pendingなら短期purchから法定保持(5年)へ昇格。
   const res = await getReservation(c.env, id);
   if (res) await promoteSelfReportRetention(c.env, res, parseInt(c.env.DATA_RETENTION_YEARS || "5", 10));
   await appendAudit(c.env, { reservationId: id, actorType: "admin", actorId: c.get("admin").email, action: "approve_reservation" });
+
+  // 承認時：暗証番号が設定済み・代表者メールが分かっていれば自動でPIN案内メールを送信。
+  // 既に承認済みの予約への再承認クリックでは送らない（二重送信防止）。
+  if (res && !wasApproved) await sendPinEmailIfReady(c.env, res);
   return c.redirect(`/admin/r/${id}`);
 });
 
 app.post("/admin/r/:id/send-pin", async (c) => {
   const id = c.req.param("id");
-  const tk = generateToken();
-  const th = await hashToken(tk);
-  const exp = new Date(Date.now() + 24 * 3600 * 1000).toISOString();
-  await c.env.DB.prepare("INSERT INTO pin_view_tokens (id, reservation_id, token_hash, expires_at, created_at) VALUES (?,?,?,?,?)").bind(newId("pv_"), id, th, exp, nowIso()).run();
+  const res = await getReservation(c.env, id);
+  if (!res) return c.notFound();
+  const tk = await issuePinViewToken(c.env, id);
   await appendAudit(c.env, { reservationId: id, actorType: "admin", actorId: c.get("admin").email, action: "issue_pin_link" });
-  const url = `${c.env.APP_BASE_URL}/pin/${tk}`;
-  // TODO: 実際の送付（Airbnbメッセージ手動 or メール）。MVPはリンクを管理者へ表示。
+  const url = `${c.env.APP_BASE_URL}/pin/${tk}?lang=${normalizeLang(res.preferred_lang)}`;
   return c.html(layout({ title: "暗証番号リンク", lang: "ja", path: `/admin/r/${id}`, showLangs: false, body: messagePage("ja", { title: "暗証番号リンク（24時間有効・要手動送付）", message: url, kind: "ok", backHref: `/admin/r/${id}`, backLabel: "戻る" }) }));
 });
 
@@ -1249,17 +1443,45 @@ app.get("/admin/r/:id/export.csv", async (c) => {
   return c.body(body, 200, { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="roster_${id}.csv"` });
 });
 
-// 暗証番号の一度だけ表示（MVPスタブ：実際の番号管理はTODO）
-app.get("/pin/:token", async (c) => {
+// 暗証番号の一度だけ表示。GETでは中身を見せず「表示する」ボタンのみ提示し（メールリンクスキャナ等の
+// 自動先読みによる消費を防ぐ）、実際の消費・表示はPOSTでのみ行う。
+async function resolvePinRow(c: any) {
   const token = c.req.param("token");
   const th = await hashToken(token);
-  const row = await c.env.DB.prepare("SELECT * FROM pin_view_tokens WHERE token_hash=?").bind(th).first<any>();
+  const row = await c.env.DB.prepare("SELECT * FROM pin_view_tokens WHERE token_hash=?").bind(th).first();
+  const resForLang = row ? await getReservation(c.env, row.reservation_id) : null;
+  const lang = pickLang(c, resForLang?.preferred_lang);
+  return { token, row, lang };
+}
+const NO_STORE = { "Cache-Control": "no-store, private, max-age=0", "Referrer-Policy": "no-referrer" };
+
+app.get("/pin/:token", async (c) => {
+  const { token, row, lang } = await resolvePinRow(c);
   if (!row || row.viewed_at || new Date(row.expires_at) < new Date()) {
-    return c.html(layout({ title: "Hilltop Zushi", lang: "ja", path: "/pin", body: messagePage("ja", { title: "Hilltop Zushi", message: t("ja", "expired"), kind: "err" }) }));
+    return c.html(layout({ title: "Hilltop Zushi", lang, path: "/pin", body: messagePage(lang, { title: "Hilltop Zushi", message: t(lang, "expired"), kind: "err" }) }), 200, NO_STORE);
   }
-  await c.env.DB.prepare("UPDATE pin_view_tokens SET viewed_at=? WHERE id=?").bind(nowIso(), row.id).run();
-  // TODO: 実際の暗証番号を keybox_codes から復号して表示。MVPは案内文のみ。
-  return c.html(layout({ title: "Hilltop Zushi", lang: "ja", path: "/pin", body: messagePage("ja", { title: "チェックイン情報", message: "（ここに暗証番号が表示されます。MVPでは番号管理は未実装）", kind: "ok" }) }));
+  return c.html(layout({ title: "Hilltop Zushi", lang, path: "/pin", body: pinConfirmPage(lang, { token }) }), 200, NO_STORE);
+});
+
+app.post("/pin/:token", async (c) => {
+  const { row, lang } = await resolvePinRow(c);
+  if (!row || row.viewed_at || new Date(row.expires_at) < new Date()) {
+    return c.html(layout({ title: "Hilltop Zushi", lang, path: "/pin", body: messagePage(lang, { title: "Hilltop Zushi", message: t(lang, "expired"), kind: "err" }) }), 200, NO_STORE);
+  }
+  // 原子的に「未閲覧→閲覧済み」へ更新。変更0件なら他リクエストが既に消費済み（同時アクセスのレース対策）。
+  const claim = await c.env.DB.prepare("UPDATE pin_view_tokens SET viewed_at=? WHERE id=? AND viewed_at IS NULL").bind(nowIso(), row.id).run();
+  if (!claim.meta.changes) {
+    return c.html(layout({ title: "Hilltop Zushi", lang, path: "/pin", body: messagePage(lang, { title: "Hilltop Zushi", message: t(lang, "expired"), kind: "err" }) }), 200, NO_STORE);
+  }
+  const keybox = await c.env.DB.prepare(
+    "SELECT code_enc FROM keybox_codes WHERE reservation_id=? AND active=1 AND code_enc IS NOT NULL ORDER BY changed_at DESC LIMIT 1"
+  ).bind(row.reservation_id).first<{ code_enc: string | null }>();
+  const code = keybox ? await decryptField(c.env.MASTER_KEY, keybox.code_enc) : null;
+  await appendAudit(c.env, { reservationId: row.reservation_id, actorType: "guest", action: "view_pin" });
+  return c.html(layout({
+    title: "Hilltop Zushi", lang, path: "/pin",
+    body: messagePage(lang, { title: t(lang, "pin_title"), message: code ?? t(lang, "pin_not_set"), kind: code ? "ok" : "warn" }),
+  }), 200, NO_STORE);
 });
 
 // 保存期限切れデータの自動削除。画像=KVから削除、名簿本体=予約と全子テーブルを明示削除。
@@ -1330,6 +1552,60 @@ async function purgeExpiredData(env: Env): Promise<{ imagesPurged: number; reser
 
 // 定期実行（Cron）: ①iCal自動取込 ②保存期限切れデータの自動削除。
 // どちらも失敗が他方を巻き込まないよう個別にtry。waitUntilでハンドラ完了後も処理継続。
+// 督促リマインド（チェックイン15〜7日前・未完了の予約のみ）と、当日0件の緊急アラートを送る。
+// 1日2回cronが走るため、片方の実行時刻だけで発火するようscheduled()側で絞り込む。
+async function sendDailyReminders(env: Env): Promise<{ reminders: number; zeroAlerts: number }> {
+  const today = jstTodayYmd();
+  const todayNum = daysFromYmd(today);
+  let reminders = 0, zeroAlerts = 0;
+
+  // ① 15〜7日前：未完了の予約に督促リマインド（代表者の提出済みメール優先、なければ予約作成時のヒント）
+  const upcoming = await env.DB.prepare(
+    "SELECT * FROM reservations WHERE status != 'cancelled' AND check_in_date > ? AND check_in_date <= ?"
+  ).bind(today, addDays(today, 15).slice(0, 10)).all<Reservation>();
+  for (const r of upcoming.results ?? []) {
+    const daysLeft = daysFromYmd(r.check_in_date) - todayNum;
+    if (daysLeft < 7 || daysLeft > 15) continue;
+    const guests = await getGuestsByReservation(env, r.id);
+    const { done, total } = computeProgress(guests, r.expected_guests);
+    if (total > 0 && done >= total) continue; // 完了済みは送らない
+    const rep = guests.find((g) => g.member_role === "representative");
+    const toEmail = (rep?.email || r.rep_email_hint || "").trim();
+    if (!toEmail) continue;
+    const lang = normalizeLang(r.preferred_lang);
+    const token = await createGroupToken(env, r.id, checkoutExpiry(r.check_out_date));
+    const groupUrl = `${env.APP_BASE_URL}/g/${token}?lang=${lang}`;
+    const mail = reminderEmail(lang, {
+      code: r.airbnb_reservation_code ?? r.id.slice(0, 8),
+      checkIn: r.check_in_date, checkOut: r.check_out_date,
+      done, total, daysLeft, started: guests.length > 0, groupUrl,
+    });
+    const result = await sendEmail(env, { to: toEmail, subject: mail.subject, html: mail.html });
+    await appendAudit(env, { reservationId: r.id, actorType: "system", action: "send_reminder_email", detail: { ok: result.ok, days_left: daysLeft } });
+    if (result.ok) reminders++;
+  }
+
+  // ② 当日チェックインなのに1件も提出されていない予約はオーナーへ緊急アラート
+  const todayRows = await env.DB.prepare(
+    "SELECT * FROM reservations WHERE status != 'cancelled' AND check_in_date = ?"
+  ).bind(today).all<Reservation>();
+  for (const r of todayRows.results ?? []) {
+    const guests = await getGuestsByReservation(env, r.id);
+    const { done } = computeProgress(guests, r.expected_guests);
+    if (done > 0) continue;
+    const mail = zeroSubmissionAlertEmail({
+      code: r.airbnb_reservation_code ?? r.id.slice(0, 8),
+      checkIn: r.check_in_date, checkOut: r.check_out_date,
+      adminUrl: `${env.APP_BASE_URL}/admin/r/${r.id}`,
+    });
+    const result = await sendEmail(env, { to: OWNER_EMAIL, subject: mail.subject, html: mail.html });
+    await appendAudit(env, { reservationId: r.id, actorType: "system", action: "send_zero_submission_alert", detail: { ok: result.ok } });
+    if (result.ok) zeroAlerts++;
+  }
+
+  return { reminders, zeroAlerts };
+}
+
 async function scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
   ctx.waitUntil((async () => {
     if (env.ICAL_URL) {
@@ -1345,6 +1621,18 @@ async function scheduled(_event: ScheduledController, env: Env, ctx: ExecutionCo
       console.log("[cron] purge", JSON.stringify(p));
     } catch (e) {
       console.error("[cron] purge failed", e);
+    }
+    // 督促リマインド・当日0件アラートは1日1回だけ送る。KVに「本日実行済み」を記録してcronの発火回数
+    // (wrangler.tomlのcrons設定)から切り離す＝将来cron式を増減しても無音で止まったり重複したりしない。
+    const guardKey = `daily_reminders_ran:${jstTodayYmd()}`;
+    if (!(await env.KV.get(guardKey))) {
+      await env.KV.put(guardKey, "1", { expirationTtl: 3 * 24 * 3600 });
+      try {
+        const n = await sendDailyReminders(env);
+        console.log("[cron] daily reminders", JSON.stringify(n));
+      } catch (e) {
+        console.error("[cron] daily reminders failed", e);
+      }
     }
   })());
 }
