@@ -88,7 +88,11 @@ app.onError((err, c) => {
 });
 
 // 個人トークン等の機微な生リンクを含むレスポンスに付与する（共有PC・プロキシ・ブラウザキャッシュ対策）。
-const NO_STORE = { "Cache-Control": "no-store, private, max-age=0", "Referrer-Policy": "no-referrer" };
+// Referrer-Policyは same-origin にする（no-referrerにすると、このページ自身のフォームを送信した際に
+// ブラウザがOriginヘッダーを文字列"null"にすることがあり、CSRF対策の同一オリジン確認が誤って失敗するため）。
+// same-originでも「外部サイトへは遷移元URLを渡さない」という本来の目的（機微なトークン付きURLの漏洩防止）は
+// 変わらず満たされる。
+const NO_STORE = { "Cache-Control": "no-store, private, max-age=0", "Referrer-Policy": "same-origin" };
 
 function pickLang(c: any, fallback?: string): Lang {
   const q = c.req.query("lang");
@@ -111,7 +115,11 @@ app.use("*", async (c, next) => {
   if (c.req.method === "POST") {
     const host = c.req.header("host");
     const origin = c.req.header("origin") ?? c.req.header("referer");
-    if (origin) {
+    // ブラウザは「Referrer-Policyがno-referrer等のページ」からの同一オリジンPOSTでも、
+    // プライバシー保護のためOriginを文字列"null"として送ることがある（実際にどこから来たかの
+    // 情報を持たない値）。これは悪意ある他サイトからの送信を示すものではないため、
+    // 判定不能として許可する（拒否すると同一オリジンの正規フォーム送信まで弾いてしまう）。
+    if (origin && origin !== "null") {
       try {
         if (new URL(origin).host !== host) return c.text("Bad origin", 403);
       } catch {
