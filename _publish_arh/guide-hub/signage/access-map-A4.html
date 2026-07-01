@@ -1,0 +1,630 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Access · アクセス — Hilltop Zushi</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F3A34;
+    --primary-deep: #14271F;
+    --accent: #C9A56D;
+    --accent-deep: #A8854B;
+    --bg: #F5F3F0;
+    --bg-soft: #FAF8F4;
+    --text: #2C2C2C;
+    --neutral: #6B6B6B;
+    --keikyu: #C8242A;
+    --jp-font: 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    --serif-font: 'Cormorant Garamond', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  html, body { background: #888; }
+  body {
+    font-family: 'Inter', var(--jp-font);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    background: var(--bg);
+    position: relative;
+    padding: 14mm 14mm 12mm;
+    box-shadow: 0 8px 50px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .frame {
+    position: absolute;
+    top: 7mm; left: 7mm; right: 7mm; bottom: 7mm;
+    border: 1px solid rgba(201,165,109,0.5);
+    pointer-events: none;
+  }
+  .frame .corner {
+    position: absolute;
+    width: 18px; height: 18px;
+    border: 2px solid var(--accent);
+  }
+  .frame .corner.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .frame .corner.tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+  .frame .corner.bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+  .frame .corner.br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  /* ヘッダー */
+  .brand {
+    text-align: center;
+    margin-bottom: 4mm;
+  }
+  .brand .brand-text {
+    font-family: 'Cormorant Garamond', 'Hiragino Mincho ProN', serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.22em;
+    margin: 0 0 1.5mm;
+    line-height: 1;
+  }
+  .brand .tagline {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.62rem;
+    color: var(--neutral);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  /* セクションタイトル */
+  .section-title {
+    text-align: center;
+    margin-bottom: 5mm;
+    position: relative;
+  }
+  .section-title h1 {
+    font-family: var(--serif-font);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.18em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .section-title .ja {
+    font-family: var(--jp-font);
+    font-size: 1rem;
+    color: var(--accent-deep);
+    margin-top: 1.5mm;
+    letter-spacing: 0.32em;
+    font-weight: 700;
+  }
+  .section-title .multi {
+    font-size: 0.68rem;
+    color: var(--neutral);
+    margin-top: 1mm;
+    letter-spacing: 0.18em;
+  }
+  .section-title .multi .zh { font-family: 'Noto Sans SC', sans-serif; }
+  .section-title .multi .ko { font-family: 'Noto Sans KR', sans-serif; }
+
+  /* 住所カード */
+  .address-card {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
+    color: #fff;
+    border-radius: 4mm;
+    padding: 5mm 6mm;
+    text-align: center;
+    margin-bottom: 5mm;
+    position: relative;
+    overflow: hidden;
+  }
+  .address-card::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(201,165,109,0.12);
+  }
+  .address-card .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+    color: var(--accent);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 2mm;
+    position: relative;
+  }
+  .address-card .jp-address {
+    font-family: var(--jp-font);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 1mm;
+    position: relative;
+  }
+  .address-card .en-address {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 0.06em;
+    position: relative;
+  }
+
+  /* 駅情報 */
+  .station-block {
+    background: #fff;
+    border-radius: 3mm;
+    padding: 4mm 5mm;
+    margin-bottom: 5mm;
+    border-left: 4px solid var(--keikyu);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    display: flex;
+    align-items: center;
+    gap: 4mm;
+  }
+  .station-block .train-icon {
+    width: 14mm;
+    height: 14mm;
+    background: var(--keikyu);
+    border-radius: 2mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+  }
+  .station-block .info { flex: 1; }
+  .station-block .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+    color: var(--keikyu);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 0.5mm;
+  }
+  .station-block .name {
+    font-family: var(--jp-font);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.04em;
+  }
+  .station-block .name .en {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: var(--neutral);
+    margin-left: 4mm;
+    font-style: italic;
+  }
+  .station-block .line {
+    font-family: var(--jp-font);
+    font-size: 0.72rem;
+    color: var(--neutral);
+    margin-top: 0.5mm;
+  }
+  .station-block .badge {
+    background: var(--keikyu);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 0.7rem;
+    padding: 1mm 3mm;
+    border-radius: 1.5mm;
+    letter-spacing: 0.08em;
+    flex-shrink: 0;
+  }
+
+  /* ルートマップ */
+  .route-map {
+    background: var(--bg-soft);
+    border-radius: 3mm;
+    padding: 5mm 4mm;
+    margin-bottom: 5mm;
+    border: 1px dashed rgba(201,165,109,0.5);
+  }
+  .route-map .route-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.62rem;
+    color: var(--accent-deep);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 4mm;
+  }
+  .route-flow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2mm;
+  }
+  .stop {
+    flex: 1;
+    text-align: center;
+  }
+  .stop .icon {
+    font-size: 1.8rem;
+    line-height: 1;
+    margin-bottom: 1mm;
+  }
+  .stop .label {
+    font-family: var(--jp-font);
+    font-weight: 700;
+    font-size: 0.72rem;
+    color: var(--primary);
+    line-height: 1.3;
+  }
+  .stop .sub {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.58rem;
+    color: var(--neutral);
+    margin-top: 0.5mm;
+    line-height: 1.3;
+  }
+  .arrow {
+    flex-shrink: 0;
+    text-align: center;
+    color: var(--accent);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+  .arrow .line {
+    width: 18mm;
+    height: 1.5px;
+    background: var(--accent);
+    margin: 1mm auto 0.5mm;
+    position: relative;
+  }
+  .arrow .line::after {
+    content: '▶';
+    position: absolute;
+    right: -3px;
+    top: -5px;
+    color: var(--accent);
+    font-size: 0.6rem;
+  }
+  .stop.destination .icon {
+    transform: scale(1.15);
+  }
+  .stop.destination .label {
+    color: var(--keikyu);
+  }
+
+  /* 都心アクセス */
+  .from-tokyo {
+    margin-bottom: 4mm;
+  }
+  .from-tokyo h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.62rem;
+    color: var(--accent-deep);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 2mm;
+    text-align: center;
+  }
+  .from-tokyo .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2mm;
+  }
+  .from-card {
+    background: #fff;
+    border-radius: 2mm;
+    padding: 3mm 2mm;
+    text-align: center;
+    border: 1px solid rgba(201,165,109,0.3);
+  }
+  .from-card .from {
+    font-family: var(--jp-font);
+    font-weight: 700;
+    font-size: 0.72rem;
+    color: var(--primary);
+  }
+  .from-card .from-en {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.55rem;
+    color: var(--neutral);
+    margin-top: 0.3mm;
+    margin-bottom: 1.5mm;
+    letter-spacing: 0.06em;
+  }
+  .from-card .time {
+    font-family: var(--serif-font);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent-deep);
+    line-height: 1;
+  }
+  .from-card .unit {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.55rem;
+    color: var(--neutral);
+    margin-top: 0.5mm;
+  }
+
+  /* 周辺施設 */
+  .around {
+    margin-bottom: 3mm;
+  }
+  .around h3 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.62rem;
+    color: var(--accent-deep);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 2mm;
+    text-align: center;
+  }
+  .around .ja {
+    font-family: var(--jp-font);
+    font-size: 0.7rem;
+    color: var(--accent-deep);
+    text-align: center;
+    margin-top: -1mm;
+    margin-bottom: 2mm;
+    letter-spacing: 0.16em;
+    font-weight: 700;
+  }
+  .around .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2mm;
+  }
+  .place {
+    background: #fff;
+    border-radius: 2mm;
+    padding: 2.5mm 3mm;
+    display: flex;
+    gap: 3mm;
+    align-items: flex-start;
+    border-left: 2px solid var(--accent);
+  }
+  .place .ico {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    line-height: 1.2;
+  }
+  .place .body { flex: 1; min-width: 0; }
+  .place .name {
+    font-family: var(--jp-font);
+    font-weight: 700;
+    font-size: 0.7rem;
+    color: var(--primary);
+    line-height: 1.3;
+  }
+  .place .name-en {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.55rem;
+    color: var(--neutral);
+    font-style: italic;
+    margin-top: 0.3mm;
+  }
+  .place .desc {
+    font-family: var(--jp-font);
+    font-size: 0.6rem;
+    color: var(--neutral);
+    margin-top: 0.5mm;
+    line-height: 1.3;
+  }
+
+  /* フッター */
+  .foot {
+    margin-top: auto;
+    text-align: center;
+    font-size: 0.6rem;
+    color: var(--neutral);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding-top: 3mm;
+  }
+  .foot .ja {
+    text-transform: none;
+    letter-spacing: 0.1em;
+    font-family: var(--jp-font);
+    margin-top: 1mm;
+    font-size: 0.62rem;
+  }
+
+  /* スマホ最適化: A4を画面幅にフィット */
+  @media (max-width: 880px) {
+    html, body { margin: 0; padding: 0; background: #fff; overflow-x: hidden; overflow-y: auto; }
+    body {
+      display: block;
+      min-height: 0;
+      height: calc(100vw * 1123 / 794);
+    }
+    .sheet {
+      transform: scale(calc(100vw / 794px));
+      transform-origin: top left;
+      box-shadow: none;
+    }
+  }
+
+  @media print {
+    html, body { background: #fff; overflow: hidden; }
+    html { -ms-overflow-style: none; scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+    body { padding: 0; }
+    .sheet {
+      box-shadow: none;
+      page-break-after: avoid;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="frame">
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+    </div>
+
+    <header class="brand">
+      <div class="brand-text">HILLTOP ZUSHI</div>
+      <div class="tagline">How to Reach Us · アクセスのご案内</div>
+    </header>
+
+    <section class="section-title">
+      <h1>Access</h1>
+      <div class="ja">アクセス</div>
+      <div class="multi"><span class="zh">交通指南</span> &middot; <span class="ko">교통 안내</span></div>
+    </section>
+
+    <section class="address-card">
+      <div class="label">📍 Property Address · 物件住所</div>
+      <div class="jp-address">神奈川県 逗子市 池子 2-10-9</div>
+      <div class="en-address">2-10-9 Ikego, Zushi-shi, Kanagawa, Japan</div>
+    </section>
+
+    <section class="station-block">
+      <div class="train-icon">🚆</div>
+      <div class="info">
+        <div class="label">Nearest Station · 最寄駅</div>
+        <div class="name">神武寺駅 <span class="en">Jimmuji Station</span></div>
+        <div class="line">京急逗子線 / Keikyu Zushi Line &middot; 駅徒歩 約5分 / About 5 min walk</div>
+      </div>
+      <div class="badge">KK 52</div>
+    </section>
+
+    <section class="route-map">
+      <div class="route-title">Walking Route from Station · 駅からのルート</div>
+      <div class="route-flow" style="justify-content:center;gap:8mm;">
+        <div class="stop">
+          <div class="icon" style="font-size:2.4rem;">🚆</div>
+          <div class="label">神武寺駅</div>
+          <div class="sub">Jimmuji Sta. (KK52)<br>京急逗子線</div>
+        </div>
+        <div class="arrow" style="flex:0 0 auto;min-width:30mm;">
+          <div>~5 min walk</div>
+          <div class="line" style="width:28mm;"></div>
+          <div>徒歩 約5分</div>
+        </div>
+        <div class="stop destination">
+          <div class="icon" style="font-size:2.4rem;">🏡</div>
+          <div class="label">Hilltop Zushi</div>
+          <div class="sub">池子 2-10-9</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="from-tokyo">
+      <h3>Travel Time from Major Hubs · 主要拠点からの所要時間</h3>
+      <div class="grid">
+        <div class="from-card">
+          <div class="from">東京駅から</div>
+          <div class="from-en">From Tokyo Sta.</div>
+          <div class="time">~65</div>
+          <div class="unit">min</div>
+        </div>
+        <div class="from-card">
+          <div class="from">品川駅から</div>
+          <div class="from-en">From Shinagawa</div>
+          <div class="time">~57</div>
+          <div class="unit">min</div>
+        </div>
+        <div class="from-card">
+          <div class="from">横浜駅から</div>
+          <div class="from-en">From Yokohama</div>
+          <div class="time">~38</div>
+          <div class="unit">min</div>
+        </div>
+        <div class="from-card">
+          <div class="from">羽田空港から</div>
+          <div class="from-en">From Haneda Airport</div>
+          <div class="time">~58</div>
+          <div class="unit">min</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="around">
+      <h3>Around the Property</h3>
+      <div class="ja">物件まわりのご案内</div>
+      <div class="grid">
+        <div class="place">
+          <div class="ico">🏪</div>
+          <div class="body">
+            <div class="name">ローソン 池子二丁目店</div>
+            <div class="name-en">LAWSON · 24h · Parcel Locker</div>
+            <div class="desc">徒歩1分・宅配ボックス・食材ピックアップ可</div>
+          </div>
+        </div>
+        <div class="place">
+          <div class="ico">🚲</div>
+          <div class="body">
+            <div class="name">レンタサイクル（駅前）</div>
+            <div class="name-en">Bicycle Rental at Station</div>
+            <div class="desc">海岸・観光地巡りに便利</div>
+          </div>
+        </div>
+        <div class="place">
+          <div class="ico">⛩️</div>
+          <div class="body">
+            <div class="name">神武寺・ハイキングコース</div>
+            <div class="name-en">Jinmu-ji Temple · Hiking Trail</div>
+            <div class="desc">駅名の由来・自然散策</div>
+          </div>
+        </div>
+        <div class="place">
+          <div class="ico">🏖️</div>
+          <div class="body">
+            <div class="name">逗子海岸</div>
+            <div class="name-en">Zushi Beach</div>
+            <div class="desc">電車・自転車で約15分</div>
+          </div>
+        </div>
+        <div class="place">
+          <div class="ico">🛒</div>
+          <div class="body">
+            <div class="name">スーパー（逗子駅周辺）</div>
+            <div class="name-en">Supermarkets near Zushi Sta.</div>
+            <div class="desc">電車1駅・タクシー約8分</div>
+          </div>
+        </div>
+        <div class="place">
+          <div class="ico">🏯</div>
+          <div class="body">
+            <div class="name">鎌倉エリア</div>
+            <div class="name-en">Kamakura Area</div>
+            <div class="desc">電車で約15-20分・観光名所</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      Welcome to your hilltop retreat &middot; 丘の上の隠れ家へようこそ
+      <div class="ja">お困りの際はホストまでお気軽にご連絡ください / Please contact your host for assistance</div>
+    </footer>
+  </div>
+</body>
+</html>

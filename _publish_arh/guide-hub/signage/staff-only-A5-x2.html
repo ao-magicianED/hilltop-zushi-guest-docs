@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>スタッフ専用 (A4縦×2枚分) — Hilltop Zushi</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@700;800;900&family=Noto+Sans+JP:wght@700;900&family=Noto+Sans+KR:wght@700;900&family=Noto+Sans+SC:wght@700;900&family=Noto+Serif+JP:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F3A34;
+    --accent: #C9A56D;
+    --bg: #F5F3F0;
+    --text: #2C2C2C;
+    --info: #2563A4;
+    --jp-font: 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    --serif-font: 'Cormorant Garamond', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: A4 portrait; margin: 0; }
+  html, body { background: #888; }
+  body {
+    font-family: var(--jp-font);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.4;
+  }
+  /* A4 用紙 = A5 を2枚 縦に積む */
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    background: var(--bg);
+    position: relative;
+    box-shadow: 0 8px 50px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  /* 切り取り線（中央） */
+  .cut-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    border-top: 1.5px dashed #888;
+    z-index: 10;
+    pointer-events: none;
+  }
+  .cut-line::before,
+  .cut-line::after {
+    content: '✂';
+    position: absolute;
+    top: -10px;
+    font-size: 14px;
+    color: #555;
+    background: var(--bg);
+    padding: 0 6px;
+  }
+  .cut-line::before { left: 8mm; }
+  .cut-line::after { right: 8mm; }
+  .cut-label {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg);
+    padding: 0 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.55rem;
+    color: #666;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    z-index: 11;
+  }
+
+  /* A5 1枚分（A4 縦の半分） */
+  .half {
+    width: 210mm;
+    height: 148.5mm;
+    position: relative;
+    padding: 7mm 12mm 6mm;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* 装飾枠 */
+  .frame {
+    position: absolute;
+    top: 4mm; left: 4mm; right: 4mm; bottom: 4mm;
+    border: 1.5px solid var(--info);
+    pointer-events: none;
+  }
+  .frame .corner {
+    position: absolute; width: 14px; height: 14px;
+    border: 2px solid var(--info);
+  }
+  .frame .corner.tl { top: -1.5px; left: -1.5px; border-right: none; border-bottom: none; }
+  .frame .corner.tr { top: -1.5px; right: -1.5px; border-left: none; border-bottom: none; }
+  .frame .corner.bl { bottom: -1.5px; left: -1.5px; border-right: none; border-top: none; }
+  .frame .corner.br { bottom: -1.5px; right: -1.5px; border-left: none; border-top: none; }
+
+  /* ブランド */
+  .brand {
+    text-align: center;
+    margin-bottom: 2mm;
+    flex-shrink: 0;
+  }
+  .brand .brand-text {
+    font-family: var(--serif-font);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.2em;
+    line-height: 1;
+  }
+
+  /* 縦レイアウト: アイコン + テキスト（中央寄せ） */
+  .body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4mm;
+    padding: 1mm 0;
+  }
+
+  /* アイコン円 */
+  .icon-circle {
+    width: 42mm;
+    height: 42mm;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #E8F0F8 0%, #C7D9EB 100%);
+    border: 4px solid var(--info);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 6px 20px rgba(37,99,164,0.22);
+  }
+  .icon-circle .symbol {
+    font-size: 4.2rem;
+    line-height: 1;
+  }
+
+  /* テキスト */
+  .text {
+    text-align: center;
+  }
+  .text .jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.85rem;
+    font-weight: 900;
+    color: var(--info);
+    letter-spacing: 0.12em;
+    line-height: 1.1;
+    margin-bottom: 1.5mm;
+  }
+  .text .en {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: var(--primary);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    margin-bottom: 1.5mm;
+  }
+  .text .multi {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.08em;
+    margin-bottom: 2.5mm;
+  }
+  .text .multi .zh { font-family: 'Noto Sans SC', sans-serif; }
+  .text .multi .ko { font-family: 'Noto Sans KR', sans-serif; }
+  .text .multi .sep { color: var(--accent); margin: 0 3mm; font-weight: 400; }
+
+  /* 理由バッジ（小） */
+  .reason {
+    background: var(--info);
+    color: #fff;
+    border-radius: 2.5mm;
+    padding: 2.5mm 4mm;
+    font-family: var(--jp-font);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    box-shadow: 0 3px 10px rgba(37,99,164,0.25);
+    display: inline-block;
+  }
+  .reason .icon {
+    margin-right: 2mm;
+  }
+  .reason .en {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: 0.8mm;
+    opacity: 0.95;
+  }
+
+  /* フッター */
+  .foot {
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.5rem;
+    color: var(--primary);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding-top: 1.5mm;
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+
+  /* スマホ最適化 */
+  @media (max-width: 880px) {
+    html, body { margin: 0; padding: 0; background: #fff; overflow-x: hidden; overflow-y: auto; }
+    body {
+      display: block;
+      min-height: 0;
+      height: calc(100vw * 1123 / 794);
+    }
+    .sheet {
+      transform: scale(calc(100vw / 794px));
+      transform-origin: top left;
+      box-shadow: none;
+    }
+  }
+
+  @media print {
+    html, body { background: #fff; overflow: hidden; }
+    html { -ms-overflow-style: none; scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+    body { padding: 0; }
+    .sheet { box-shadow: none; page-break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+
+    <!-- ===== 上半分 (A5) ===== -->
+    <div class="half" data-section="half-1">
+      <div class="frame">
+        <span class="corner tl"></span>
+        <span class="corner tr"></span>
+        <span class="corner bl"></span>
+        <span class="corner br"></span>
+      </div>
+
+      <header class="brand">
+        <div class="brand-text">HILLTOP ZUSHI</div>
+      </header>
+
+      <div class="body">
+        <div class="icon-circle">
+          <span class="symbol">🔒</span>
+        </div>
+        <div class="text">
+          <div class="jp">スタッフ専用</div>
+          <div class="en">Staff Only</div>
+          <div class="multi"><span class="zh">仅限工作人员</span><span class="sep">·</span><span class="ko">직원 전용</span></div>
+          <div class="reason">
+            <span class="icon">🙏</span>こちらは開けないでください
+            <div class="en">Please Do Not Open</div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="foot">Thank You For Your Cooperation · ご協力ありがとうございます</footer>
+    </div>
+
+    <!-- 切り取り線 -->
+    <div class="cut-line">
+      <span class="cut-label">Cut Here · 切り取り線</span>
+    </div>
+
+    <!-- ===== 下半分 (A5) ===== -->
+    <div class="half" data-section="half-2">
+      <div class="frame">
+        <span class="corner tl"></span>
+        <span class="corner tr"></span>
+        <span class="corner bl"></span>
+        <span class="corner br"></span>
+      </div>
+
+      <header class="brand">
+        <div class="brand-text">HILLTOP ZUSHI</div>
+      </header>
+
+      <div class="body">
+        <div class="icon-circle">
+          <span class="symbol">🔒</span>
+        </div>
+        <div class="text">
+          <div class="jp">スタッフ専用</div>
+          <div class="en">Staff Only</div>
+          <div class="multi"><span class="zh">仅限工作人员</span><span class="sep">·</span><span class="ko">직원 전용</span></div>
+          <div class="reason">
+            <span class="icon">🙏</span>こちらは開けないでください
+            <div class="en">Please Do Not Open</div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="foot">Thank You For Your Cooperation · ご協力ありがとうございます</footer>
+    </div>
+
+  </div>
+</body>
+</html>

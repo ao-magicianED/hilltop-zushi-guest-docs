@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hilltop Zushi — システム構成メモ(オーナー専用)</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F3A34;
+    --primary-light: #2B4A3F;
+    --accent: #C9A56D;
+    --accent-light: #D4B87A;
+    --bg: #F5F3F0;
+    --bg-soft: #FAF8F4;
+    --white: #FFFFFF;
+    --text: #2C2C2C;
+    --text-light: #6B6B6B;
+    --border: #E8E2D5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', 'Hiragino Sans', 'メイリオ', 'Meiryo', 'Yu Gothic', 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.7;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 40px 24px 80px; }
+  .back { display:inline-block; margin-bottom:24px; font-size:0.85rem; color:var(--text-light); text-decoration:none; }
+  .back:hover { color: var(--primary); }
+  h1 {
+    font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+    font-size: 2rem; color: var(--primary); font-weight:700; margin-bottom:6px;
+  }
+  .subtitle { font-size:0.85rem; color:var(--text-light); margin-bottom:8px; }
+  .warn-badge {
+    display:inline-block; background:#E5E7EB; color:#374151; font-size:0.72rem; font-weight:700;
+    padding:4px 12px; border-radius:12px; letter-spacing:0.05em; margin-bottom:36px;
+  }
+  .section { margin-top:44px; }
+  .section h2 {
+    font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+    font-size: 1.35rem; color: var(--primary); font-weight:700; margin-bottom:14px;
+    border-bottom: 1px solid var(--border); padding-bottom:10px;
+  }
+  .acct {
+    background: var(--white); border:1px solid var(--border); border-radius:10px;
+    padding:18px 20px; margin-bottom:14px;
+  }
+  .acct .acct-title { font-weight:700; font-size:0.95rem; color:var(--primary); }
+  .acct .acct-id { font-size:0.78rem; color:var(--text-light); margin-bottom:10px; font-family:monospace; }
+  .proj { background: var(--bg-soft); border-radius:8px; padding:10px 14px; margin-top:8px; font-size:0.85rem; }
+  .proj.live { border-left:3px solid #15803D; }
+  .proj.frozen { border-left:3px solid #B45309; }
+  .tag { display:inline-block; font-size:0.68rem; font-weight:700; padding:2px 9px; border-radius:10px; margin-left:6px; }
+  .tag.ok { background:#DCFCE7; color:#15803D; }
+  .tag.warn { background:#FEF3C7; color:#92400E; }
+  .tag.danger { background:#FEE2E2; color:#B91C1C; }
+  .tag.info { background:#E0E7FF; color:#3730A3; }
+  table { width:100%; border-collapse:collapse; font-size:0.85rem; margin-top:10px; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  th { color:var(--text-light); font-weight:600; font-size:0.78rem; }
+  code { background:var(--bg-soft); padding:1px 6px; border-radius:4px; font-size:0.85em; }
+  a.link { color: var(--primary); text-decoration:underline; word-break:break-all; }
+  ul.issues { margin-top:8px; padding-left:20px; }
+  ul.issues li { margin-bottom:8px; font-size:0.88rem; }
+  .updated { margin-top:56px; padding-top:20px; border-top:1px solid var(--border); font-size:0.75rem; color:#BBB; text-align:center; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <a class="back" href="index.html">← 資料ハブへ戻る</a>
+  <h1>システム構成メモ</h1>
+  <div class="subtitle">Hilltop Zushi 公式サイト・予約導線まわりの技術構成</div>
+  <div class="warn-badge">⚠ オーナー専用・ゲストには無関係の内容です</div>
+
+  <!-- ① Cloudflareアカウント -->
+  <div class="section">
+    <h2>① Cloudflareアカウント(2つ)</h2>
+    <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:14px;">
+      同じ「hilltop-zushi」という名前のプロジェクトが両方のアカウントに別々に存在する紛らわしい構造。作業前は必ず<code>npx wrangler whoami</code>でログイン先を確認する。
+    </p>
+
+    <div class="acct">
+      <div class="acct-title">info@bluestage-lcc.com</div>
+      <div class="acct-id">Account ID: 9ed124d538632a4f936e77031e20c8f5</div>
+      <div class="proj frozen">
+        <strong>hilltop-zushi</strong> → hilltop-zushi.pages.dev
+        <span class="tag warn">QRガイド専用・凍結</span><br>
+        物理QRコード設置済みの<code>/ハウスガイド_Hilltop_Zushi_v2#welcome</code>だけをここに残す。独自ドメイン購入まで変更禁止。
+      </div>
+      <div class="proj" style="margin-top:8px;">他プロジェクトも同居: bluestage-corporate(ブルーステージ合同会社HP)、spacehp(レンタルスペース外販)</div>
+    </div>
+
+    <div class="acct">
+      <div class="acct-title">2520000530@campus.ouj.ac.jp</div>
+      <div class="acct-id">Account ID: d1baf436df81893d1f8478a3cda0c082</div>
+      <div class="proj live">
+        <strong>hilltop-zushi</strong>(プロジェクト名) → hilltop-zushi-arh.pages.dev
+        <span class="tag ok">★本サイト・稼働中</span><br>
+        「A Forest Retreat」統合版(2026-07-01デプロイ)。Cloudflareアカウントは最終的にこちらへ一本化する方針。将来は独自ドメインに移行予定。
+      </div>
+      <div class="proj live" style="margin-top:8px;">
+        <strong>hilltop-guest-registration</strong>(Worker) <span class="tag info">別枠・多物件共用予定</span><br>
+        宿泊者名簿収集アプリ。Hilltop Zushi専用ではなく他の民泊物件でも使う想定のため、意図的にサイト本体とは別システムとして構築。詳細は<a class="link" href="#guest-registration">④ 宿泊者名簿システム(宿泊台帳)</a>を参照。
+      </div>
+      <div class="proj" style="margin-top:8px;">他プロジェクトも同居: bluestage-internal-report、bluereserve、line-crm-admin、line-crm-liff、x-harness-aosalon-admin</div>
+    </div>
+  </div>
+
+  <!-- ② サイト構成 -->
+  <div class="section">
+    <h2>② サイトのページ構成(hilltop-zushi-arh.pages.dev)</h2>
+    <table>
+      <tr><th>パス</th><th>内容</th><th>備考</th></tr>
+      <tr><td><code>/</code></td><td>トップページ(A Forest Retreat)</td><td>写真ギャラリー・空き状況・予約リクエスト・6言語対応</td></tr>
+      <tr><td><code>/360/</code></td><td>360度バーチャルツアー</td><td>Pannellum、10部屋分のパノラマ写真</td></tr>
+      <tr><td><code>/guide-hub/</code></td><td>資料室(このページ含む)</td><td>公開サイトからリンクなし・URLを知っている人のみ到達可</td></tr>
+      <tr><td><code>/availability</code></td><td>予約状況API(JSON)</td><td>Cloudflare Pages Function、下記③参照</td></tr>
+      <tr><td><code>/guide-hub/intra/dashboard-x7k2.html</code></td><td>内部ダッシュボード(詳細未精査)</td><td>guide-hubからもリンクなし・完全非公開URL</td></tr>
+    </table>
+  </div>
+
+  <!-- ③ 外部連携 -->
+  <div class="section">
+    <h2>③ 外部で連携しているサービス</h2>
+
+    <div class="proj live">
+      <strong>Airbnb(iCalカレンダー)</strong> <span class="tag ok">稼働中</span><br>
+      ホストダッシュボードの「カレンダーをエクスポート」で取得した秘匿URLを、Cloudflare Secret <code>AIRBNB_ICAL_URL</code>に設定。<code>functions/availability.js</code>がサーバー側で取得しブロック日程をJSON化。未設定/取得失敗時は「空き状況を表示しない」フェイルセーフ設計(ダブルブッキング防止)。
+    </div>
+
+    <div class="proj" style="margin-top:10px;border-left:3px solid #92400E;">
+      <strong>Google Apps Script(予約リクエストフォームの送信先)</strong> <span class="tag warn">レート制限なし</span><br>
+      サイトの予約リクエストフォームが<code>fetch(..., {mode:'no-cors'})</code>でPOST送信。<br>
+      ・スクリプトのオーナー(編集アカウント): <code>info@bluestage-lcc.com</code><br>
+      ・通知メール受信先: <code>hilltop.zushi@gmail.com</code><br>
+      ・GASプロジェクト: <a class="link" href="https://script.google.com/home/projects/12qHTkcVNuIRIm6_UmeYojtMXqXT0zLuuelesoZ0_0y6105GiuP898dVj/edit" target="_blank" rel="noopener">script.google.com(コード.gs)</a><br>
+      ・予約台帳(スプレッドシート): <a class="link" href="https://docs.google.com/spreadsheets/d/11qa4-rLBn2quZBhx2GS6uGkDzTk-huabo4XLdtnZ_VE/edit" target="_blank" rel="noopener">docs.google.com/spreadsheets/...dtnZ_VE</a><br>
+      実装済み対策: ハニーポット・入力形式チェック・式注入対策の3つのみ。<strong>「同一メール60秒レート制限」「LockService」は手順書に記載があるが実装には存在しない(2026-07-01実機確認)</strong>。<code>mode:'no-cors'</code>のため送信成功/失敗をサイト側で検知できず、台帳シートを定期的に見に行く運用が必須。
+    </div>
+
+    <div class="proj" style="margin-top:10px;">
+      <strong>Google Maps埋め込み</strong> <span class="tag danger">要修正</span><br>
+      iframe埋め込み(APIキー不要・無料)。現状は仮の座標のまま(<code>!1s0x0%3A0x0</code>のプレースホルダー)。「共有→地図を埋め込む」の公式手順でpb URLを再取得する必要あり。
+    </div>
+
+    <div class="proj" style="margin-top:10px;">
+      <strong>Google Fonts / jsDelivr(CDN)</strong> <span class="tag ok">問題なし</span><br>
+      フォント配信とPannellum(360度ビューワー本体)の配信。無料・APIキー不要。
+    </div>
+  </div>
+
+  <!-- ④ 宿泊者名簿システム -->
+  <div class="section" id="guest-registration">
+    <h2>④ 宿泊者名簿システム(宿泊台帳)</h2>
+    <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:14px;">
+      サイト本体(A Forest Retreat)とは独立したCloudflare Worker。①で触れた通り、他の民泊物件でも使う想定のため意図的に別システムにしている。
+    </p>
+    <div class="proj live">
+      <strong>本番</strong>: <a class="link" href="https://hilltop-guest-registration.2520000530.workers.dev" target="_blank" rel="noopener">hilltop-guest-registration.2520000530.workers.dev</a><br>
+      <strong>管理ダッシュボード</strong>: <a class="link" href="https://dash.cloudflare.com/d1baf436df81893d1f8478a3cda0c082/workers/services/view/hilltop-guest-registration/production" target="_blank" rel="noopener">Cloudflare Workers管理画面</a>
+    </div>
+    <div class="proj" style="margin-top:10px;">
+      <strong>管理ページ</strong>: <a class="link" href="https://hilltop-guest-registration.2520000530.workers.dev/admin" target="_blank" rel="noopener">/admin</a><br>
+      初回ログイン時は<strong>パスワード変更＋2段階認証(TOTP、認証アプリでQRコード読取)</strong>の設定が必須。<br>
+      マスターアカウント: <code>ao.magician@gmail.com</code>
+    </div>
+    <table>
+      <tr><th>パス</th><th>内容</th></tr>
+      <tr><td><code>/admin</code></td><td>予約一覧</td></tr>
+      <tr><td><code>/admin/reservations</code></td><td>予約・売上管理(新規予約作成・iCal取込)</td></tr>
+      <tr><td><code>/admin/metrics</code></td><td>指標ダッシュボード(ADR・稼働率など)</td></tr>
+      <tr><td><code>/admin/purge-log</code></td><td>自動削除履歴</td></tr>
+      <tr><td><code>/admin/admins</code></td><td>管理者の管理(マスターのみ)</td></tr>
+    </table>
+    <div class="proj live" style="margin-top:10px;">
+      <strong>メール通知システム(Resend)</strong> <span class="tag ok">稼働中</span><br>
+      送信元は<code>send.bluestage-lcc.com</code>ドメイン(Resend)。APIキーはCloudflare Secret <code>RESEND_API_KEY</code>に設定済み。<br>
+      ・<strong>完了通知</strong>: 全員分の宿泊者情報が提出されると、オーナー(<code>hilltop.zushi@gmail.com</code>)と代表者(bcc:オーナー)の両方へ自動メール。<br>
+      ・<strong>暗証番号(PIN)案内</strong>: 暗証番号はAES-256-GCMで暗号化してD1に保存(以前は「保存しない」方針だったが2026-07-01に変更)。承認時・暗証番号(再)設定時に、代表者メールが判明していれば自動送信。ゲストはメール内リンクを開くと確認ボタンが出て、押すと一度だけ暗証番号が表示される(以後リンクは無効化)。<br>
+      ・<strong>督促リマインド</strong>: チェックイン15〜7日前で未提出の予約に代表者へ督促メール、当日なのに0件の予約はオーナーへ緊急アラート(cronで1日1回)。<br>
+      ・<strong>グループリンクの自動送信</strong>: 予約作成時・編集ページの「グループリンクを発行する」ボタンで、代表者メールが分かっていれば自動送信(bcc:オーナー)。メール以外の経路(Airbnbメッセージ等)用に案内文案もコピー可能。
+    </div>
+    <div class="proj" style="margin-top:10px;border-left:3px solid #92400E;">
+      <strong>確認待ち事項</strong> <span class="tag warn">要判断</span><br>
+      テストデータ削除(<code>HMTEST0715</code>など、予約一覧から確認可能)について、①本番環境のまま削除してよいか、②実行方法(私が実行 or あおさんのターミナルでコマンド実行)、の2点が2026-07-01時点で未確定・確認待ち。
+    </div>
+  </div>
+
+  <!-- ⑤ ソース管理 -->
+  <div class="section">
+    <h2>⑤ ソースコード管理(デプロイとは別経路)</h2>
+    <div class="proj">
+      <strong>GitHub: ao-magicianED/hilltop-zushi-guest-docs</strong><br>
+      コードの保管用リポジトリ。ここにpushしても本番には反映されない(Cloudflareへは<code>wrangler pages deploy</code>で手動アップロードする方式=Direct Upload)。<br>
+      統合版一式(<code>_publish_arh/</code>フォルダ)は2026-07-01にコミット・push済み(<a class="link" href="https://github.com/ao-magicianED/hilltop-zushi-guest-docs/pull/3" target="_blank" rel="noopener">PR #3</a>)。
+    </div>
+  </div>
+
+  <!-- ⑥ 既知の未対応事項 -->
+  <div class="section">
+    <h2>⑥ 既知の未対応事項</h2>
+    <ul class="issues">
+      <li><span class="tag danger">要修正</span> Googleマップ埋め込みが仮座標のまま(③参照)</li>
+      <li><span class="tag warn">任意</span> <code>images/</code>内の未参照ファイル28枚(54枚中)が未整理のまま残っている(実害は軽微)</li>
+      <li><span class="tag warn">低優先度</span> 予約リクエストフォームが<code>no-cors</code>のため送信成功をクライアント側で検証できない</li>
+      <li><span class="tag ok">解消済</span> <code>guide-hub/intra/dashboard-x7k2.html</code>はKV等のバインディング非依存の静的HTML（PIN・一時保存ともsessionStorageのみ）と2026-07-01に確認済み。中身は「運営者用オペレーションダッシュボード」で、ホスティング構成・火災保険・BBQ用品v4・宿泊者名簿運用SOP等の記載をあわせて最新化（v4）。PINが平文でJS内にハードコードされている点は要ローテーション検討（低優先度・Cloudflare Access昇格で根本対応予定）。</li>
+      <li><span class="tag warn">低優先度</span> GASのスパム対策にレート制限・LockServiceがない(③参照、実害は現状低い)</li>
+      <li><span class="tag warn">要判断</span> 宿泊者名簿システムのテストデータ削除(④参照、進め方確認待ち)</li>
+    </ul>
+  </div>
+
+  <!-- ⑦ 変更履歴 -->
+  <div class="section">
+    <h2>⑦ 変更履歴</h2>
+    <p style="font-size:0.82rem;color:var(--text-light);margin-bottom:10px;">
+      <strong>運用ルール:</strong> システム構成(アカウント・連携サービス・デプロイ方法など)に変更があった場合は、このページの該当セクションを更新し、下の表に1行追記すること。
+    </p>
+    <table>
+      <tr><th>日付</th><th>変更内容</th></tr>
+      <tr>
+        <td>2026-07-01</td>
+        <td>初版作成。「A Forest Retreat」統合版(vibrant-shannon版採用)をcampusアカウント(hilltop-zushi-arh.pages.dev)へデプロイ。Cloudflareアカウント構成・宿泊者名簿Worker・GAS予約フォーム(オーナー/通知先/台帳URL/実コード確認結果)・Googleマップの現状を整理して記載。</td>
+      </tr>
+      <tr>
+        <td>2026-07-01</td>
+        <td>「④ 宿泊者名簿システム(宿泊台帳)」セクションを新設。管理ページURL・初回ログイン手順(パスワード変更+TOTP 2段階認証)・マスターアカウント・管理画面の各ページ一覧・テストデータ削除の確認待ち事項を追記。GitHub同期(PR #3)を反映。</td>
+      </tr>
+      <tr>
+        <td>2026-07-01</td>
+        <td><code>guide-hub/intra/dashboard-x7k2.html</code>を全体見直し(v3→v4)。KV等バインディング非依存の静的HTMLと確認し「⑥ 既知の未対応事項」の未精査項目を解消済みに変更。ダッシュボード側も同日付でホスティング(2アカウント構成)・火災保険(契約確定)・BBQ用品(v4ガス主力化・合計¥319,219)・宿泊者名簿運用SOP(専用Webアプリの実態)を反映し、解決済みTODOを除去。</td>
+      </tr>
+      <tr>
+        <td>2026-07-01</td>
+        <td>宿泊者名簿システムにメール通知(Resend)を追加・本番デプロイ。全員提出完了時のオーナー/代表者への通知、暗証番号の暗号化保存(AES-256-GCM)＋承認時/設定時の代表者への自動案内(一度きり表示)、督促リマインド(15〜7日前)・当日0件アラートのcron自動化、グループリンクの自動送信・コピー機能を追加。Codex+多エージェント敵対的レビューを2巡実施し、完了通知のレース条件・PIN表示の非アトミック性・連打での重複送信等を修正。</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="updated">最終更新 2026-07-01</div>
+
+</div>
+</body>
+</html>

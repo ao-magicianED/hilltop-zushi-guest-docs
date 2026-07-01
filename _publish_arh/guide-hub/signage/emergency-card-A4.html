@@ -1,0 +1,512 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Emergency · 緊急連絡先 — Hilltop Zushi</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F3A34;
+    --primary-deep: #14271F;
+    --accent: #C9A56D;
+    --accent-deep: #A8854B;
+    --bg: #F5F3F0;
+    --bg-soft: #FAF8F4;
+    --text: #2C2C2C;
+    --neutral: #6B6B6B;
+    --emergency: #C8242A;
+    --emergency-deep: #8E1418;
+    --info-blue: #2563A4;
+    --jp-font: 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    --serif-font: 'Cormorant Garamond', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @page { size: A4 portrait; margin: 0; }
+  html, body { background: #888; }
+  body {
+    font-family: var(--jp-font);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    background: var(--bg);
+    position: relative;
+    padding: 13mm 13mm 11mm;
+    box-shadow: 0 8px 50px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .frame {
+    position: absolute;
+    top: 7mm; left: 7mm; right: 7mm; bottom: 7mm;
+    border: 1px solid rgba(201,165,109,0.5);
+    pointer-events: none;
+  }
+  .frame .corner {
+    position: absolute; width: 18px; height: 18px;
+    border: 2px solid var(--accent);
+  }
+  .frame .corner.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .frame .corner.tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+  .frame .corner.bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+  .frame .corner.br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  .brand { text-align: center; margin-bottom: 2mm; }
+  .brand .brand-text { font-family: 'Cormorant Garamond', 'Hiragino Mincho ProN', serif; font-size: 1.3rem; font-weight: 700; color: var(--primary); letter-spacing: 0.22em; margin: 0 0 0.8mm; line-height: 1; }
+  .brand .tagline {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.56rem;
+    color: var(--emergency);
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .title-block { text-align: center; margin-bottom: 3.2mm; }
+  .title-block h1 {
+    font-family: var(--serif-font);
+    font-size: 2.05rem;
+    font-weight: 700;
+    color: var(--emergency);
+    letter-spacing: 0.14em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .title-block .ja {
+    font-family: var(--jp-font);
+    font-size: 0.94rem;
+    color: var(--emergency-deep);
+    margin-top: 1mm;
+    letter-spacing: 0.18em;
+    font-weight: 700;
+  }
+  .title-block .multi {
+    font-size: 0.62rem;
+    color: var(--neutral);
+    margin-top: 0.6mm;
+    letter-spacing: 0.14em;
+  }
+  .title-block .multi .zh { font-family: 'Noto Sans SC', sans-serif; }
+  .title-block .multi .ko { font-family: 'Noto Sans KR', sans-serif; }
+
+  /* 住所カード */
+  .address {
+    background: linear-gradient(135deg, var(--emergency) 0%, var(--emergency-deep) 100%);
+    color: #fff;
+    border-radius: 2.6mm;
+    padding: 3.2mm 4mm;
+    margin-bottom: 2.6mm;
+    text-align: center;
+  }
+  .address .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.56rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+    font-weight: 700;
+    margin-bottom: 1mm;
+  }
+  .address .ja {
+    font-family: var(--jp-font);
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.2mm;
+  }
+  .address .en {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 0.8mm;
+  }
+  .address .multi {
+    font-size: 0.62rem;
+    color: rgba(255,255,255,0.85);
+    margin-top: 0.6mm;
+  }
+  .address .multi .zh { font-family: 'Noto Sans SC', sans-serif; }
+  .address .multi .ko { font-family: 'Noto Sans KR', sans-serif; }
+  .address .note {
+    margin-top: 1.2mm;
+    font-family: var(--jp-font);
+    font-size: 0.58rem;
+    color: rgba(255,255,255,0.9);
+    border-top: 1px solid rgba(255,255,255,0.3);
+    padding-top: 1.2mm;
+    line-height: 1.3;
+  }
+
+  /* 119/110 ヒーロー */
+  .hero-numbers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.2mm;
+    margin-bottom: 2.5mm;
+  }
+  .num-card {
+    background: #fff;
+    border-radius: 2.5mm;
+    padding: 3.2mm 3mm;
+    text-align: center;
+    border: 2px solid var(--emergency);
+    box-shadow: 0 2px 8px rgba(200,36,42,0.12);
+    position: relative;
+  }
+  .num-card.police { border-color: var(--info-blue); }
+  .num-card .icon { font-size: 1.5rem; line-height: 1; margin-bottom: 0.6mm; }
+  .num-card .number {
+    font-family: 'Inter', sans-serif;
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--emergency);
+    line-height: 1;
+    letter-spacing: 0.05em;
+  }
+  .num-card.police .number { color: var(--info-blue); }
+  .num-card .label {
+    font-family: var(--jp-font);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-top: 0.8mm;
+  }
+  .num-card .en {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.56rem;
+    color: var(--neutral);
+    margin-top: 0.3mm;
+    letter-spacing: 0.04em;
+  }
+  .num-card .multi {
+    font-size: 0.56rem;
+    color: var(--neutral);
+    margin-top: 0.5mm;
+  }
+  .num-card .multi .zh { font-family: 'Noto Sans SC', sans-serif; }
+  .num-card .multi .ko { font-family: 'Noto Sans KR', sans-serif; }
+
+  /* ホスト連絡 */
+  .host-block {
+    background: #fff;
+    border: 2px solid var(--accent);
+    border-radius: 2.6mm;
+    padding: 3.2mm 4.2mm;
+    margin-bottom: 2.6mm;
+    display: flex;
+    gap: 3mm;
+    align-items: center;
+  }
+  .host-block .icon {
+    font-size: 1.6rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .host-block .body { flex: 1; }
+  .host-block .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.56rem;
+    color: var(--accent-deep);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 0.6mm;
+  }
+  .host-block .name {
+    font-family: var(--jp-font);
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.3mm;
+  }
+  .host-block .desc {
+    font-family: var(--jp-font);
+    font-size: 0.62rem;
+    color: var(--neutral);
+    line-height: 1.25;
+  }
+  .host-block .desc .en { font-family: 'Inter', sans-serif; font-style: italic; }
+  .host-block .desc .zh { font-family: 'Noto Sans SC', sans-serif; }
+  .host-block .desc .ko { font-family: 'Noto Sans KR', sans-serif; }
+
+  /* 医療機関カード */
+  .medical-section { margin-bottom: 1.8mm; }
+  .medical-section h2 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.56rem;
+    color: var(--emergency-deep);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.3mm;
+  }
+  .medical-section .ja-h2 {
+    font-family: var(--jp-font);
+    font-size: 0.66rem;
+    font-weight: 700;
+    color: var(--emergency-deep);
+    text-align: center;
+    margin-bottom: 0.8mm;
+    letter-spacing: 0.1em;
+  }
+  .medical-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.8mm;
+  }
+  .med-card {
+    background: #fff;
+    border-radius: 1.6mm;
+    padding: 2mm 2.4mm;
+    border-left: 3px solid var(--emergency);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .med-card.full { grid-column: span 2; }
+  .med-card .name {
+    font-family: var(--jp-font);
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.74rem;
+    margin-bottom: 0.3mm;
+    line-height: 1.2;
+  }
+  .med-card .name-en {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.56rem;
+    color: var(--neutral);
+    font-style: italic;
+    margin-bottom: 0.5mm;
+  }
+  .med-card .meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.56rem;
+    color: var(--text);
+    margin-bottom: 0.25mm;
+  }
+  .med-card .meta strong {
+    color: var(--emergency);
+    font-weight: 700;
+  }
+  .med-card .desc {
+    font-family: var(--jp-font);
+    font-size: 0.56rem;
+    color: var(--neutral);
+    line-height: 1.25;
+    margin-top: 0.3mm;
+  }
+
+  /* 多言語通訳 */
+  .interpreter {
+    background: #EBF1F7;
+    border-left: 3px solid var(--info-blue);
+    border-radius: 1.5mm;
+    padding: 1.8mm 2.8mm;
+    margin-bottom: 1.2mm;
+  }
+  .interpreter .head {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.54rem;
+    color: var(--info-blue);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 0.3mm;
+  }
+  .interpreter .name {
+    font-family: var(--jp-font);
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.66rem;
+    line-height: 1.2;
+  }
+  .interpreter .meta {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.55rem;
+    color: var(--text);
+    margin-top: 0.2mm;
+  }
+  .interpreter .meta strong { color: var(--info-blue); font-weight: 700; }
+  .interpreter .desc {
+    font-family: var(--jp-font);
+    font-size: 0.54rem;
+    color: var(--neutral);
+    margin-top: 0.2mm;
+    line-height: 1.2;
+  }
+
+  .foot {
+    margin-top: auto;
+    text-align: center;
+    font-size: 0.56rem;
+    color: var(--neutral);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding-top: 1mm;
+  }
+  .foot .ja {
+    text-transform: none;
+    letter-spacing: 0.04em;
+    font-family: var(--jp-font);
+    margin-top: 0.3mm;
+    font-size: 0.58rem;
+  }
+
+  /* スマホ最適化: A4を画面幅にフィット */
+  @media (max-width: 880px) {
+    html, body { margin: 0; padding: 0; background: #fff; overflow-x: hidden; overflow-y: auto; }
+    body {
+      display: block;
+      min-height: 0;
+      height: calc(100vw * 1123 / 794);
+    }
+    .sheet {
+      transform: scale(calc(100vw / 794px));
+      transform-origin: top left;
+      box-shadow: none;
+    }
+  }
+
+  @media print {
+    html, body { background: #fff; overflow: hidden; }
+    html { -ms-overflow-style: none; scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+    body { padding: 0; }
+    .sheet { box-shadow: none; page-break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="frame">
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+    </div>
+
+    <header class="brand">
+      <div class="brand-text">HILLTOP ZUSHI</div>
+      <div class="tagline">Emergency Contact · 緊急連絡先</div>
+    </header>
+
+    <section class="title-block">
+      <h1>Emergency</h1>
+      <div class="ja">緊急連絡先</div>
+      <div class="multi"><span class="zh">紧急联络</span> &middot; <span class="ko">긴급 연락처</span></div>
+    </section>
+
+    <section class="hero-numbers">
+      <div class="num-card">
+        <div style="position:absolute;top:-3mm;left:50%;transform:translateX(-50%);background:#C8242A;color:#fff;font-family:'Inter',sans-serif;font-size:0.55rem;font-weight:800;padding:0.5mm 3mm;border-radius:1.5mm;letter-spacing:0.18em;">STEP 1</div>
+        <div class="icon">🚑</div>
+        <div class="number">119</div>
+        <div class="label">救急車・消防</div>
+        <div class="en">Ambulance / Fire</div>
+        <div class="multi"><span class="zh">救护车・消防</span> &middot; <span class="ko">구급차・소방</span></div>
+      </div>
+      <div class="num-card police">
+        <div style="position:absolute;top:-3mm;left:50%;transform:translateX(-50%);background:#2563A4;color:#fff;font-family:'Inter',sans-serif;font-size:0.55rem;font-weight:800;padding:0.5mm 3mm;border-radius:1.5mm;letter-spacing:0.18em;">STEP 1</div>
+        <div class="icon">🚓</div>
+        <div class="number">110</div>
+        <div class="label">警察</div>
+        <div class="en">Police</div>
+        <div class="multi"><span class="zh">警察</span> &middot; <span class="ko">경찰</span></div>
+      </div>
+    </section>
+
+    <section class="address">
+      <div class="label">📍 STEP 2 · 119通報時に読み上げてください</div>
+      <div class="ja">神奈川県 逗子市 池子 2-10-9</div>
+      <div class="en">2-10-9 Ikego, Zushi-shi, Kanagawa, Japan</div>
+      <div class="multi">
+        <span class="zh">神奈川县 逗子市 池子 2-10-9</span> &middot; <span class="ko">가나가와현 즈시시 이케고 2-10-9</span>
+      </div>
+      <div class="note">「Hilltop Zushi という民泊からの通報です」と伝えてください / Mention "calling from Hilltop Zushi vacation rental"</div>
+    </section>
+
+    <section class="host-block">
+      <div class="icon">💬</div>
+      <div class="body">
+        <div class="label">STEP 3 · 救急対応後 / After Emergency Call</div>
+        <div class="name">ホストへ Airbnb / Booking メッセージ</div>
+        <div class="desc">
+          <span class="en">After contacting 119/110, notify your host via the booking platform.</span><br>
+          <span class="zh">在拨打119/110之后，请通过预订平台告知房东。</span><br>
+          <span class="ko">119/110에 신고 후, 예약 플랫폼 메시지로 호스트에게 알려 주세요.</span>
+        </div>
+      </div>
+    </section>
+
+    <section style="background:#EBF1F7;border-top:2px solid #2563A4;padding:1.5mm 4mm;border-radius:1.8mm;margin-bottom:2mm;text-align:center;">
+      <div style="font-family:'Inter',sans-serif;font-size:0.56rem;color:#2563A4;letter-spacing:0.2em;text-transform:uppercase;font-weight:700;margin-bottom:0.2mm;">— Non-Emergency Only · 以下は非緊急時のみ —</div>
+      <div style="font-family:var(--jp-font);font-size:0.58rem;color:#2563A4;">急病・重症は必ず先に 119 / Always dial 119 first for serious symptoms</div>
+    </section>
+
+    <section class="medical-section">
+      <h2>For Non-Emergency · 非緊急時の受診先</h2>
+      <div class="ja-h2">非緊急時の医療機関</div>
+      <div class="medical-grid">
+        <div class="med-card full">
+          <div class="name">逗葉地域医療センター（徒歩圏・最寄り）</div>
+          <div class="name-en">Zuyou Regional Medical Center · Walking distance</div>
+          <div class="meta">📍 逗子市池子字桟敷戸1892-6 &nbsp;|&nbsp; ☎ <strong>046-873-7752</strong></div>
+          <div class="meta">🏥 内科・小児科・外科・歯科 / Internal · Pediatrics · Surgery · Dental</div>
+          <div class="meta">🕐 夜間 20:00–23:00 &middot; 休日 10:00–17:00 (年末年始休)</div>
+          <div class="desc">外国語対応は事前要確認。Foreign language support: please confirm in advance.</div>
+        </div>
+        <div class="med-card">
+          <div class="name">湘南藤沢徳洲会病院</div>
+          <div class="name-en">Shonan-Fujisawa Tokushukai Hospital</div>
+          <div class="meta">☎ <strong>0466-35-1177</strong></div>
+          <div class="meta">🌐 24時間救急 + 英語対応</div>
+          <div class="desc">藤沢市・電車約30-40分 / 24h ER + English</div>
+        </div>
+        <div class="med-card">
+          <div class="name">横須賀市救急医療センター</div>
+          <div class="name-en">Yokosuka Emergency Medical Center</div>
+          <div class="meta">☎ <strong>046-824-3001</strong></div>
+          <div class="meta">🕐 平日20-24時 / 休日8-24時</div>
+          <div class="desc">内・小・外科 / Internal · Pediatric · Surgery</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="interpreter">
+      <div class="head">🌐 Multilingual Support Hotlines · 多言語サポート窓口</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:3mm;margin-top:1mm;">
+        <div>
+          <div class="name">Japan Visitor Hotline (JNTO)</div>
+          <div class="meta">☎ <strong>050-3816-2787</strong></div>
+          <div class="desc">24時間365日・観光/災害/緊急<br>EN・中文・한국어 対応 (政府機関)</div>
+        </div>
+        <div>
+          <div class="name">AMDA 国際医療情報センター</div>
+          <div class="meta">☎ <strong>03-5285-8185</strong></div>
+          <div class="desc">医療通訳・平日17-20時/土日9-20時<br>英・中・韓・タイ・スペイン語</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      Verified 2026-05-15 &middot; 119/110 first
+      <div class="ja">2026-05-15確認 &middot; 重症時はまず119/110</div>
+    </footer>
+  </div>
+</body>
+</html>

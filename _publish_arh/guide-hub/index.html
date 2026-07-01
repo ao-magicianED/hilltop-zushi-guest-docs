@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hilltop Zushi — 資料ハブ</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F3A34;
+    --primary-light: #2B4A3F;
+    --accent: #C9A56D;
+    --accent-light: #D4B87A;
+    --bg: #F5F3F0;
+    --bg-soft: #FAF8F4;
+    --white: #FFFFFF;
+    --text: #2C2C2C;
+    --text-light: #6B6B6B;
+    --border: #E8E2D5;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Inter', 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.6;
+  }
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+  /* Hero */
+  .hero {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  .hero .hero-logo {
+    display: block;
+    width: 360px;
+    max-width: 80%;
+    height: auto;
+    margin: 0 auto 18px;
+  }
+  .hero .sub {
+    font-family: 'Cormorant Garamond', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+    font-size: 1.15rem;
+    color: var(--accent);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-style: italic;
+    margin-bottom: 10px;
+  }
+  .hero .location {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    letter-spacing: 0.12em;
+    line-height: 1.7;
+  }
+  .hero .location .ja {
+    font-weight: 600;
+    color: var(--text);
+  }
+  .hero .divider {
+    width: 60px;
+    height: 1px;
+    background: var(--accent);
+    margin: 28px auto 0;
+  }
+
+  /* Section */
+  .section {
+    margin-top: 56px;
+  }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 14px;
+  }
+  .section-head h2 {
+    font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.04em;
+  }
+  .section-head .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  /* Cards */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 28px 24px 22px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.10);
+    border-color: var(--accent-light);
+  }
+  .card .card-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 0.9rem;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    font-weight: 600;
+  }
+  .card h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 1.2rem;
+    color: var(--primary);
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  .card .card-en {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--accent);
+    letter-spacing: 0.03em;
+  }
+  .card .card-desc {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    line-height: 1.65;
+    margin-top: 4px;
+  }
+  .card .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .card .badge {
+    display: inline-block;
+    background: var(--bg);
+    color: var(--primary);
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+    letter-spacing: 0.05em;
+  }
+  .card .badge.print {
+    background: #FFF5E6;
+    color: #B87A1F;
+  }
+  .card .badge.lang {
+    background: #E8F0EE;
+    color: var(--primary);
+  }
+  .card .arrow {
+    margin-top: auto;
+    padding-top: 14px;
+    color: var(--accent);
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+  }
+
+  /* Featured card */
+  .card.featured {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: var(--white);
+    border: none;
+  }
+  .card.featured h3,
+  .card.featured .card-num,
+  .card.featured .card-en,
+  .card.featured .arrow {
+    color: var(--accent-light);
+  }
+  .card.featured h3 { color: var(--white); }
+  .card.featured .card-desc { color: rgba(255,255,255,0.78); }
+  .card.featured .badge {
+    background: rgba(255,255,255,0.15);
+    color: var(--white);
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 80px;
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+  footer .ja { font-family: 'Noto Sans JP', sans-serif; }
+  footer .en { font-family: 'Cormorant Garamond', serif; font-style: italic; margin-top: 4px; }
+  footer .meta { margin-top: 14px; font-size: 0.7rem; color: #BBB; }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 2.2rem; }
+    .container { padding: 40px 18px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="hero">
+    <img src="signage/assets/logo-horizontal.png" alt="Hilltop Zushi" class="hero-logo">
+    <div class="sub">Hidden Forest Retreat</div>
+    <div class="location">
+      <span class="ja">神奈川県 逗子市 池子 2-10-9</span><br>
+      2-10-9 Ikego, Zushi, Kanagawa &middot; 京急逗子線 神武寺駅 (KK52) 徒歩約5分
+    </div>
+    <div class="divider"></div>
+  </header>
+
+  <!-- サイトトップへ戻る -->
+  <section class="section">
+    <div class="section-head">
+      <h2>A Forest Retreat</h2>
+      <span class="label">Main Site</span>
+    </div>
+    <div class="cards">
+      <a class="card featured" href="../">
+        <div class="card-num">←</div>
+        <h3>公式サイトトップへ戻る</h3>
+        <div class="card-en">Back to A Forest Retreat</div>
+        <div class="card-desc">写真ギャラリー・360度バーチャル内見・空き状況カレンダー・ご予約はこちらのトップページから。</div>
+        <div class="badges">
+          <span class="badge">予約カレンダー</span>
+          <span class="badge lang">6言語対応</span>
+        </div>
+        <div class="arrow">← BACK TO SITE</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- マニュアル -->
+  <section class="section">
+    <div class="section-head">
+      <h2>ゲスト向けマニュアル</h2>
+      <span class="label">Guest Manuals</span>
+    </div>
+    <div class="cards">
+      <a class="card featured" href="https://hilltop-zushi.pages.dev/ハウスガイド_Hilltop_Zushi_v2#welcome" target="_blank" rel="noopener" style="background:linear-gradient(135deg,#1F3A34 0%,#2B4A3F 100%);">
+        <div class="card-num" style="color:#C9A56D;">★</div>
+        <h3 style="color:#fff;">📖 ハウスガイド v2 統合版</h3>
+        <div class="card-en" style="color:#D4B87A;">House Guide v2 · 17 chapters · for guests</div>
+        <div class="card-desc" style="color:rgba(255,255,255,0.85);">Welcome / アクセス / チェックイン / 設備 / BBQ / 花火 / ゴミ / Wi-Fi / 喫煙 / 自然 / 崖 / 周辺 / ルール / チェックアウト / 緊急 / 間取り の17章統合。5/22 MTG反映・確定情報版。現地QRコード掲示済みのため hilltop-zushi.pages.dev 上で公開中。</div>
+        <div class="badges">
+          <span class="badge" style="background:#C9A56D;color:#1F3A34;">⭐ メインマニュアル</span>
+          <span class="badge lang">日 + EN</span>
+          <span class="badge" style="background:#E8F0F8;color:#2563A4;">🔗 外部サイトで開く(QR掲示済み)</span>
+        </div>
+        <div class="arrow" style="color:#D4B87A;">OPEN GUIDE →</div>
+      </a>
+      <a class="card featured" href="清掃マニュアル_Hilltop_Zushi_v2.html" style="background:linear-gradient(135deg,#2B4A3F 0%,#1F3A34 100%);">
+        <div class="card-num" style="color:#C9A56D;">★</div>
+        <h3 style="color:#fff;">🧹 清掃マニュアル v2</h3>
+        <div class="card-en" style="color:#D4B87A;">Cleaning Manual v2 · 19 chapters · for staff</div>
+        <div class="card-desc" style="color:rgba(255,255,255,0.85);">13章（既存）+ NEW 6章（屋外/BBQ/ペット/緊急/設備/PM/写真運用）= 全19章。前バージョンの Codex レビュー指摘を反映。業者様向け。</div>
+        <div class="badges">
+          <span class="badge" style="background:#C9A56D;color:#1F3A34;">⭐ 業者用マニュアル</span>
+          <span class="badge" style="background:#2563A4;color:#fff;">+6 NEW chapters</span>
+        </div>
+        <div class="arrow" style="color:#D4B87A;">OPEN MANUAL →</div>
+      </a>
+      <div class="card" style="opacity:0.4;background:#F8F4ED;border-style:dashed;cursor:not-allowed;pointer-events:none;">
+        <div class="card-num">v1</div>
+        <h3>📚 v1 旧版 <span style="font-size:0.7rem;color:#B87A1F;background:#FFE5C7;padding:2px 8px;border-radius:8px;letter-spacing:0.05em;font-weight:700;">🔒 ARCHIVED</span></h3>
+        <div class="card-en">Guest Guide v1 + House Rules v1 (Archived)</div>
+        <div class="card-desc">v1旧版は v2 で完全置き換え済み。 <strong>印刷・配布しないでください</strong>。</div>
+        <div class="badges">
+          <span class="badge" style="background:#FFD6D6;color:#C8242A;">🔒 印刷不可</span>
+        </div>
+      </div>
+      <a class="card" href="施設名提案_Hilltop_Zushi.html" style="opacity:0.85;">
+        <div class="card-num">04</div>
+        <h3>施設名提案</h3>
+        <div class="card-en">Property Name Proposals</div>
+        <div class="card-desc">施設名「Hilltop Zushi」決定までの経緯・比較・評価。</div>
+        <div class="badges">
+          <span class="badge">参考資料</span>
+        </div>
+        <div class="arrow">OPEN →</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 🏡 現地壁掲示物（5枚） -->
+  <section class="section">
+    <div class="section-head">
+      <h2>🏡 現地壁掲示物（5枚・印刷推奨）</h2>
+      <span class="label">On-site Wall Signage · 4 Languages</span>
+    </div>
+    <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:18px;line-height:1.6;">
+      物件内に <strong>印刷して貼り出す</strong> ための5枚。ラミネート推奨（庭設置物は特に）。
+    </p>
+    <div class="cards">
+      <a class="card" href="signage/windows-doors-A4.html">
+        <div class="card-num">01</div>
+        <h3>🪟 窓を開けないで</h3>
+        <div class="card-en">Do Not Open Windows · 虫が入ります</div>
+        <div class="card-desc">超シンプル・巨大アイコン版。<strong>窓の鍵まわり・カーテン裏</strong>に貼って一目で伝える。</div>
+        <div class="badges">
+          <span class="badge print">A4 縦・印刷推奨</span>
+          <span class="badge lang">日 / EN / 中 / 한</span>
+        </div>
+        <div class="arrow">OPEN →</div>
+      </a>
+      <a class="card" href="signage/danger-warning-A4.html" style="border-color:#C8242A;background:#FFF8F8;">
+        <div class="card-num" style="color:#C8242A;">02</div>
+        <h3 style="color:#C8242A;">⚠ 立入禁止警告（崖）</h3>
+        <div class="card-en" style="color:#8E1418;">DANGER · KEEP OUT</div>
+        <div class="card-desc">この先は崖・転落注意。<strong>パノラマテラス側</strong>に向けて掲示。</div>
+        <div class="badges">
+          <span class="badge print" style="background:#FFE5E5;color:#C8242A;">A4 縦・最重要</span>
+          <span class="badge lang">日 / EN / 中 / 한</span>
+        </div>
+        <div class="arrow" style="color:#C8242A;">OPEN →</div>
+      </a>
+      <a class="card" href="signage/no-smoking-A4.html">
+        <div class="card-num">03</div>
+        <h3>🚭 全館禁煙</h3>
+        <div class="card-en">No Smoking Indoors</div>
+        <div class="card-desc">玄関・リビング・各寝室入口に貼る禁煙標識。屋外（プライベートガーデン+パノラマテラス）は喫煙OK。</div>
+        <div class="badges">
+          <span class="badge print">A4 縦・印刷推奨</span>
+          <span class="badge lang">日 / EN / 中 / 한</span>
+        </div>
+        <div class="arrow">OPEN →</div>
+      </a>
+      <a class="card" href="signage/bbq-rules-A4.html">
+        <div class="card-num">04</div>
+        <h3>🔥 BBQルール</h3>
+        <div class="card-en">BBQ House Rules</div>
+        <div class="card-desc">利用時間 10:00–20:00、騒音配慮、後片付け。<strong>庭BBQエリアにラミネート貼り</strong>。</div>
+        <div class="badges">
+          <span class="badge print">A4 縦・ラミネート推奨</span>
+          <span class="badge lang">日 / EN / 中 / 한</span>
+        </div>
+        <div class="arrow">OPEN →</div>
+      </a>
+      <a class="card" href="signage/insects-notice-A4.html">
+        <div class="card-num">05</div>
+        <h3>🌿 自然からのお便り</h3>
+        <div class="card-en">A Note from Nature</div>
+        <div class="card-desc">虫の出現案内＋備え付け殺虫剤の使い方（キッチン下の引き出し）。</div>
+        <div class="badges">
+          <span class="badge print">A4 縦・印刷推奨</span>
+          <span class="badge lang">日 / EN / 中 / 한</span>
+        </div>
+        <div class="arrow">OPEN →</div>
+      </a>
+      <a class="card" href="signage/staff-only-A4.html" style="border-color:#2563A4;background:#F4F8FC;">
+        <div class="card-num" style="color:#2563A4;">06</div>
+        <h3 style="color:#2563A4;">🔒 スタッフ専用（A4 縦・大）</h3>
+        <div class="card-en" style="color:#1F3A34;">Staff Only · A4 Full Size</div>
+        <div class="card-desc"><strong>備品庫の扉</strong>に貼る大きめ版。シンプルな大型アイコン版。</div>
+        <div class="badges">
+          <span class="badge print" style="background:#E8F0F8;color:#2563A4;">A4 縦・大型版</span>
+          <span class="badge lang">日 / EN / 中 / 한</span>
+        </div>
+        <div class="arrow" style="color:#2563A4;">OPEN →</div>
+      </a>
+      <a class="card" href="signage/staff-only-A5-x2.html" style="border-color:#2563A4;background:#F4F8FC;">
+        <div class="card-num" style="color:#2563A4;">07</div>
+        <h3 style="color:#2563A4;">🔒 スタッフ専用（A5 ×2枚分）</h3>
+        <div class="card-en" style="color:#1F3A34;">Staff Only · 2 per A4 (cut in half)</div>
+        <div class="card-desc"><strong>A4 1枚で2枚分</strong>取れる切り取り線付き版。<strong>洗面台横の収納</strong>など狭い箇所に。</div>
+        <div class="badges">
+          <span class="badge print" style="background:#E8F0F8;color:#2563A4;">A4 縦・2枚分</span>
+          <span class="badge" style="background:#FFE5C7;color:#B87A1F;">✂ 切り取り線あり</span>
+          <span class="badge lang">日 / EN / 中 / 한</span>
+        </div>
+        <div class="arrow" style="color:#2563A4;">OPEN →</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 📖 ハウスガイドv2 統合予定（4要素） -->
+  <section class="section">
+    <div class="section-head">
+      <h2>📖 ハウスガイドv2 に統合予定（4要素）</h2>
+      <span class="label">To be merged into House Guide v2</span>
+    </div>
+    <p style="font-size:0.85rem;color:var(--text-light);margin-bottom:18px;line-height:1.6;">
+      これらは <strong>現地に貼らず、ゲストマニュアル（ハウスガイドv2）に章として統合</strong> します。
+      QRコード経由でWebでも見られる構成にする予定。
+    </p>
+    <div class="cards">
+      <a class="card" href="signage/emergency-card-A4.html" style="opacity:0.92;">
+        <div class="card-num">06</div>
+        <h3>📞 緊急連絡先</h3>
+        <div class="card-en">Emergency Contact</div>
+        <div class="card-desc">119/110・ホスト連絡・最寄り医療機関3つ・AMDA多言語通訳・JVH 24h。<span style="color:#B87A1F;">→ ガイド統合予定</span></div>
+        <div class="badges">
+          <span class="badge" style="background:#FFE5C7;color:#B87A1F;">📖 ガイド統合中</span>
+          <span class="badge lang">日 / EN / 中 / 한</span>
+        </div>
+        <div class="arrow">PREVIEW →</div>
+      </a>
+      <a class="card" href="signage/disaster-card-A4.html" style="opacity:0.92;">
+        <div class="card-num">07</div>
+        <h3>🆘 災害・避難</h3>
+        <div class="card-en">Disaster Preparedness</div>
+        <div class="card-desc">通信不能時の避難場所・地震/火災手順・119読み上げ4点。<span style="color:#B87A1F;">→ ガイド統合予定</span></div>
+        <div class="badges">
+          <span class="badge" style="background:#FFE5C7;color:#B87A1F;">📖 ガイド統合中</span>
+          <span class="badge lang">日 / EN / 中 / 한</span>
+        </div>
+        <div class="arrow">PREVIEW →</div>
+      </a>
+      <a class="card" href="signage/fees-card-A4.html" style="opacity:0.92;">
+        <div class="card-num">08</div>
+        <h3>💰 追加料金</h3>
+        <div class="card-en">Optional Fees · BBQ &amp; Pet</div>
+        <div class="card-desc">BBQ・ペット同伴3段階料金。<strong>当日メッセージ案内</strong>として運用。<span style="color:#B87A1F;">→ ガイド統合予定</span></div>
+        <div class="badges">
+          <span class="badge" style="background:#FFE5C7;color:#B87A1F;">📖 ガイド統合中</span>
+          <span class="badge lang">日 / EN / 中 / 한</span>
+        </div>
+        <div class="arrow">PREVIEW →</div>
+      </a>
+      <a class="card" href="signage/access-map-A4.html" style="opacity:0.92;">
+        <div class="card-num">09</div>
+        <h3>🗺 アクセスマップ</h3>
+        <div class="card-en">Access &amp; Directions</div>
+        <div class="card-desc">神武寺駅から徒歩約5分・主要拠点所要時間・周辺施設。<span style="color:#B87A1F;">→ ガイド統合予定</span></div>
+        <div class="badges">
+          <span class="badge" style="background:#FFE5C7;color:#B87A1F;">📖 ガイド統合中</span>
+          <span class="badge lang">日 / EN / 中 / 한</span>
+        </div>
+        <div class="arrow">PREVIEW →</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 🔧 オーナー用メモ -->
+  <section class="section">
+    <div class="section-head">
+      <h2>🔧 オーナー用メモ</h2>
+      <span class="label">Owner Only · Not for Guests</span>
+    </div>
+    <div class="cards">
+      <a class="card" href="システム構成.html" style="border-color:#6B7280;background:#F3F4F6;">
+        <div class="card-num" style="color:#4B5563;">⚙</div>
+        <h3 style="color:#374151;">システム構成メモ</h3>
+        <div class="card-en" style="color:#6B7280;">System Architecture Notes</div>
+        <div class="card-desc">Cloudflareアカウント・外部連携サービス・既知の未対応事項をまとめた内部用メモ。ゲストには無関係な内容です。</div>
+        <div class="badges">
+          <span class="badge" style="background:#E5E7EB;color:#374151;">オーナー専用</span>
+        </div>
+        <div class="arrow" style="color:#4B5563;">OPEN →</div>
+      </a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="ja">Hilltop Zushi — 森の隠れ家</div>
+    <div class="en">Hidden Forest Retreat · Zushi, Kanagawa</div>
+    <div class="meta">© 2026 Hilltop Zushi · Guide Hub</div>
+  </footer>
+
+</div>
+
+</body>
+</html>

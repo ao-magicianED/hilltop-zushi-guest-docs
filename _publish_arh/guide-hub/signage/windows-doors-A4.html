@@ -1,0 +1,273 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>窓を開けないでください — Hilltop Zushi</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@700;800;900&family=Noto+Sans+JP:wght@700;900&family=Noto+Sans+KR:wght@700;900&family=Noto+Sans+SC:wght@700;900&family=Noto+Serif+JP:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F3A34;
+    --accent: #C9A56D;
+    --bg: #F5F3F0;
+    --text: #2C2C2C;
+    --warning: #D67230;
+    --danger: #C8242A;
+    --jp-font: 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    --serif-font: 'Cormorant Garamond', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: A4 portrait; margin: 0; }
+  html, body { background: #888; }
+  body {
+    font-family: var(--jp-font);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.4;
+  }
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    background: var(--bg);
+    position: relative;
+    padding: 16mm 14mm 14mm;
+    box-shadow: 0 8px 50px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .frame {
+    position: absolute;
+    top: 7mm; left: 7mm; right: 7mm; bottom: 7mm;
+    border: 2px solid var(--warning);
+    pointer-events: none;
+  }
+  .frame .corner {
+    position: absolute; width: 22px; height: 22px;
+    border: 3px solid var(--warning);
+  }
+  .frame .corner.tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+  .frame .corner.tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+  .frame .corner.bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+  .frame .corner.br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+  .brand {
+    text-align: center;
+    margin-bottom: 4mm;
+    flex-shrink: 0;
+  }
+  .brand .brand-text {
+    font-family: var(--serif-font);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.22em;
+    line-height: 1;
+  }
+
+  /* メインビジュアル: 巨大アイコン */
+  .icon-block {
+    text-align: center;
+    margin: 8mm 0 6mm;
+    flex-shrink: 0;
+  }
+  .icon-circle {
+    width: 95mm;
+    height: 95mm;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FFE6CC 0%, #FFCC99 100%);
+    border: 6px solid var(--danger);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: 0 12px 40px rgba(200,36,42,0.25);
+  }
+  .icon-circle .symbol {
+    font-size: 12rem;
+    line-height: 1;
+  }
+  .icon-circle .cross {
+    position: absolute;
+    font-size: 17rem;
+    line-height: 1;
+    color: var(--danger);
+    font-weight: 900;
+    z-index: 2;
+    opacity: 0.92;
+    text-shadow: 0 0 8px rgba(255,255,255,0.6);
+  }
+
+  /* 巨大メッセージ */
+  .message {
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4mm 0;
+  }
+  .message .jp {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: var(--danger);
+    letter-spacing: 0.1em;
+    line-height: 1.1;
+    margin-bottom: 5mm;
+  }
+  .message .en {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--primary);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 6mm;
+  }
+  .message .multi {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.08em;
+  }
+  .message .multi .zh { font-family: 'Noto Sans SC', sans-serif; }
+  .message .multi .ko { font-family: 'Noto Sans KR', sans-serif; }
+  .message .multi .sep {
+    color: var(--accent);
+    margin: 0 6mm;
+    font-weight: 400;
+  }
+
+  /* 理由バッジ */
+  .reason {
+    background: var(--warning);
+    color: #fff;
+    border-radius: 4mm;
+    padding: 5mm 6mm;
+    text-align: center;
+    margin-top: auto;
+    flex-shrink: 0;
+    box-shadow: 0 6px 18px rgba(214,114,48,0.3);
+  }
+  .reason .icon {
+    font-size: 2.2rem;
+    margin-right: 3mm;
+    vertical-align: middle;
+  }
+  .reason .jp {
+    font-family: var(--jp-font);
+    font-size: 1.4rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    vertical-align: middle;
+  }
+  .reason .en {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-top: 2mm;
+    opacity: 0.95;
+  }
+  .reason .multi {
+    font-size: 0.78rem;
+    margin-top: 1.5mm;
+    opacity: 0.95;
+  }
+  .reason .multi .zh { font-family: 'Noto Sans SC', sans-serif; }
+  .reason .multi .ko { font-family: 'Noto Sans KR', sans-serif; }
+
+  .foot {
+    text-align: center;
+    font-size: 0.6rem;
+    color: var(--primary);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding-top: 3mm;
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+  .foot .ja {
+    text-transform: none;
+    letter-spacing: 0.06em;
+    font-family: var(--jp-font);
+    margin-top: 1mm;
+    font-size: 0.64rem;
+  }
+
+  /* スマホ最適化 */
+  @media (max-width: 880px) {
+    html, body { margin: 0; padding: 0; background: #fff; overflow-x: hidden; overflow-y: auto; }
+    body {
+      display: block;
+      min-height: 0;
+      height: calc(100vw * 1123 / 794);
+    }
+    .sheet {
+      transform: scale(calc(100vw / 794px));
+      transform-origin: top left;
+      box-shadow: none;
+    }
+  }
+
+  @media print {
+    html, body { background: #fff; overflow: hidden; }
+    html { -ms-overflow-style: none; scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+    body { padding: 0; }
+    .sheet { box-shadow: none; page-break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="frame">
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+    </div>
+
+    <header class="brand" data-section="header">
+      <div class="brand-text">HILLTOP ZUSHI</div>
+    </header>
+
+    <div class="icon-block" data-section="icon">
+      <div class="icon-circle">
+        <span class="symbol">🪟</span>
+        <span class="cross">✕</span>
+      </div>
+    </div>
+
+    <main class="message" data-section="message">
+      <div class="jp">窓を開けないで<br>ください</div>
+      <div class="en">Do Not Open Windows</div>
+      <div class="multi">
+        <span class="zh">请勿打开窗户</span><span class="sep">·</span><span class="ko">창문을 열지 마세요</span>
+      </div>
+    </main>
+
+    <div class="reason" data-section="reason">
+      <span class="icon">🪲</span><span class="jp">虫が入ります</span>
+      <div class="en">Insects Will Come In</div>
+      <div class="multi"><span class="zh">虫子会进入</span> &middot; <span class="ko">벌레가 들어옵니다</span></div>
+    </div>
+
+    <footer class="foot" data-section="footer">
+      Thank You For Your Cooperation
+      <div class="ja">ご協力ありがとうございます</div>
+    </footer>
+  </div>
+</body>
+</html>

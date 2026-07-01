@@ -1,0 +1,1003 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cleaning Manual v2 — Hilltop Zushi 清掃マニュアル</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F3A34;
+    --accent: #C9A56D;
+    --accent-deep: #A8854B;
+    --bg: #F5F3F0;
+    --bg-soft: #FAF8F4;
+    --text: #2C2C2C;
+    --text-light: #6B6B6B;
+    --emergency: #C8242A;
+    --warning: #D67230;
+    --info: #2563A4;
+    --good: #2D7A4F;
+    --border: #E8E2D5;
+    --jp-font: 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    --serif-font: 'Cormorant Garamond', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', var(--jp-font);
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(31,58,52,0.97);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    padding: 10px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--accent);
+  }
+  .top-nav .brand-text {
+    font-family: var(--serif-font);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+  }
+  .top-nav .role {
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, var(--primary) 0%, #14271F 100%);
+    color: #fff;
+    padding: 60px 24px;
+    text-align: center;
+  }
+  .hero .pre {
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+  .hero h1 {
+    font-family: var(--serif-font);
+    font-size: 2.6rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+  }
+  .hero .sub {
+    font-style: italic;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 20px;
+  }
+  .hero .meta {
+    display: inline-block;
+    background: rgba(0,0,0,0.25);
+    padding: 8px 18px;
+    border-radius: 100px;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+  }
+
+  .info-bar {
+    background: var(--bg-soft);
+    padding: 20px 24px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-light);
+  }
+  .info-bar strong { color: var(--primary); }
+
+  .toc {
+    max-width: 980px;
+    margin: 40px auto;
+    padding: 30px 24px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .toc h2 {
+    font-family: var(--serif-font);
+    font-size: 1.6rem;
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px;
+  }
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.85rem;
+    border-left: 3px solid var(--accent);
+    background: var(--bg-soft);
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  .toc-item:hover { background: var(--primary); color: #fff; }
+  .toc-item .num {
+    font-family: var(--serif-font);
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 24px;
+  }
+  .toc-item.new { border-left-color: var(--info); background: #F4F8FC; }
+  .toc-item.new .num { color: var(--info); }
+
+  .chapter {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 60px 24px 30px;
+    border-bottom: 1px solid var(--border);
+  }
+  .chapter-header { margin-bottom: 24px; }
+  .chapter-num {
+    font-family: var(--serif-font);
+    font-style: italic;
+    color: var(--accent);
+    font-size: 0.85rem;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .chapter h2 {
+    font-family: var(--serif-font);
+    font-size: 2rem;
+    color: var(--primary);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .chapter h2 .badge-new {
+    display: inline-block;
+    background: var(--info);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.55rem;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.15em;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+  .chapter .desc {
+    color: var(--text-light);
+    font-size: 0.92rem;
+    margin-top: 8px;
+  }
+
+  .block {
+    background: #fff;
+    border-radius: 8px;
+    padding: 22px 26px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.03);
+  }
+  .block.warning { border-left: 4px solid var(--warning); background: #FFF7EE; }
+  .block.critical { border-left: 4px solid var(--emergency); background: #FFF8F8; }
+  .block.info { border-left: 4px solid var(--info); background: #F4F8FC; }
+  .block.good { border-left: 4px solid var(--good); background: #EAF5EE; }
+  .block.accent { border-left: 4px solid var(--accent); }
+  .block h3 {
+    font-family: var(--jp-font);
+    font-size: 1.05rem;
+    color: var(--primary);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .block h3 .ico { font-size: 1.2rem; }
+  .block p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin-bottom: 8px;
+  }
+  .block ul, .block ol { padding-left: 22px; margin-bottom: 8px; }
+  .block li {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin-bottom: 4px;
+  }
+  .block strong { color: var(--primary); font-weight: 700; }
+  .block.warning strong { color: var(--warning); }
+  .block.critical strong { color: var(--emergency); }
+  .block.info strong { color: var(--info); }
+  .block.good strong { color: var(--good); }
+
+  .checklist { list-style: none; padding-left: 0; }
+  .checklist li {
+    padding: 5px 0 5px 24px;
+    position: relative;
+    font-size: 0.88rem;
+    border-bottom: 1px dashed var(--border);
+  }
+  .checklist li:before {
+    content: '☐';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .checklist li:last-child { border-bottom: none; }
+
+  .steps { list-style: none; padding-left: 0; counter-reset: n; }
+  .steps li {
+    counter-increment: n;
+    padding: 8px 0 8px 36px;
+    position: relative;
+    font-size: 0.88rem;
+    border-bottom: 1px dashed var(--border);
+  }
+  .steps li:before {
+    content: counter(n);
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin: 10px 0;
+  }
+  table th, table td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  table th {
+    background: var(--bg-soft);
+    font-weight: 700;
+    color: var(--primary);
+  }
+  table tr:last-child td { border-bottom: none; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 640px) {
+    .two-col { grid-template-columns: 1fr; }
+  }
+
+  footer.manual-footer {
+    background: var(--primary);
+    color: #fff;
+    padding: 30px 24px;
+    text-align: center;
+    font-size: 0.8rem;
+  }
+  footer.manual-footer .brand {
+    font-family: var(--serif-font);
+    font-size: 1.2rem;
+    letter-spacing: 0.2em;
+    margin-bottom: 6px;
+  }
+
+  @media print {
+    @page { size: A4 portrait; margin: 12mm; }
+    .top-nav, .toc { display: none; }
+    .chapter { page-break-before: always; padding: 20px 0; }
+    .chapter:first-of-type { page-break-before: avoid; }
+    .block { page-break-inside: avoid; box-shadow: none; border: 1px solid var(--border); }
+    body { background: #fff; }
+  }
+
+  @media (max-width: 720px) {
+    .hero h1 { font-size: 1.8rem; }
+    .chapter h2 { font-size: 1.5rem; }
+    .block { padding: 16px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="brand-text">HILLTOP ZUSHI · Cleaning Manual v2</div>
+  <div class="role">業者様向け / For Cleaning Staff</div>
+</nav>
+
+<section class="hero">
+  <div class="pre">For Cleaning Partners · 清掃業者様向け</div>
+  <h1>清掃マニュアル v2</h1>
+  <div class="sub">Hilltop Zushi · 神武寺民泊 / 19章 統合版</div>
+  <div class="meta">📍 神奈川県逗子市池子 2-10-9 · 6寝室 / 最大12名 · BBQ・庭・ペット可</div>
+</section>
+
+<div class="info-bar">
+  <strong>本マニュアルについて</strong>: 神武寺民泊の清掃手順書です。<strong>v2では屋外・BBQ・ペット・緊急対応・PM・写真運用</strong>を追加しました（前バージョンのCodexレビュー反映）。必ず<strong>写真の状態</strong>に戻してください。
+</div>
+
+<section class="toc">
+  <h2>📋 目次 · Table of Contents</h2>
+  <div class="toc-grid">
+    <a class="toc-item" href="#c1"><span class="num">01</span><span>共通清掃ルール</span></a>
+    <a class="toc-item" href="#c2"><span class="num">02</span><span>間取り図</span></a>
+    <a class="toc-item" href="#c3"><span class="num">03</span><span>リビング・ダイニング</span></a>
+    <a class="toc-item" href="#c4"><span class="num">04</span><span>キッチン</span></a>
+    <a class="toc-item" href="#c5"><span class="num">05</span><span>トイレ</span></a>
+    <a class="toc-item" href="#c6"><span class="num">06</span><span>バスルーム・洗面</span></a>
+    <a class="toc-item" href="#c7"><span class="num">07</span><span>洋室1（SDx2）</span></a>
+    <a class="toc-item" href="#c8"><span class="num">08</span><span>洋室2（King）</span></a>
+    <a class="toc-item" href="#c9"><span class="num">09</span><span>洋室3（収納/畳）</span></a>
+    <a class="toc-item" href="#c10"><span class="num">10</span><span>洋室4（リラックス）</span></a>
+    <a class="toc-item" href="#c11"><span class="num">11</span><span>洋室5（SDx2 2F）</span></a>
+    <a class="toc-item" href="#c12"><span class="num">12</span><span>洋室6（Dx2 2F）</span></a>
+    <a class="toc-item" href="#c13"><span class="num">13</span><span>仕上げ・最終確認</span></a>
+    <a class="toc-item new" href="#c14"><span class="num">14</span><span>🌳 屋外・BBQ・庭 [NEW]</span></a>
+    <a class="toc-item new" href="#c15"><span class="num">15</span><span>🐕 ペット利用後 [NEW]</span></a>
+    <a class="toc-item new" href="#c16"><span class="num">16</span><span>🆘 緊急時対応 [NEW]</span></a>
+    <a class="toc-item new" href="#c17"><span class="num">17</span><span>📶 設備・通信チェック [NEW]</span></a>
+    <a class="toc-item new" href="#c18"><span class="num">18</span><span>📅 月次・季次PM [NEW]</span></a>
+    <a class="toc-item new" href="#c19"><span class="num">19</span><span>📸 写真・報告運用 [NEW]</span></a>
+  </div>
+</section>
+
+<!-- ===== 01. 共通清掃ルール ===== -->
+<section class="chapter" id="c1">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 01</div>
+    <h2>共通の清掃ルール</h2>
+    <p class="desc">作業の流れ・標準工数・役割分担・薬剤安全</p>
+  </div>
+
+  <div class="block accent">
+    <h3><span class="ico">📋</span>作業の流れ（標準）</h3>
+    <ol class="steps">
+      <li>入室時に全室の状態を写真撮影（破損・忘れ物のエビデンス）</li>
+      <li>全室の窓を開け換気開始（虫対策のため短時間）</li>
+      <li>使用済みリネン・タオルの回収（全部屋一括）</li>
+      <li>ゴミ回収（各部屋・トイレ・洗面・キッチン）→ 外のストッカーへ</li>
+      <li>水回り清掃（バスルーム→洗面→トイレ→キッチン）</li>
+      <li>居室清掃（ベッドメイク→拭き上げ→掃除機）</li>
+      <li>共用部（リビング・廊下・玄関・階段）</li>
+      <li><strong>屋外・BBQ・庭エリア（章14参照）</strong></li>
+      <li>アメニティ・備品補充</li>
+      <li>設備・通信チェック（章17参照）</li>
+      <li>最終チェック・施錠</li>
+      <li>写真・完了報告（章19参照）</li>
+    </ol>
+  </div>
+
+  <div class="block info">
+    <h3><span class="ico">⏱</span>標準工数（NEW v2）</h3>
+    <table>
+      <tr><th>条件</th><th>人数</th><th>所要時間</th></tr>
+      <tr><td>通常ターン</td><td>2名</td><td>3.5〜4.5時間</td></tr>
+      <tr><td>BBQあり</td><td>2名</td><td>+45〜60分</td></tr>
+      <tr><td>ペットあり</td><td>2名</td><td>+30〜45分</td></tr>
+      <tr><td>汚損あり</td><td>別見積</td><td>事前相談</td></tr>
+    </table>
+  </div>
+
+  <div class="block info">
+    <h3><span class="ico">👥</span>役割分担（推奨ゾーン制）</h3>
+    <ul>
+      <li><strong>A担当</strong>: 水回り（バス・洗面・トイレ・キッチン）</li>
+      <li><strong>B担当</strong>: 寝室・リネン交換</li>
+      <li><strong>C担当 / または兼任</strong>: 共用部・屋外・BBQ</li>
+      <li><strong>QC</strong>: 最後に1名がチェック</li>
+    </ul>
+  </div>
+
+  <div class="block critical">
+    <h3><span class="ico">⚠</span>薬剤安全（NEW v2）</h3>
+    <p><strong>🚫 まぜるな危険</strong>: 塩素系（カビキラー等）と酸性洗剤（クエン酸・サンポール等）を絶対に混ぜない（塩素ガス発生）</p>
+    <ul>
+      <li>使用時は <strong>手袋・保護眼鏡</strong> を着用</li>
+      <li>希釈容器には <strong>名称・希釈倍率・作成日・混ぜるな危険</strong> を貼付</li>
+      <li>感染疑い客室では <strong>運営者へ連絡 → 隔離 → 消毒</strong></li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">🧴</span>使用洗剤の目安</h3>
+    <table>
+      <tr><th>場所</th><th>洗剤</th></tr>
+      <tr><td>水回り</td><td>中性〜弱酸性のバスクリーナー / 除菌スプレー</td></tr>
+      <tr><td>キッチン</td><td>中性洗剤＋アルコール除菌 / 油汚れにはアルカリ性</td></tr>
+      <tr><td>床（無垢・複合フローリング）</td><td>固絞り雑巾＋ワックス不可洗剤注意</td></tr>
+      <tr><td>木製家具</td><td>乾拭き基本 / 汚れは固絞り→乾拭き</td></tr>
+      <tr><td>鏡・ガラス</td><td>ガラスクリーナー＋マイクロファイバー</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== 02. 間取り図 ===== -->
+<section class="chapter" id="c2">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 02</div>
+    <h2>間取り図</h2>
+  </div>
+  <div class="block">
+    <p><strong>1階</strong>: 玄関→廊下→リビング・ダイニング・キッチン / 洋室1・2・3・4 / トイレ・洗面・浴室</p>
+    <p><strong>2階</strong>: 洋室5・6（ベランダあり）</p>
+    <p><strong>屋外</strong>: プライベートガーデン / パノラマテラス（BBQ可）</p>
+    <p style="color:var(--text-light);margin-top:10px;">※ 詳細な間取り図画像は別添（現地にも掲示）</p>
+  </div>
+</section>
+
+<!-- ===== 03-06: 既存セクションを凝縮 ===== -->
+<section class="chapter" id="c3">
+  <div class="chapter-header"><div class="chapter-num">Chapter 03</div><h2>リビング・ダイニング</h2></div>
+  <div class="block">
+    <ul class="checklist">
+      <li>ソファ: クッション配置を写真通り（黄色・グレー・チェック柄）</li>
+      <li>ローテーブル（円形・黒）: 天板拭き上げ、輪ジミ除去</li>
+      <li>ダイニングテーブル: 天板拭き上げ、小物を中央に</li>
+      <li>ベンチ・椅子: 座面チェック、テーブル下に揃える</li>
+      <li>TV画面: マイクロファイバーで乾拭き</li>
+      <li>エアコン: リモコン定位置</li>
+      <li>カーテン: 閉じた状態、シワを整える</li>
+      <li>観葉植物: 葉のホコリ除去</li>
+      <li>シーリングライト: 消灯確認</li>
+      <li>フローリング: 掃除機→固絞り雑巾（無垢調・水濡れ注意）</li>
+      <li>スイッチ・ドアノブ: アルコール除菌</li>
+    </ul>
+  </div>
+</section>
+
+<section class="chapter" id="c4">
+  <div class="chapter-header"><div class="chapter-num">Chapter 04</div><h2>キッチン</h2></div>
+  <div class="block">
+    <ul class="checklist">
+      <li>シンク・水栓・水切りラック: 油汚れ・水アカ除去</li>
+      <li>ハンドソープ・洗剤: 残量確認、規定位置</li>
+      <li>コンロ・IH: 天板の油汚れ、五徳洗浄</li>
+      <li>電子レンジ内部: 庫内拭き上げ</li>
+      <li>トースター: パンくず受け皿清掃</li>
+      <li>電気ケトル: 水アカチェック（クエン酸）</li>
+      <li>炊飯器: 内釜を洗い、外装拭き上げ</li>
+      <li>食器棚: 食器枚数確認・配置を写真通り</li>
+      <li>カトラリー本数確認</li>
+      <li>カウンター・調理台: 拭き上げ・除菌</li>
+      <li>ゴミ箱: 袋交換、本体拭く</li>
+      <li>消火器: 所定位置にあるか確認</li>
+      <li>冷蔵庫: 庫内チェック・残置物廃棄、ハンドル除菌</li>
+      <li><strong>BBQガスボンベ × 2本</strong>: キッチン上の所定位置にあるか確認（NEW v2）</li>
+    </ul>
+  </div>
+  <div class="block info">
+    <h3>🧊 冷蔵庫残置物の廃棄基準（NEW v2）</h3>
+    <ul>
+      <li>開封済み / 消費期限切れ / 手作り食品 → 廃棄</li>
+      <li>未開封で運営在庫と識別可能 → 残置可</li>
+      <li>忘れ物疑い → 写真→隔離保管→報告</li>
+    </ul>
+  </div>
+</section>
+
+<section class="chapter" id="c5">
+  <div class="chapter-header"><div class="chapter-num">Chapter 05</div><h2>トイレ</h2></div>
+  <div class="block">
+    <ul class="checklist">
+      <li>便器（座面・蓋・内側・外側・床接地部）: トイレ用洗剤＋ブラシ</li>
+      <li>ウォシュレットノズル: ノズル洗浄後、外側拭き上げ</li>
+      <li>操作パネル・リモコン: アルコール除菌</li>
+      <li>小便器: 床部分含めて尿石はクエン酸で対応</li>
+      <li>手洗いボウル・蛇口: 水アカ除去</li>
+      <li>タイル壁・床: 拭き上げ、カビは塩素系でスポット処理</li>
+      <li>窓・サッシ: 曇りがあれば拭く、レール部のホコリ</li>
+      <li>ペーパーストック: 写真通り上段・下段</li>
+      <li>使用中ロール: 残量1/3未満なら新品交換</li>
+      <li>ティッシュホルダー: 補充</li>
+      <li>スリッパ: 拭き上げ後揃えて配置</li>
+      <li>サニタリーボックス: 袋交換</li>
+      <li>換気扇: ホコリ除去（月1回）</li>
+      <li>ドア・ドアノブ・スイッチ: アルコール除菌</li>
+    </ul>
+  </div>
+</section>
+
+<section class="chapter" id="c6">
+  <div class="chapter-header"><div class="chapter-num">Chapter 06</div><h2>バスルーム・洗面・脱衣所</h2></div>
+  <div class="block">
+    <h3>🛁 浴室</h3>
+    <ul class="checklist">
+      <li>浴槽: 内・外・エプロン部、ヌメリ完全除去</li>
+      <li>洗い場の床: 石鹸カス・髪の毛除去、防カビ仕上げ</li>
+      <li>壁面（鏡含む）: 水垢・石鹸カス除去、鏡は曇り止め</li>
+      <li>排水口: 髪の毛・ヌメリ除去</li>
+      <li>シャワーヘッド・カラン: 水垢除去</li>
+      <li>シャンプー類: 残量6割以下なら補充</li>
+      <li>窓・換気扇: ホコリ・カビチェック</li>
+      <li>操作リモコン: 水跡拭き取り</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h3>🪞 洗面・脱衣所</h3>
+    <ul class="checklist">
+      <li>洗面ボウル: 水アカ・歯磨き粉跡除去</li>
+      <li>水栓: 磨き上げ</li>
+      <li>鏡: マイクロファイバー仕上げ</li>
+      <li>ドライヤー: ホコリ除去、コード収納</li>
+      <li>ハンドソープ: 残量確認</li>
+      <li>洗濯機（Panasonic）: 内部・パッキン・洗剤口拭き上げ、糸くずフィルター</li>
+      <li>タオル類: 写真通りラックに折りたたみ</li>
+      <li>洗濯カゴ: 空で所定位置</li>
+      <li>床: 水跡を残さず拭き上げ</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 07-12: 各洋室 -->
+<section class="chapter" id="c7">
+  <div class="chapter-header"><div class="chapter-num">Chapter 07</div><h2>洋室1（1階・セミダブル × 2）</h2></div>
+  <div class="block">
+    <ul class="checklist">
+      <li>ベッドリネン全交換</li>
+      <li>マットレスのシミ・髪の毛確認</li>
+      <li>枕: 各ベッドに1個ずつ、写真通り</li>
+      <li>掛け布団: シワを伸ばす</li>
+      <li>デスク天板: 拭き上げ</li>
+      <li>モニター・キーボード・マウス: 除菌</li>
+      <li>デスクライト: ホコリ・動作確認</li>
+      <li>カーテン（グレー遮光）: 閉じる</li>
+      <li>エアコン: リモコン定位置</li>
+      <li>フローリング: 掃除機＋拭き上げ</li>
+      <li>ゴミ箱: 袋交換</li>
+    </ul>
+  </div>
+</section>
+
+<section class="chapter" id="c8">
+  <div class="chapter-header"><div class="chapter-num">Chapter 08</div><h2>洋室2（1階・キングサイズ）</h2></div>
+  <div class="block">
+    <ul class="checklist">
+      <li>ベッドリネン全交換</li>
+      <li>枕 × 2: 写真の位置・向き</li>
+      <li>掛け布団: ふんわり整える</li>
+      <li>レンガ調アクセント壁: 乾拭きのみ（湿拭き禁止・塗装剥がれ）</li>
+      <li>絵画（モノクロ）: 傾き・額のホコリ</li>
+      <li>遮音パネル・黒色ボード: 乾拭き</li>
+      <li>デスク・モニター・キーボード等</li>
+      <li>受話器（ホテル電話風）: 拭き上げ</li>
+      <li>ナイトテーブル: 天板拭き上げ、ランプ傘も</li>
+      <li>引き出し: 中身チェック（忘れ物）</li>
+      <li>観葉植物: 葉のホコリ</li>
+      <li>カーテン・エアコン</li>
+      <li><strong>🚫 ペット入室不可</strong>（章15参照）</li>
+    </ul>
+  </div>
+</section>
+
+<section class="chapter" id="c9">
+  <div class="chapter-header"><div class="chapter-num">Chapter 09</div><h2>洋室3（1階・収納/セーフティ）</h2></div>
+  <div class="block">
+    <ul class="checklist">
+      <li>ハンガー: 本数確認、向きを揃える</li>
+      <li>セーフティボックス: 空であることを必ず確認、開錠状態に</li>
+      <li>セーフティBOXの鍵が金庫裏に貼ってあるか確認</li>
+      <li>アイロン・アイロン台: 汚れ・水垢・焦げ跡確認</li>
+      <li>霧吹きスプレー: 水を空に、所定位置</li>
+      <li>サンダル類: 拭き上げ・揃える</li>
+      <li>収納内壁・棚板: ホコリ除去</li>
+      <li>畳: ホウキ／掃除機（畳目に沿って）、湿拭き厳禁</li>
+      <li>ビーズクッション: 形を整える</li>
+      <li>円形ラグ: 掃除機、ズレを直す</li>
+      <li>観葉植物: 葉のホコリ</li>
+      <li>ペンダントライト（提灯型）: 軽く払う</li>
+      <li>建具（障子・襖）: 紙部分はホコリのみ</li>
+    </ul>
+  </div>
+</section>
+
+<section class="chapter" id="c10">
+  <div class="chapter-header"><div class="chapter-num">Chapter 10</div><h2>洋室4（1階・リラックスルーム）</h2></div>
+  <div class="block">
+    <ul class="checklist">
+      <li>ティピーテント: クッション・玩具整える、布のシワを伸ばす</li>
+      <li>テント内部: ホコリ・食べこぼし確認</li>
+      <li>ラグ: 掃除機、髪の毛・食べこぼし</li>
+      <li>カーテン（白レース）: 閉じる、汚れ確認</li>
+      <li>木質壁面: 拭き上げ（やさしく）</li>
+      <li>ペンダントライト: ホコリ・点灯確認</li>
+      <li>床: 掃除機＋拭き上げ</li>
+      <li>玩具・小物類: 写真と同じ位置</li>
+    </ul>
+  </div>
+</section>
+
+<section class="chapter" id="c11">
+  <div class="chapter-header"><div class="chapter-num">Chapter 11</div><h2>洋室5（2階・セミダブル × 2）</h2></div>
+  <div class="block">
+    <ul class="checklist">
+      <li>ベッドリネン全交換</li>
+      <li>枕: 各ベッドに1個ずつ</li>
+      <li>マットレスのシミ確認</li>
+      <li>掛け布団: シワ伸ばす</li>
+      <li>カーテン（グレー）: 閉じる、左右均等</li>
+      <li>窓のサッシ・レール: ホコリ除去</li>
+      <li>エアコン排水コード: 写真通り（壁沿い自然に）</li>
+      <li>デスク・モニター・キーボード等</li>
+      <li>デスクチェア: 座面拭き上げ、写真位置</li>
+      <li>スピーカー類: 拭き上げ</li>
+      <li>フローリング: 掃除機＋拭き上げ</li>
+      <li>ゴミ箱: 袋交換</li>
+      <li><strong>⚠ ベランダ窓: 必ず施錠</strong>（章17参照）</li>
+    </ul>
+  </div>
+</section>
+
+<section class="chapter" id="c12">
+  <div class="chapter-header"><div class="chapter-num">Chapter 12</div><h2>洋室6（2階・ダブル × 2）</h2></div>
+  <div class="block">
+    <ul class="checklist">
+      <li>ベッドリネン全交換</li>
+      <li>枕: 各ベッドに2個ずつ（黒・白）、写真配置</li>
+      <li>クッション: 写真通り</li>
+      <li>掛け布団: シワ伸ばし、ふんわり</li>
+      <li>マットレスのシミ確認</li>
+      <li>ナイトテーブル: ランプ・ティッシュ・リモコンを写真位置</li>
+      <li>ナイトテーブル下ゴミ箱: 袋交換</li>
+      <li>ランプシェード（ガラス）: ホコリ除去（破損注意）</li>
+      <li>テレビ: 画面拭き上げ、リモコン除菌</li>
+      <li>フロアランプ: 傘のホコリ、点灯確認</li>
+      <li>押し入れ（襖）: 内部・忘れ物確認、閉じる</li>
+      <li>カーテン（グレー遮光）: 閉じる</li>
+      <li>エアコン: リモコン定位置</li>
+      <li>フローリング: 掃除機＋拭き上げ</li>
+      <li>梁部分のホコリ: 月次清掃</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 13. 仕上げ ===== -->
+<section class="chapter" id="c13">
+  <div class="chapter-header"><div class="chapter-num">Chapter 13</div><h2>仕上げ・退室前最終確認</h2></div>
+
+  <div class="block">
+    <h3>📦 消耗品の最終補充</h3>
+    <table>
+      <tr><th>消耗品</th><th>確認</th></tr>
+      <tr><td>トイレットペーパー</td><td>本体＋ストック / ホルダー上に予備</td></tr>
+      <tr><td>ティッシュ</td><td>各部屋・トイレ・洗面</td></tr>
+      <tr><td>ハンドソープ</td><td>キッチン・トイレ・洗面・浴室入口</td></tr>
+      <tr><td>シャンプー・コンディショナー・ボディソープ</td><td>浴室の壁付ディスペンサー</td></tr>
+      <tr><td>タオル類</td><td>バスタオル/フェイスタオル（人数分＋予備）</td></tr>
+      <tr><td>ゴミ袋</td><td>各ゴミ箱に新品＋予備</td></tr>
+      <tr><td>ハンガー</td><td>洋室3の本数</td></tr>
+      <tr><td>食器・カトラリー</td><td>枚数・本数</td></tr>
+    </table>
+  </div>
+
+  <div class="block good">
+    <h3>✅ 退室前チェックリスト</h3>
+    <ul class="checklist">
+      <li>全部屋のカーテン: 閉じた状態</li>
+      <li>全部屋のエアコン: OFF、リモコン所定位置</li>
+      <li>全部屋の照明: OFF</li>
+      <li>水回り: 水栓を完全に閉める</li>
+      <li>全ての窓: 施錠</li>
+      <li><strong>2階ベランダ窓: 施錠</strong></li>
+      <li>網戸の隙間がないか</li>
+      <li>勝手口・玄関: 施錠</li>
+      <li>消火器: 所定位置</li>
+      <li>セーフティボックス: 開錠・空</li>
+      <li>ゴミ: 所定の集積場所へ</li>
+      <li>忘れ物: 玄関保管・運営者連絡</li>
+      <li>破損・汚損: 写真撮影し報告</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 14. 屋外・BBQ・庭 [NEW v2] ===== -->
+<section class="chapter" id="c14">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 14</div>
+    <h2>屋外・BBQ・庭清掃 <span class="badge-new">NEW v2</span></h2>
+    <p class="desc">Hilltop Zushi の差別化要素。パノラマテラス・プライベートガーデン・BBQ・近隣配慮</p>
+  </div>
+
+  <div class="block warning">
+    <h3><span class="ico">🔥</span>BBQ 使用後清掃</h3>
+    <ol class="steps">
+      <li>使用有無確認（前夜の予約状況も確認）</li>
+      <li>灰・油・食残処理（ゴミ袋へ分別）</li>
+      <li>グリル本体・網・トング・作業台 洗浄</li>
+      <li>テーブル・チェア 拭き上げ</li>
+      <li>ガスボンベ × 2 をキッチン上の所定位置に戻す</li>
+      <li>収納ボックス（570L×2）の在庫確認・乾燥・施錠</li>
+      <li>清掃後の写真撮影（章19参照）</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">🌳</span>パノラマテラス・プライベートガーデン</h3>
+    <ul class="checklist">
+      <li>芝生・花壇のチェック（吸殻・食品残渣ゼロ）</li>
+      <li>排泄物（ペット利用時）の除去</li>
+      <li>近隣への飛散物確認</li>
+      <li>屋外家具: チェア畳む、テーブル拭き上げ</li>
+      <li>灰皿（屋外2箇所）: 中身を空に、洗浄</li>
+      <li>パノラマテラス先の <strong>立入禁止セット</strong>（木材・ネット・張り紙）が正しい位置か確認</li>
+      <li>花火使用痕跡確認・処分</li>
+    </ul>
+  </div>
+
+  <div class="block critical">
+    <h3><span class="ico">⚠</span>退室条件（屋外）</h3>
+    <p>以下が満たされるまで「退室完了」としない:</p>
+    <ul>
+      <li>BBQ用品が <strong>全て収納ボックスへ戻され、施錠</strong>されている</li>
+      <li>芝生・花壇・テラスに <strong>灰・油・食品残渣が一切残っていない</strong></li>
+      <li>吸殻・花火ゴミが <strong>完全に処分</strong>されている</li>
+      <li>立入禁止セットが <strong>正しい位置にある</strong></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 15. ペット利用後 [NEW v2] ===== -->
+<section class="chapter" id="c15">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 15</div>
+    <h2>ペット利用後 特別清掃 <span class="badge-new">NEW v2</span></h2>
+    <p class="desc">ペット同伴利用後の毛・臭い・アレルゲン対策</p>
+  </div>
+
+  <div class="block warning">
+    <h3><span class="ico">🐕</span>ペット利用 SOP</h3>
+    <ol class="steps">
+      <li>粘着クリーナーで全体（ペット専用色を使用）</li>
+      <li>掃除機で布製品・カーテン・ベッド下・巾木</li>
+      <li>ソファ・布製品の念入りな清掃</li>
+      <li>消臭スプレー（ペット用）</li>
+      <li>食器・足拭き跡の除去</li>
+      <li><strong>ペット同伴禁止室の確認</strong>: 洋室2（キング寝室）への毛・足跡がないか</li>
+      <li>証跡写真の撮影</li>
+    </ol>
+  </div>
+
+  <div class="block critical">
+    <h3><span class="ico">🚫</span>洋室2（キング寝室）への立入確認</h3>
+    <p>洋室2は <strong>ペット同伴禁止</strong>です。万一、毛・足跡・臭いが確認された場合:</p>
+    <ul>
+      <li>運営者へ <strong>即報告</strong>（写真添付）</li>
+      <li>該当寝具・カーペットの追加清掃 → 追加料金請求対象</li>
+    </ul>
+  </div>
+
+  <div class="block info">
+    <h3><span class="ico">🧰</span>専用道具管理</h3>
+    <ul>
+      <li>ペット対応用の <strong>粘着ローラー・ブラシ・消臭剤・手袋</strong>は他物件と分けて色分け</li>
+      <li>他物件へ毛を持ち出さない</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 16. 緊急時対応 [NEW v2] ===== -->
+<section class="chapter" id="c16">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 16</div>
+    <h2>緊急時対応フロー <span class="badge-new">NEW v2</span></h2>
+    <p class="desc">鍵紛失・侵入者・水漏れ・停電・ガス臭・破損時の初動</p>
+  </div>
+
+  <div class="block critical">
+    <h3><span class="ico">📞</span>優先連絡フロー</h3>
+    <table>
+      <tr><th>事象</th><th>初動</th><th>連絡順</th></tr>
+      <tr><td>人命・火災・侵入者</td><td>避難・安全確保</td><td>110 / 119 → 運営者 → 駆けつけ</td></tr>
+      <tr><td>水漏れ</td><td>元栓を閉める</td><td>運営者 → 業者</td></tr>
+      <tr><td>停電・ブレーカー</td><td>復旧試行</td><td>運営者</td></tr>
+      <tr><td>ガス臭</td><td>元栓・換気</td><td>119（ガス漏れ）→ 運営者</td></tr>
+      <tr><td>破損</td><td>写真撮影</td><td>運営者へ報告</td></tr>
+      <tr><td>忘れ物発見</td><td>玄関に隔離保管</td><td>運営者へ報告</td></tr>
+      <tr><td>鍵紛失</td><td>1時間以内に報告</td><td>運営者（交換費用は実費）</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">🚨</span>119読み上げ用文章</h3>
+    <ol class="steps">
+      <li>何が起きたか: 「火事です」「急病です」</li>
+      <li>住所: 「逗子市池子 2-10-9 Hilltop Zushi」</li>
+      <li>名前と折返し電話番号</li>
+      <li>近くの目印: 「神武寺駅のそば」</li>
+    </ol>
+  </div>
+
+  <div class="block info">
+    <h3><span class="ico">🚑</span>救急医療機関</h3>
+    <ul>
+      <li><strong>逗葉地域医療センター</strong>（最寄）☎ 046-873-7752</li>
+      <li><strong>湘南藤沢徳洲会病院</strong>（24h英語対応）☎ 0466-35-1177</li>
+      <li><strong>横須賀市救急医療センター</strong>（夜間休日）☎ 046-824-3001</li>
+      <li><strong>JNTO Japan Visitor Hotline</strong>（外国人24h）☎ 050-3816-2787</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 17. 設備・通信チェック [NEW v2] ===== -->
+<section class="chapter" id="c17">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 17</div>
+    <h2>設備・通信チェック <span class="badge-new">NEW v2</span></h2>
+    <p class="desc">Wi-Fi・スマートロック・カメラ・給湯器・家電エラー確認</p>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">📶</span>退室前 設備チェック</h3>
+    <ul class="checklist">
+      <li><strong>Wi-Fi ルーター</strong>: 電源ランプ点灯・オンライン状態（赤ランプなし）</li>
+      <li><strong>スマートロック/キーボックス</strong>: 施解錠テスト</li>
+      <li><strong>カメラ（屋外）</strong>: 通電確認のみ（録画内容は触らない）</li>
+      <li><strong>給湯器</strong>: お湯出し確認、エラー表示なし</li>
+      <li><strong>エアコン</strong>: 全室OFF、エラー表示なし</li>
+      <li><strong>冷蔵庫</strong>: 通電・温度OK</li>
+      <li><strong>洗濯機・乾燥機</strong>: エラー表示なし、扉開放</li>
+    </ul>
+  </div>
+
+  <div class="block warning">
+    <h3><span class="ico">🪟</span>2階ベランダ窓 特別チェック</h3>
+    <p><strong>2階ベランダの窓は虫の侵入・転落リスクが高い</strong>ため、退室時に特に確認:</p>
+    <ul>
+      <li>窓: 完全に閉まっているか</li>
+      <li>網戸: 隙間なく閉まっているか</li>
+      <li>鍵: しっかり施錠</li>
+      <li>カーテン: 閉じる</li>
+    </ul>
+  </div>
+
+  <div class="block info">
+    <h3><span class="ico">🔧</span>家電エラー時の対応</h3>
+    <ul>
+      <li>エラー表示は <strong>必ず写真撮影</strong>して運営者へ報告</li>
+      <li>勝手に分解・修理しない</li>
+      <li>給湯器のエラーコードはメモして報告</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== 18. 月次・季次PM [NEW v2] ===== -->
+<section class="chapter" id="c18">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 18</div>
+    <h2>月次・季次 PM チェック <span class="badge-new">NEW v2</span></h2>
+    <p class="desc">毎月1日以降最初のターンで実施・責任者・写真必須</p>
+  </div>
+
+  <div class="block accent">
+    <h3><span class="ico">📅</span>月次チェック表</h3>
+    <table>
+      <tr><th>項目</th><th>頻度</th><th>備考</th></tr>
+      <tr><td>エアコンフィルター清掃（全室）</td><td>月1回</td><td>外し方・乾燥・復旧</td></tr>
+      <tr><td>換気扇（トイレ・浴室）ホコリ除去</td><td>月1回</td><td></td></tr>
+      <tr><td>窓ガラス外面・網戸全館・レール</td><td>月1回</td><td>雨天時運用注意</td></tr>
+      <tr><td>梁・桟（黒い枠）部分のホコリ</td><td>月1回</td><td>洋室5・6特に</td></tr>
+      <tr><td>消火器の有効期限・封・圧力チェック</td><td>月1回</td><td>毎ターン位置確認は別</td></tr>
+      <tr><td>救急箱 中身・期限チェック</td><td>月1回</td><td>内服薬は置かない</td></tr>
+      <tr><td>屋外家具・BBQ用品の劣化チェック</td><td>月1回</td><td>サビ・破損</td></tr>
+      <tr><td>排水溝（全水回り）の徹底清掃</td><td>月1回</td><td>ヌメリ・カビ</td></tr>
+    </table>
+  </div>
+
+  <div class="block info">
+    <h3><span class="ico">🌧</span>季次・天候別運用</h3>
+    <ul>
+      <li><strong>梅雨・湿度高い時期</strong>: 換気扇＋除湿機を活用、屋外家具は乾燥保管</li>
+      <li><strong>冬季</strong>: 給湯器・水栓の凍結注意</li>
+      <li><strong>夏季</strong>: 虫対策強化（殺虫剤・蚊取り在庫多め）</li>
+      <li><strong>雨天時</strong>: 窓開放時間短く、室内干しルール確認</li>
+    </ul>
+  </div>
+
+  <div class="block warning">
+    <h3><span class="ico">📝</span>未実施時の繰越ルール</h3>
+    <p>月次作業を実施できない場合は、<strong>必ず運営者へ事前報告</strong>し、翌月最初のターンで繰越実施。</p>
+  </div>
+</section>
+
+<!-- ===== 19. 写真・報告運用 [NEW v2] ===== -->
+<section class="chapter" id="c19">
+  <div class="chapter-header">
+    <div class="chapter-num">Chapter 19</div>
+    <h2>写真・報告運用基準 <span class="badge-new">NEW v2</span></h2>
+    <p class="desc">必須写真・保存先・命名規則・報告期限・再提出条件</p>
+  </div>
+
+  <div class="block good">
+    <h3><span class="ico">📸</span>必須写真カット</h3>
+    <ul class="checklist">
+      <li>入室時5枚（全体俯瞰）</li>
+      <li>異常箇所の接写（破損・汚損）</li>
+      <li>清掃後全景（リビング・キッチン・各寝室・水回り）</li>
+      <li>屋外BBQエリア（使用前後）</li>
+      <li>設備異常があれば該当機器</li>
+      <li>消火器・救急キット位置</li>
+      <li>セーフティBOX 空・開錠状態</li>
+    </ul>
+  </div>
+
+  <div class="block info">
+    <h3><span class="ico">📁</span>写真フォルダ命名規則</h3>
+    <p><strong>フォルダ構造</strong>:</p>
+    <pre style="background:var(--bg-soft);padding:12px;border-radius:6px;font-size:0.8rem;line-height:1.5;font-family:monospace;">HilltopZushi/
+  YYYY/MM/
+    YYYYMMDD_CO_予約ID/
+      01_入室/
+      02_破損/
+      03_忘れ物/
+      04_清掃後/
+      05_屋外BBQ/
+      06_設備異常/</pre>
+    <p><strong>ファイル命名</strong>: <code>20260525_CO_12345_BBQ_after_01.jpg</code></p>
+    <p style="color:var(--text-light);">形式: <code>日付_区分_予約ID_場所_連番</code></p>
+  </div>
+
+  <div class="block">
+    <h3><span class="ico">📤</span>報告ツール運用</h3>
+    <table>
+      <tr><th>報告内容</th><th>ツール</th><th>期限</th></tr>
+      <tr><td>清掃完了報告</td><td>Google Forms（主系）</td><td>退室後30分以内</td></tr>
+      <tr><td>緊急連絡・速報</td><td>LINE（緊急専用）</td><td>即時</td></tr>
+      <tr><td>写真アップ</td><td>Google Drive</td><td>退室後1時間以内</td></tr>
+      <tr><td>異常発見</td><td>LINE + 写真</td><td>発見から30分以内</td></tr>
+    </table>
+    <p style="color:var(--warning);font-weight:700;margin-top:10px;">⚠ LINEだけで完了報告を閉じない。必ずFormsで正式報告。</p>
+  </div>
+
+  <div class="block accent">
+    <h3><span class="ico">✅</span>清掃完了報告に含める内容</h3>
+    <ol class="steps">
+      <li>清掃完了時刻</li>
+      <li>補充した消耗品の一覧</li>
+      <li>破損・汚損があれば写真付き</li>
+      <li>忘れ物の有無と保管場所</li>
+      <li>故障・異常（電気・水回り・建具など）</li>
+      <li>BBQ使用有無と清掃完了確認</li>
+      <li>ペット利用有無と特別清掃完了確認</li>
+      <li>設備・通信チェック結果</li>
+    </ol>
+  </div>
+</section>
+
+<footer class="manual-footer">
+  <div class="brand">HILLTOP ZUSHI</div>
+  <div>Cleaning Manual v2 · 2026-05-25 · 19章統合版</div>
+  <div style="margin-top:8px;color:rgba(255,255,255,0.6);font-size:0.7rem;letter-spacing:0.1em;">業者様向け／Cleaning Partner Manual · お問い合わせ: 運営者まで</div>
+</footer>
+
+</body>
+</html>

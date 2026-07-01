@@ -1,0 +1,428 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Disaster Preparedness · 災害時のご案内 — Hilltop Zushi</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1F3A34;
+    --primary-deep: #14271F;
+    --accent: #C9A56D;
+    --accent-deep: #A8854B;
+    --bg: #F5F3F0;
+    --bg-soft: #FAF8F4;
+    --text: #2C2C2C;
+    --neutral: #6B6B6B;
+    --emergency: #C8242A;
+    --warning: #D67230;
+    --info: #2563A4;
+    --jp-font: 'Hiragino Sans', 'ヒラギノ角ゴ ProN', 'メイリオ', 'Meiryo', 'Yu Gothic', 'YuGothic', 'Noto Sans JP', sans-serif;
+    --serif-font: 'Cormorant Garamond', 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  @page { size: A4 portrait; margin: 0; }
+  html, body { background: #888; }
+  body {
+    font-family: var(--jp-font);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.45;
+  }
+  .sheet {
+    width: 210mm;
+    height: 297mm;
+    background: var(--bg);
+    position: relative;
+    padding: 12mm 12mm 10mm;
+    box-shadow: 0 8px 50px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .frame {
+    position: absolute;
+    top: 7mm; left: 7mm; right: 7mm; bottom: 7mm;
+    border: 1px solid rgba(201,165,109,0.5);
+    pointer-events: none;
+  }
+  .frame .corner {
+    position: absolute; width: 18px; height: 18px;
+    border: 2px solid var(--accent);
+  }
+  .frame .corner.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+  .frame .corner.tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+  .frame .corner.bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+  .frame .corner.br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+  .brand { text-align: center; margin-bottom: 3mm; }
+  .brand .brand-text { font-family: 'Cormorant Garamond', 'Hiragino Mincho ProN', serif; font-size: 1.45rem; font-weight: 700; color: var(--primary); letter-spacing: 0.22em; margin: 0 0 1.5mm; line-height: 1; }
+  .brand .tagline {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.62rem;
+    color: var(--emergency);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .title-block { text-align: center; margin-bottom: 2.5mm; }
+  .title-block h1 {
+    font-family: var(--serif-font);
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--emergency);
+    letter-spacing: 0.14em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .title-block .ja {
+    font-family: var(--jp-font);
+    font-size: 0.78rem;
+    color: var(--emergency);
+    margin-top: 0.8mm;
+    letter-spacing: 0.16em;
+    font-weight: 700;
+  }
+  .title-block .multi {
+    font-size: 0.58rem;
+    color: var(--neutral);
+    margin-top: 0.4mm;
+    letter-spacing: 0.12em;
+  }
+  .title-block .multi .zh { font-family: 'Noto Sans SC', sans-serif; }
+  .title-block .multi .ko { font-family: 'Noto Sans KR', sans-serif; }
+
+  /* セクション共通 */
+  .sec {
+    background: #fff;
+    border-radius: 2.5mm;
+    padding: 3.5mm 4mm;
+    margin-bottom: 2.5mm;
+    border-left: 3px solid var(--accent);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .sec.alert {
+    border-left-color: var(--emergency);
+    background: #FFF8F8;
+  }
+  .sec .head {
+    font-family: var(--jp-font);
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.85rem;
+    margin-bottom: 1mm;
+    display: flex;
+    align-items: center;
+    gap: 2.5mm;
+  }
+  .sec.alert .head { color: var(--emergency); }
+  .sec .head .ico { font-size: 1.15rem; line-height: 1; }
+  .sec .head-en {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.58rem;
+    color: var(--accent-deep);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 1.5mm;
+  }
+  .sec.alert .head-en { color: var(--emergency); }
+
+  .sec .row {
+    font-size: 0.66rem;
+    line-height: 1.5;
+    margin-bottom: 0.4mm;
+  }
+  .sec .row.jp { font-family: var(--jp-font); color: var(--text); font-weight: 500; font-size: 0.72rem; }
+  .sec .row.en { font-family: 'Inter', sans-serif; color: var(--neutral); font-style: italic; }
+  .sec .row.zh { font-family: 'Noto Sans SC', sans-serif; color: var(--neutral); }
+  .sec .row.ko { font-family: 'Noto Sans KR', sans-serif; color: var(--neutral); }
+  .sec strong { color: var(--emergency); font-weight: 700; }
+  .sec .row.jp strong { background: #FFE5E5; padding: 0 4px; }
+
+  /* ステップ */
+  .steps {
+    counter-reset: step-counter;
+    margin-top: 1mm;
+  }
+  .step {
+    counter-increment: step-counter;
+    position: relative;
+    padding-left: 7mm;
+    margin-bottom: 1mm;
+    font-family: var(--jp-font);
+    font-size: 0.7rem;
+    line-height: 1.4;
+    color: var(--text);
+  }
+  .step::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 5mm;
+    height: 5mm;
+    border-radius: 50%;
+    background: var(--emergency);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 0.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .step .en {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    color: var(--neutral);
+    font-size: 0.6rem;
+    margin-top: 0.3mm;
+  }
+
+  /* 避難場所グリッド */
+  .shelter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2mm;
+    margin-top: 1.5mm;
+  }
+  .shelter {
+    background: var(--bg-soft);
+    border-radius: 2mm;
+    padding: 2mm 2.5mm;
+    border: 1px solid rgba(201,165,109,0.5);
+  }
+  .shelter .name {
+    font-family: var(--jp-font);
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+  .shelter .name-en {
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    color: var(--neutral);
+    font-size: 0.58rem;
+    margin-top: 0.2mm;
+  }
+  .shelter.nearest {
+    background: #FFF8F8;
+    border-color: var(--emergency);
+  }
+  .shelter.nearest .name { color: var(--emergency); }
+  .shelter .tag {
+    display: inline-block;
+    background: var(--emergency);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.5rem;
+    font-weight: 700;
+    padding: 0.5mm 1.5mm;
+    border-radius: 1mm;
+    letter-spacing: 0.08em;
+    margin-right: 1mm;
+    vertical-align: middle;
+  }
+
+  /* 地震・火災 横並びグリッド */
+  .disasters-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5mm;
+    margin-bottom: 2.5mm;
+  }
+  .disasters-grid > .sec { margin-bottom: 0; }
+  .disasters-grid .step { font-size: 0.66rem; padding-left: 6.5mm; }
+  .disasters-grid .step::before { width: 4.5mm; height: 4.5mm; font-size: 0.55rem; }
+  .disasters-grid .step .en { font-size: 0.55rem; }
+
+  /* 119読み上げ */
+  .speak-card {
+    flex-shrink: 0;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 2.5mm;
+    padding: 3.5mm 4mm;
+    margin-top: auto;
+  }
+  .speak-card .label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.58rem;
+    color: var(--accent);
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 1.5mm;
+  }
+  .speak-card .row {
+    font-size: 0.7rem;
+    line-height: 1.5;
+    padding: 0.7mm 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.2);
+  }
+  .speak-card .row:last-child { border-bottom: none; }
+  .speak-card .row.jp { font-family: var(--jp-font); font-weight: 500; }
+  .speak-card .row.en { font-family: 'Inter', sans-serif; font-style: italic; color: rgba(255,255,255,0.85); }
+  .speak-card .row.zh { font-family: 'Noto Sans SC', sans-serif; color: rgba(255,255,255,0.85); font-size: 0.66rem; }
+  .speak-card .row.ko { font-family: 'Noto Sans KR', sans-serif; color: rgba(255,255,255,0.85); font-size: 0.66rem; }
+  .speak-card strong { background: #FFCC00; color: #1A1A1A; padding: 0 4px; font-weight: 700; }
+
+  .foot {
+    text-align: center;
+    font-size: 0.58rem;
+    color: var(--neutral);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding-top: 2mm;
+  }
+  .foot .ja {
+    text-transform: none;
+    letter-spacing: 0.08em;
+    font-family: var(--jp-font);
+    margin-top: 0.5mm;
+    font-size: 0.6rem;
+  }
+
+  /* スマホ最適化: A4を画面幅にフィット */
+  @media (max-width: 880px) {
+    html, body { margin: 0; padding: 0; background: #fff; overflow-x: hidden; overflow-y: auto; }
+    body {
+      display: block;
+      min-height: 0;
+      height: calc(100vw * 1123 / 794);
+    }
+    .sheet {
+      transform: scale(calc(100vw / 794px));
+      transform-origin: top left;
+      box-shadow: none;
+    }
+  }
+
+  @media print {
+    html, body { background: #fff; overflow: hidden; }
+    html { -ms-overflow-style: none; scrollbar-width: none; }
+    html::-webkit-scrollbar { display: none; }
+    body { padding: 0; }
+    .sheet { box-shadow: none; page-break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="frame">
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+    </div>
+
+    <header class="brand">
+      <div class="brand-text">HILLTOP ZUSHI</div>
+      <div class="tagline">⚠ Disaster &amp; Evacuation · 災害・避難 ⚠</div>
+    </header>
+
+    <section class="title-block">
+      <h1>Disaster Preparedness</h1>
+      <div class="ja">災害時のご案内</div>
+      <div class="multi"><span class="zh">防灾指南</span> &middot; <span class="ko">재해 시 안내</span></div>
+    </section>
+
+    <!-- ① 地震時 + 火災時 横並び（最優先・初動） -->
+    <div class="disasters-grid">
+      <section class="sec">
+        <div class="head"><span class="ico">🌍</span>地震時 / Earthquake</div>
+        <div class="head-en">Earthquake Response</div>
+        <div class="steps">
+          <div class="step">頭を守って机の下へ <span class="en">Protect head, under a table</span></div>
+          <div class="step">揺れ後に火の元・ガス確認 <span class="en">Check stove &amp; gas after shaking</span></div>
+          <div class="step">玄関を開け避難経路を確保 <span class="en">Open front door for exit</span></div>
+          <div class="step">安全確認し屋外へ <span class="en">Evacuate outside when safe</span></div>
+          <div class="step">避難場所へ徒歩移動 <span class="en">Walk to nearby shelter</span></div>
+        </div>
+      </section>
+
+      <section class="sec alert">
+        <div class="head"><span class="ico">🔥</span>火災時 / Fire</div>
+        <div class="head-en">Fire Response</div>
+        <div class="steps">
+          <div class="step"><strong>119</strong>へ通報（下記文章を使用）<span class="en">Dial <strong>119</strong> — use script below</span></div>
+          <div class="step">大声で家中に知らせる <span class="en">Alert everyone loudly</span></div>
+          <div class="step">煙を避け低姿勢で避難 <span class="en">Stay low, avoid smoke</span></div>
+          <div class="step">小火なら消火器（倉庫横）<span class="en">Small fire: extinguisher</span></div>
+          <div class="step">屋外集合→全員確認 <span class="en">Gather outside, check all</span></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ② 119読み上げ文（4点固定） -->
+    <section class="speak-card">
+      <div class="label">📞 119 読み上げ用文章 · Read This When Calling 119</div>
+      <div class="row jp"><strong style="background:#FFCC00;color:#1A1A1A;padding:0 4px;">①</strong> 何が起きたか「火事です／急病です」<br><strong style="background:#FFCC00;color:#1A1A1A;padding:0 4px;">②</strong> 住所「<strong>逗子市池子 2-10-9 · Hilltop Zushi</strong>」<br><strong style="background:#FFCC00;color:#1A1A1A;padding:0 4px;">③</strong> 名前と折返し電話番号<br><strong style="background:#FFCC00;color:#1A1A1A;padding:0 4px;">④</strong> 近くの目印「<strong>神武寺駅</strong>のそば」</div>
+      <div class="row en"><strong>①</strong> What happened: "Fire" / "Medical emergency" <strong>②</strong> Address: <strong>2-10-9 Ikego, Zushi-shi · Hilltop Zushi</strong> <strong>③</strong> Your name &amp; callback number <strong>④</strong> Landmark: near <strong>Jimmuji Station</strong></div>
+      <div class="row zh">① 发生什么：「火灾」「急病」 ② 地址：<strong>逗子市池子2-10-9 · Hilltop Zushi</strong> ③ 姓名和回拨电话 ④ 附近地标：<strong>神武寺站</strong>附近</div>
+      <div class="row ko">① 무슨 일: "화재" / "응급" ② 주소: <strong>즈시시 이케고 2-10-9 · Hilltop Zushi</strong> ③ 이름과 회신 번호 ④ 가까운 표시: <strong>진무지역</strong> 근처</div>
+    </section>
+
+    <!-- ③ 避難場所 -->
+    <section class="sec">
+      <div class="head"><span class="ico">🏫</span>逗子市指定 避難場所 / Designated Shelters</div>
+      <div class="head-en">Ikego Area · 池子地区</div>
+      <div class="shelter-grid">
+        <div class="shelter nearest">
+          <span class="tag">最寄</span>
+          <div class="name">池子小学校</div>
+          <div class="name-en">Ikego Elementary School</div>
+        </div>
+        <div class="shelter nearest">
+          <span class="tag">最寄</span>
+          <div class="name">池子会館</div>
+          <div class="name-en">Ikego Community Hall</div>
+        </div>
+        <div class="shelter">
+          <div class="name">逗子中学校</div>
+          <div class="name-en">Zushi Junior High School</div>
+        </div>
+        <div class="shelter">
+          <div class="name">逗子市立体育館</div>
+          <div class="name-en">Zushi Municipal Gymnasium</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ④ 通信不能時の対応 -->
+    <section class="sec alert">
+      <div class="head"><span class="ico">📵</span>通信できない場合 / If Communication Is Down</div>
+      <div class="row jp">スマホ圏外・電池切れ・Wi-Fi停止時は、<strong>上記の避難場所まで徒歩で移動</strong>。隣家のチャイム or 神武寺駅前の公衆電話もご利用ください。</div>
+      <div class="row en">If phone is out — <strong>walk to a shelter above</strong>. Ring a neighbor's doorbell or use the public phone at Jimmuji Station.</div>
+      <div class="row zh">手机不通时，<strong>步行前往上述避难场所</strong>。可按邻居门铃或使用神武寺站前公用电话。</div>
+      <div class="row ko">통신 불능 시 <strong>위 대피소까지 도보 이동</strong>. 이웃집 초인종 또는 진무지역 앞 공중전화 이용 가능.</div>
+    </section>
+
+    <!-- ⑤ 外国人サポートホットライン -->
+    <section class="sec" style="border-left-color:#2563A4;background:#F4F8FC;">
+      <div class="head" style="color:#2563A4;"><span class="ico">🌐</span>外国人サポート / Multilingual Hotline</div>
+      <div class="row jp">電話可能な場合: <strong style="color:#2563A4;">Japan Visitor Hotline ☎ 050-3816-2787</strong>（24時間365日・英中韓・政府運営）</div>
+      <div class="row en"><strong>Japan Visitor Hotline ☎ 050-3816-2787</strong> (24/7 · EN/中/한 · Government-run)</div>
+    </section>
+
+    <footer class="foot">
+      Verified 2026-05-15 · Stay calm · Walk to safety
+      <div class="ja">2026-05-15確認 · 落ち着いて行動 · 焦らず徒歩で避難場所へ</div>
+    </footer>
+  </div>
+</body>
+</html>
