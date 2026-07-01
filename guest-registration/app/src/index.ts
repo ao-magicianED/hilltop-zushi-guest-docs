@@ -4,7 +4,7 @@ import { html, raw } from "hono/html";
 import type { Env, Lang } from "./types";
 import { normalizeLang } from "./types";
 import { layout } from "./views/layout";
-import { startPage, channelChooserPage, declarePage, progressPage, formPage, messagePage, pinConfirmPage, type StartChannel } from "./views/guest";
+import { startPage, channelChooserPage, declarePage, guestInfoPage, formPage, messagePage, pinConfirmPage, type StartChannel } from "./views/guest";
 import { privacyPolicyPage } from "./views/privacy";
 import {
   verifyReservation,
@@ -15,6 +15,8 @@ import {
   getGuest,
   getGuestsByReservation,
   declareGuests,
+  addMoreGuests,
+  MAX_GUESTS,
   computeProgress,
   appendAudit,
   rateLimit,
@@ -78,6 +80,15 @@ import {
 
 const app = new Hono<{ Bindings: Env; Variables: { admin: Session } }>();
 const OWNER_EMAIL = "hilltop.zushi@gmail.com";
+
+// 想定外の例外はスタックトレースを含む素の500を返さず、ログにだけ残して簡潔なエラーページを返す。
+app.onError((err, c) => {
+  console.error("[unhandled]", err);
+  return c.text("エラーが発生しました。しばらくしてから再度お試しください。", 500);
+});
+
+// 個人トークン等の機微な生リンクを含むレスポンスに付与する（共有PC・プロキシ・ブラウザキャッシュ対策）。
+const NO_STORE = { "Cache-Control": "no-store, private, max-age=0", "Referrer-Policy": "no-referrer" };
 
 function pickLang(c: any, fallback?: string): Lang {
   const q = c.req.query("lang");
@@ -220,39 +231,58 @@ app.post("/start", async (c) => {
 });
 
 // グループ入口：未申告なら人数申告、申告済みなら進捗
+// 未提出の各ゲストへ個人トークンを都度新規発行する（発行済みの生トークンはハッシュ化保存で復元不可なため
+// 毎回新規発行。既存トークンは失効させない＝旧リンクも新リンクもチェックアウトまで並行して有効）。
+// 提出済みゲストにはトークンを発行しない（再発行リンクによる他人PIIの再オープンを防ぐ）。
+async function mintPendingGuestLinks(
+  c: any,
+  res: Reservation,
+  guests: Guest[]
+): Promise<{ slotNo: number; role: string; fullName: string | null; submitStatus: string; token: string | null }[]> {
+  const exp = checkoutExpiry(res.check_out_date);
+  const rows: { slotNo: number; role: string; fullName: string | null; submitStatus: string; token: string | null }[] = [];
+  for (const g of guests) {
+    if (g.submit_status === "submitted") {
+      rows.push({ slotNo: g.slot_no, role: g.member_role, fullName: g.full_name, submitStatus: g.submit_status, token: null });
+      continue;
+    }
+    const tk = generateToken();
+    const th = await hashToken(tk);
+    await c.env.DB.prepare("INSERT INTO guest_tokens (id, guest_id, token_hash, expires_at, created_at) VALUES (?,?,?,?,?)").bind(newId("pt_"), g.id, th, exp, nowIso()).run();
+    rows.push({ slotNo: g.slot_no, role: g.member_role, fullName: g.full_name, submitStatus: g.submit_status, token: tk });
+  }
+  return rows;
+}
+
+// 宿泊情報入力ページ：進捗確認＋各参加者への個人リンク共有を1画面に統合。
 app.get("/g/:token", async (c) => {
   const token = c.req.param("token");
   const res = await resolveGroupToken(c.env, token);
   const lang = pickLang(c, res?.preferred_lang);
   if (!res) {
-    return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "expired"), kind: "err" }) }));
+    return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "expired"), kind: "err" }) }), 200, NO_STORE);
   }
   const guests = await getGuestsByReservation(c.env, res.id);
   if (!res.declared_guests || guests.length === 0) {
-    return c.html(layout({ title: t(lang, "declare_title"), lang, path: `/g/${token}`, body: declarePage(lang, { token }) }));
+    return c.html(layout({ title: t(lang, "declare_title"), lang, path: `/g/${token}`, body: declarePage(lang, { token }) }), 200, NO_STORE);
+  }
+  if (!(await rateLimit(c.env, `groupview:${await hashToken(ipHashKey(c))}`, 30, 600))) {
+    return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "too_many"), kind: "err" }) }), 200, NO_STORE);
   }
   const { done, total } = computeProgress(guests, res.expected_guests);
-  return c.html(
-    layout({
-      title: t(lang, "progress_title"),
-      lang,
-      path: `/g/${token}`,
-      body: [
-        progressPage(lang, { groupToken: token, guests: guests.map((g) => ({ slot_no: g.slot_no, full_name: g.full_name, submit_status: g.submit_status, guestId: g.id })), done, total }),
-        html`<div class="card"><a class="btn" href="/g/${token}/reveal?lang=${lang}">${t(lang, "share_links")}</a></div>`,
-      ],
-    })
-  );
+  const rows = await mintPendingGuestLinks(c, res, guests);
+  await appendAudit(c.env, { reservationId: res.id, actorType: "guest", action: "reveal_links", detail: { count: rows.filter((r) => r.token).length }, ipHash: await hashToken(ipHashKey(c)) });
+  return c.html(layout({ title: t(lang, "guest_info_title"), lang, path: `/g/${token}`, body: guestInfoPage(lang, { groupToken: token, base: c.env.APP_BASE_URL, guests: rows, done, total }) }), 200, NO_STORE);
 });
 
-// 人数申告 → 個人リンクを生成して表示
+// 人数申告 → 宿泊情報入力ページへ
 app.post("/g/:token/declare", async (c) => {
   const token = c.req.param("token");
   const res = await resolveGroupToken(c.env, token);
   const lang = pickLang(c, res?.preferred_lang);
-  if (!res) return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "expired"), kind: "err" }) }));
+  if (!res) return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "expired"), kind: "err" }) }), 200, NO_STORE);
   if (!(await rateLimit(c.env, `declare:${await hashToken(ipHashKey(c))}`, 20, 600))) {
-    return c.html(layout({ title: t(lang, "declare_title"), lang, path: `/g/${token}`, body: declarePage(lang, { token, error: t(lang, "too_many") }) }));
+    return c.html(layout({ title: t(lang, "declare_title"), lang, path: `/g/${token}`, body: declarePage(lang, { token, error: t(lang, "too_many") }) }), 200, NO_STORE);
   }
 
   const existing = await getGuestsByReservation(c.env, res.id);
@@ -260,40 +290,49 @@ app.post("/g/:token/declare", async (c) => {
 
   const body = await c.req.parseBody();
   const count = parseInt(String(body.count ?? "0"), 10);
-  if (!count || count < 1 || count > 12) {
-    return c.html(layout({ title: t(lang, "declare_title"), lang, path: `/g/${token}`, body: declarePage(lang, { token, error: t(lang, "fix_errors") }) }));
+  if (!count || count < 1 || count > MAX_GUESTS) {
+    return c.html(layout({ title: t(lang, "declare_title"), lang, path: `/g/${token}`, body: declarePage(lang, { token, error: t(lang, "fix_errors") }) }), 200, NO_STORE);
   }
-  const created = await declareGuests(c.env, res, count);
+  await declareGuests(c.env, res, count);
   await appendAudit(c.env, { reservationId: res.id, actorType: "guest", action: "declare_guests", detail: { count } });
-  return c.html(layout({ title: t(lang, "share_links"), lang, path: `/g/${token}`, body: linksPage(lang, c.env.APP_BASE_URL, token, created) }));
+  return c.redirect(`/g/${token}?lang=${lang}`);
 });
 
-// 個人リンクの再表示（未提出ぶんはトークンを再発行）
-// 注意：発行済みの生トークンはハッシュ化されサーバ側に残らないため「同じリンクを再表示」はできない。
-// 過去に共有したリンクを無効化すると、同行者が先に受け取ったリンクが使えなくなる（再共有のたびに壊れる）ため、
-// 既存トークンは失効させず、新しいトークンを追加発行するだけにする（旧リンクも新リンクもチェックアウトまで両方有効）。
-app.get("/g/:token/reveal", async (c) => {
+// 参加人数の追加。ここでの追加は「正式な人数変更」ではない旨を画面に明記し、超過料金判定等は
+// オーナー側がAirbnb等の別連絡で把握する運用（人数追加自体は各自入力を進めやすくするための機能）。
+app.post("/g/:token/add-guests", async (c) => {
   const token = c.req.param("token");
   const res = await resolveGroupToken(c.env, token);
   const lang = pickLang(c, res?.preferred_lang);
-  if (!res) return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "expired"), kind: "err" }) }));
-  if (!(await rateLimit(c.env, `reveal:${await hashToken(ipHashKey(c))}`, 20, 600))) {
-    return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "too_many"), kind: "err" }) }));
+  if (!res) return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "expired"), kind: "err" }) }), 200, NO_STORE);
+  if (!(await rateLimit(c.env, `addguests:${await hashToken(ipHashKey(c))}`, 10, 600))) {
+    return c.html(layout({ title: t(lang, "app_title"), lang, path: `/g/${token}`, body: messagePage(lang, { title: t(lang, "app_title"), message: t(lang, "too_many"), kind: "err" }) }), 200, NO_STORE);
   }
   const guests = await getGuestsByReservation(c.env, res.id);
-  const out: { guestId: string; slotNo: number; role: string; token: string }[] = [];
-  const exp = checkoutExpiry(res.check_out_date);
-  for (const g of guests) {
-    // 提出済みゲストはトークンを発行しない（再発行リンクで他人のPII閲覧・上書きを防ぐ）
-    if (g.submit_status === "submitted") continue;
-    const tk = generateToken();
-    const th = await hashToken(tk);
-    await c.env.DB.prepare("INSERT INTO guest_tokens (id, guest_id, token_hash, expires_at, created_at) VALUES (?,?,?,?,?)").bind(newId("pt_"), g.id, th, exp, nowIso()).run();
-    out.push({ guestId: g.id, slotNo: g.slot_no, role: g.member_role, token: tk });
+  const body = await c.req.parseBody();
+  const addCount = parseInt(String(body.add_count ?? "0"), 10);
+  const currentMax = guests.reduce((m, g) => Math.max(m, g.slot_no), 0);
+  if (!addCount || addCount < 1 || currentMax + addCount > MAX_GUESTS) {
+    const { done, total } = computeProgress(guests, res.expected_guests);
+    const rows = await mintPendingGuestLinks(c, res, guests);
+    return c.html(layout({ title: t(lang, "guest_info_title"), lang, path: `/g/${token}`, body: guestInfoPage(lang, { groupToken: token, base: c.env.APP_BASE_URL, guests: rows, done, total, addGuestsError: true }) }), 200, NO_STORE);
   }
-  await appendAudit(c.env, { reservationId: res.id, actorType: "guest", action: "reveal_links", detail: { count: out.length }, ipHash: await hashToken(ipHashKey(c)) });
-  return c.html(layout({ title: t(lang, "share_links"), lang, path: `/g/${token}/reveal`, body: linksPage(lang, c.env.APP_BASE_URL, token, out) }));
+  try {
+    await addMoreGuests(c.env, res, guests, addCount);
+  } catch (e) {
+    // ほぼ同時に複数リクエストが人数追加すると枠番号(slot_no)が衝突し失敗することがある
+    // （事前チェックはTOCTOUのため完全には防げない）。中途半端な状態を残さずやり直してもらう。
+    console.error("[add-guests] failed", e);
+    const { done, total } = computeProgress(guests, res.expected_guests);
+    const rows = await mintPendingGuestLinks(c, res, guests);
+    return c.html(layout({ title: t(lang, "guest_info_title"), lang, path: `/g/${token}`, body: guestInfoPage(lang, { groupToken: token, base: c.env.APP_BASE_URL, guests: rows, done, total, addGuestsError: true }) }), 200, NO_STORE);
+  }
+  await appendAudit(c.env, { reservationId: res.id, actorType: "guest", action: "add_guests", detail: { add_count: addCount, new_total: currentMax + addCount } });
+  return c.redirect(`/g/${token}?lang=${lang}`);
 });
+
+// 後方互換：以前はここが個人リンク一覧の独立ページだったが、/g/:token に統合したためリダイレクトのみ。
+app.get("/g/:token/reveal", (c) => c.redirect(`/g/${c.req.param("token")}?lang=${pickLang(c)}`));
 
 // 進捗ページから未提出ゲスト1名の編集ページへ：クリック時にその場で新しい個人トークンを発行して
 // リダイレクトする（生の個人トークンはハッシュ化保存で復元不可なための設計。revealと同じ考え方だが
@@ -318,39 +357,6 @@ app.get("/g/:token/edit/:guestId", async (c) => {
   await appendAudit(c.env, { reservationId: res.id, guestId: guest.id, actorType: "guest", action: "edit_link_minted", ipHash: await hashToken(ipHashKey(c)) });
   return c.redirect(`/p/${tk}?lang=${lang}`);
 });
-
-function linksPage(lang: Lang, base: string, groupToken: string, created: { slotNo: number; role: string; token: string }[]) {
-  const rows = created
-    .map((x, i) => {
-      const url = `${base}/p/${x.token}?lang=${lang}`;
-      const who = x.role === "representative" ? `👑 ${t(lang, "representative_label")}` : `#${x.slotNo}`;
-      const id = `plink${i}`;
-      return `<li><span>${who}</span> <a id="${id}" class="muted" href="${url}">${t(lang, "edit_link")}</a> <button type="button" class="btn secondary" style="width:auto;padding:4px 10px" onclick="hzCopyLink('${id}',this)">${t(lang, "copy_link")}</button></li>`;
-    })
-    .join("");
-  // JS文字列リテラルへの埋め込みは手動エスケープ(バックスラッシュ/クォートのみ)では</script>によるタグ脱出を
-  // 防げない。i18n辞書は現状固定文字列だが、将来の文言変更でも安全なようJSON.stringify+<のunicode化で埋め込む。
-  const copiedLiteral = JSON.stringify(t(lang, "copied")).replace(/</g, "\\u003c");
-  return html`
-  <div class="card">
-    <h1>${t(lang, "share_links")}</h1>
-    <p class="muted">${t(lang, "links_note")}</p>
-    <ul class="list">${raw(rows)}</ul>
-    <a class="btn secondary" href="/g/${groupToken}?lang=${lang}">← ${t(lang, "progress_title")}</a>
-  </div>
-  ${raw(`<script>
-function hzCopyLink(id, btn){
-  var el = document.getElementById(id);
-  if (!el || !navigator.clipboard || !navigator.clipboard.writeText) return;
-  var text = el.tagName === 'A' ? el.href : el.textContent;
-  navigator.clipboard.writeText(text).then(function(){
-    var orig = btn.textContent;
-    btn.textContent = ${copiedLiteral};
-    setTimeout(function(){ btn.textContent = orig; }, 1500);
-  }).catch(function(){});
-}
-</script>`)}`;
-}
 
 // 個人トークンから進捗ページへ戻る導線。生のグループトークンはハッシュ化され保存されていないため
 // 復元できない → その場で新しいグループトークンを発行してリダイレクトする（個人トークンを知っている
@@ -557,19 +563,23 @@ app.post("/p/:token", async (c) => {
   }
 
   // 全員分の提出が完了したタイミングでオーナーへ通知。
+  // 完了判定は必ずこの時点で予約を再取得してから行う（フォーム処理中（暗号化・画像アップロード等で
+  // 数百ms〜数秒かかる）に人数追加が起きるとexpected_guestsが変わるため、リクエスト開始時に取得した
+  // 古いresvスナップショットのままだと「まだ全員揃っていないのに完了」と誤判定しうる）。
   // ほぼ同時提出（代表者と同行者が同時にボタンを押す等）でのレースを防ぐため、
   // 送信前に completion_notified_at を条件付きUPDATEで「先取り」し、更新0件（他リクエストが既に取得済み）なら送らない。
-  if (resv && !resv.completion_notified_at) {
+  const freshResv = await getReservation(c.env, guest.reservation_id);
+  if (freshResv && !freshResv.completion_notified_at) {
     const allGuests = await getGuestsByReservation(c.env, guest.reservation_id);
-    const { done, total } = computeProgress(allGuests, resv.expected_guests);
+    const { done, total } = computeProgress(allGuests, freshResv.expected_guests);
     if (total > 0 && done >= total) {
       const claim = await c.env.DB.prepare(
         "UPDATE reservations SET completion_notified_at=? WHERE id=? AND completion_notified_at IS NULL"
       ).bind(nowIso(), guest.reservation_id).run();
       if (claim.meta.changes) {
         const mail = completionNotificationEmail({
-          code: resv.airbnb_reservation_code ?? guest.reservation_id.slice(0, 8),
-          checkIn: resv.check_in_date, checkOut: resv.check_out_date,
+          code: freshResv.airbnb_reservation_code ?? guest.reservation_id.slice(0, 8),
+          checkIn: freshResv.check_in_date, checkOut: freshResv.check_out_date,
           guestCount: total, adminUrl: `${c.env.APP_BASE_URL}/admin/r/${guest.reservation_id}`,
         });
         const result = await sendEmail(c.env, { to: OWNER_EMAIL, subject: mail.subject, html: mail.html });
@@ -578,11 +588,11 @@ app.post("/p/:token", async (c) => {
         // 代表者へも完了確認メールを送る（オーナー宛通知とは別物）。代表者の提出済みメールを優先し、
         // 万一空なら予約作成時のヒントで代用。宛先が無ければ静かにスキップ。
         const rep = allGuests.find((g) => g.member_role === "representative");
-        const repEmail = rep?.email?.trim() || resv.rep_email_hint?.trim() || "";
+        const repEmail = rep?.email?.trim() || freshResv.rep_email_hint?.trim() || "";
         if (repEmail) {
-          const repMail = completionConfirmEmail(normalizeLang(resv.preferred_lang), {
-            code: resv.airbnb_reservation_code ?? guest.reservation_id.slice(0, 8),
-            checkIn: resv.check_in_date, checkOut: resv.check_out_date,
+          const repMail = completionConfirmEmail(normalizeLang(freshResv.preferred_lang), {
+            code: freshResv.airbnb_reservation_code ?? guest.reservation_id.slice(0, 8),
+            checkIn: freshResv.check_in_date, checkOut: freshResv.check_out_date,
           });
           const repResult = await sendEmail(c.env, { to: repEmail, subject: repMail.subject, html: repMail.html, bcc: OWNER_EMAIL });
           await appendAudit(c.env, { reservationId: guest.reservation_id, actorType: "system", action: "send_completion_confirm_email", detail: { ok: repResult.ok, to_hash: await sha256Hex(repEmail) } });
@@ -1264,13 +1274,29 @@ app.get("/admin", async (c) => {
   }));
 });
 
+// 予約に紐づく直近の監査ログ1件を取得（PIN送付済みかどうかの表示などに使う）。
+async function getLastAuditEvent(env: Env, reservationId: string, action: string): Promise<{ at: string; ok: boolean | null } | null> {
+  const row = await env.DB.prepare(
+    "SELECT detail, created_at FROM audit_logs WHERE reservation_id=? AND action=? ORDER BY created_at DESC LIMIT 1"
+  ).bind(reservationId, action).first<{ detail: string | null; created_at: string }>();
+  if (!row) return null;
+  let ok: boolean | null = null;
+  if (row.detail) {
+    try { ok = JSON.parse(row.detail).ok ?? null; } catch { ok = null; }
+  }
+  return { at: row.created_at, ok };
+}
+const fmtDt = (iso: string) => iso.slice(0, 16).replace("T", " ");
+
 app.get("/admin/r/:id", async (c) => {
   const id = c.req.param("id");
   const res = await getReservation(c.env, id);
   if (!res) return c.notFound();
   const guests = await getGuestsByReservation(c.env, id);
   const { done, total } = computeProgress(guests, res.expected_guests);
-  const keybox = await c.env.DB.prepare("SELECT id FROM keybox_codes WHERE reservation_id=? AND active=1 AND code_enc IS NOT NULL").bind(id).first<{ id: string }>();
+  const keybox = await c.env.DB.prepare("SELECT id, changed_at FROM keybox_codes WHERE reservation_id=? AND active=1 AND code_enc IS NOT NULL").bind(id).first<{ id: string; changed_at: string }>();
+  const pinEmailStatus = await getLastAuditEvent(c.env, id, "send_pin_email");
+  const flash = c.req.query("flash") || undefined;
 
   // 機微情報の閲覧を監査ログに記録（誰が＝操作者メール）
   await appendAudit(c.env, { reservationId: id, actorType: "admin", actorId: c.get("admin").email, action: "view_guest_pii", detail: { guest_count: guests.length } });
@@ -1315,7 +1341,13 @@ app.get("/admin/r/:id", async (c) => {
       </div>
       <div class="card" style="margin-top:14px;padding:14px">
         <h2 style="margin-top:0">スマートロック暗証番号</h2>
-        <p class="muted">現在の状態：${keybox ? "設定済み" : "未設定"}（承認時に代表者メールが分かれば自動送信されます）</p>
+        ${flash === "pin_saved" ? html`<div class="notice ok">暗証番号を保存しました。</div>` : ""}
+        <p class="muted">現在の状態：${keybox ? `設定済み（最終変更：${fmtDt(keybox.changed_at)}）` : "未設定"}（承認時に代表者メールが分かれば自動送信されます）</p>
+        <p class="muted">PIN案内メール：${
+          pinEmailStatus
+            ? `${pinEmailStatus.ok ? "送付済み" : "送付を試みましたが失敗しました"}（${fmtDt(pinEmailStatus.at)}）`
+            : "まだ送付されていません"
+        }</p>
         <form method="post" action="/admin/r/${id}/set-pin" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
           <div>
             <label>${keybox ? "暗証番号を変更する" : "暗証番号を設定する"}</label>
@@ -1350,10 +1382,15 @@ async function issuePinViewToken(env: Env, reservationId: string): Promise<strin
 
 // 暗証番号が設定済み・代表者メールが分かっていればPIN案内メールを送る共通処理。
 // 承認時の自動送信と、承認後に暗証番号を(再)設定した時の自動送信の両方から呼ぶ。
+// 宛先は代表者の提出済みメールを優先し（承認する頃には代表者は必須項目として提出済みのことが多い）、
+// 万一空なら予約作成時のヒント(rep_email_hint)で代用する（完了確認メールと同じ優先順位）。
 async function sendPinEmailIfReady(env: Env, res: Reservation): Promise<void> {
   const keybox = await env.DB.prepare("SELECT id FROM keybox_codes WHERE reservation_id=? AND active=1 AND code_enc IS NOT NULL").bind(res.id).first<{ id: string }>();
-  const toEmail = res.rep_email_hint?.trim() || "";
-  if (!keybox || !toEmail) return;
+  if (!keybox) return;
+  const guests = await getGuestsByReservation(env, res.id);
+  const rep = guests.find((g) => g.member_role === "representative");
+  const toEmail = rep?.email?.trim() || res.rep_email_hint?.trim() || "";
+  if (!toEmail) return;
   const tk = await issuePinViewToken(env, res.id);
   const lang = normalizeLang(res.preferred_lang);
   const pinUrl = `${env.APP_BASE_URL}/pin/${tk}?lang=${lang}`;
@@ -1384,7 +1421,7 @@ app.post("/admin/r/:id/set-pin", async (c) => {
   // 承認済みの予約なら、暗証番号の(再)設定をトリガーに改めてPIN案内メールを送る
   // （承認が先・暗証番号設定が後、というありがちな運用順序でもゲストにメールが届くように）。
   if (res.review_status === "approved") await sendPinEmailIfReady(c.env, res);
-  return c.redirect(`/admin/r/${id}`);
+  return c.redirect(`/admin/r/${id}?flash=pin_saved`);
 });
 
 app.post("/admin/r/:id/approve", async (c) => {
@@ -1418,15 +1455,16 @@ app.get("/admin/r/:id/export.csv", async (c) => {
   const res = await getReservation(c.env, id);
   if (!res) return c.notFound();
   const guests = await getGuestsByReservation(c.env, id);
-  const header = ["slot", "role", "name", "has_jp_address", "address", "nationality", "passport_no_legacy", "occupation", "age", "gender", "phone", "email", "prev_stay", "stay_purpose", "check_in", "check_out"];
+  const header = ["reservation_code", "slot", "role", "name", "has_jp_address", "address", "nationality", "passport_no_legacy", "occupation", "age", "gender", "phone", "email", "prev_stay", "stay_purpose", "check_in", "check_out"];
   const lines = [header.join(",")];
+  const reservationCode = res.airbnb_reservation_code ?? id;
   for (const g of guests) {
     const address = (await decryptField(c.env.MASTER_KEY, g.address_enc)) ?? "";
     const passport = (await decryptField(c.env.MASTER_KEY, g.passport_no_enc)) ?? "";
     const phone = (await decryptField(c.env.MASTER_KEY, g.phone_enc)) ?? "";
     const stayPurpose = optLabel(STAY_PURPOSES, g.stay_purpose, "ja") + (g.stay_purpose_other ? `(${g.stay_purpose_other})` : "");
     const cells = [
-      g.slot_no, g.member_role, g.full_name ?? "", g.has_jp_address ?? "", address,
+      reservationCode, g.slot_no, g.member_role, g.full_name ?? "", g.has_jp_address ?? "", address,
       optLabel(NATIONALITIES, g.nationality, "ja") + (g.nationality_other ? `(${g.nationality_other})` : ""),
       passport, optLabel(OCCUPATIONS, g.occupation, "ja"), g.age ?? "", g.gender ?? "", phone, g.email ?? "", g.prev_stay ?? "", stayPurpose, res.check_in_date, res.check_out_date,
     ].map((x) => {
@@ -1440,7 +1478,8 @@ app.get("/admin/r/:id/export.csv", async (c) => {
   // TODO: Shift_JIS化（Workers標準はUTF-8のみ）。当面はUTF-8 BOM付き（Excel可）。
   const body = "﻿" + lines.join("\r\n");
   await appendAudit(c.env, { reservationId: id, actorType: "admin", actorId: c.get("admin").email, action: "export_csv" });
-  return c.body(body, 200, { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="roster_${id}.csv"` });
+  const safeFileCode = reservationCode.replace(/[^A-Za-z0-9_-]/g, "_");
+  return c.body(body, 200, { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="roster_${safeFileCode}.csv"` });
 });
 
 // 暗証番号の一度だけ表示。GETでは中身を見せず「表示する」ボタンのみ提示し（メールリンクスキャナ等の
@@ -1453,7 +1492,6 @@ async function resolvePinRow(c: any) {
   const lang = pickLang(c, resForLang?.preferred_lang);
   return { token, row, lang };
 }
-const NO_STORE = { "Cache-Control": "no-store, private, max-age=0", "Referrer-Policy": "no-referrer" };
 
 app.get("/pin/:token", async (c) => {
   const { token, row, lang } = await resolvePinRow(c);

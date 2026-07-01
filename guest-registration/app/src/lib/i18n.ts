@@ -85,12 +85,6 @@ export const T: Dict = {
     "zh-CN": "请输入本次入住人数，我们将为每位准备登记。",
     "zh-TW": "請輸入本次入住人數，我們將為每位準備登記。",
   },
-  links_note: {
-    ja: "以下のリンクを同行者ごとに共有してください。すでに共有したリンクも引き続きお使いいただけます（このページを開くたびにリンクが変わることはありません）。",
-    en: "Share each link with the corresponding companion. Links you've already shared keep working (they don't change each time you open this page).",
-    "zh-CN": "请将以下链接分别分享给同行者。已分享过的链接仍可继续使用（不会因再次打开此页面而失效）。",
-    "zh-TW": "請將以下連結分別分享給同行者。已分享過的連結仍可繼續使用（不會因再次開啟此頁面而失效）。",
-  },
   num_guests: { ja: "宿泊人数", en: "Number of guests", "zh-CN": "住宿人数", "zh-TW": "住宿人數" },
   declare_submit: { ja: "この人数で進む", en: "Continue", "zh-CN": "继续", "zh-TW": "繼續" },
 
@@ -100,9 +94,38 @@ export const T: Dict = {
   status_done: { ja: "登録済み", en: "Done", "zh-CN": "已登记", "zh-TW": "已登記" },
   status_pending: { ja: "未登録", en: "Pending", "zh-CN": "未登记", "zh-TW": "未登記" },
   enter_mine: { ja: "自分の情報を入力する", en: "Enter my information", "zh-CN": "填写我的信息", "zh-TW": "填寫我的資訊" },
-  share_links: { ja: "同行者にリンクを共有", en: "Share links with companions", "zh-CN": "与同行者共享链接", "zh-TW": "與同行者分享連結" },
   edit_link: { ja: "入力/修正", en: "Edit", "zh-CN": "填写/修改", "zh-TW": "填寫/修改" },
   all_done: { ja: "全員の登録が完了しました。ありがとうございました。", en: "Everyone is registered. Thank you!", "zh-CN": "所有人已登记完成，谢谢！", "zh-TW": "所有人已登記完成，謝謝！" },
+
+  // 宿泊情報入力ページ（進捗＋個人リンク共有を統合）
+  guest_info_title: { ja: "宿泊情報入力ページ", en: "Guest Information", "zh-CN": "住客信息登记页面", "zh-TW": "住客資訊登記頁面" },
+  guest_info_intro: {
+    ja: "必ず参加者全員の情報を入力してください。",
+    en: "Please make sure information is entered for all participants.",
+    "zh-CN": "请务必填写所有同住人员的信息。",
+    "zh-TW": "請務必填寫所有同住人員的資訊。",
+  },
+  guest_info_share_note: {
+    ja: "代表者がまとめて入力いただくか、リンク横の「コピー」を押してリンクをコピーし、参加者ご本人に送ってご入力いただいてください。",
+    en: "The representative can enter everyone's information directly, or press \"Copy\" next to a link to copy it and send it to that participant so they can fill it in themselves.",
+    "zh-CN": "可由代表人统一填写，或点击链接旁的“复制”按钮复制链接，发送给该住客本人自行填写。",
+    "zh-TW": "可由代表人統一填寫，或點擊連結旁的「複製」按鈕複製連結，傳送給該住客本人自行填寫。",
+  },
+  add_guests_label: { ja: "参加人数が増えましたか？", en: "Did your group size increase?", "zh-CN": "同住人数增加了吗？", "zh-TW": "同住人數增加了嗎？" },
+  add_guests_count_label: { ja: "追加する人数", en: "Number of additional guests", "zh-CN": "增加的人数", "zh-TW": "增加的人數" },
+  add_guests_button: { ja: "人数を追加する", en: "Add guests", "zh-CN": "增加人数", "zh-TW": "增加人數" },
+  add_guests_note: {
+    ja: "人数が増える場合は必ずこちらから追加してください。ただし、ここで追加するだけでは正式な人数変更にはなりません。追加された際は、必ずAirbnb等のメッセージでも人数が増えた旨をご連絡ください。",
+    en: "If your group size increases, please always add the extra guests here. However, adding guests here alone does not count as an official change of headcount — please also make sure to notify us via your Airbnb (or other platform) message that the number of guests has increased.",
+    "zh-CN": "如同住人数增加，请务必通过此处添加。但仅在此处添加并不构成正式的人数变更，请务必同时通过Airbnb等平台的消息告知我们人数已增加。",
+    "zh-TW": "如同住人數增加，請務必透過此處新增。但僅在此處新增並不構成正式的人數變更，請務必同時透過Airbnb等平台的訊息告知我們人數已增加。",
+  },
+  add_guests_error: {
+    ja: "追加できる人数の上限を超えています。ホストへ直接ご連絡ください。",
+    en: "This would exceed the maximum number of guests. Please contact the host directly.",
+    "zh-CN": "已超过可增加的人数上限，请直接联系房东。",
+    "zh-TW": "已超過可新增的人數上限，請直接聯絡房東。",
+  },
 
   // フォーム見出し・項目
   form_title: { ja: "宿泊者情報の入力", en: "Guest information", "zh-CN": "住客信息", "zh-TW": "住客資訊" },

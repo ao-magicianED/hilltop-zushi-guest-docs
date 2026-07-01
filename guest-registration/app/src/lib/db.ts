@@ -321,6 +321,58 @@ export async function declareGuests(
   return out;
 }
 
+export const MAX_GUESTS = 12;
+
+/** 申告済みの人数から追加で同行者を増やす（既存の枠は変更せず、末尾のslot_noから追記）。
+ * 参加人数が増えた場合の「宿泊情報入力ページ」からの人数追加機能で使う。 */
+export async function addMoreGuests(
+  env: Env,
+  res: Reservation,
+  existingGuests: Guest[],
+  addCount: number
+): Promise<{ guestId: string; slotNo: number; role: string; token: string }[]> {
+  const startSlot = existingGuests.reduce((m, g) => Math.max(m, g.slot_no), 0) + 1;
+  const newTotal = startSlot - 1 + addCount;
+  const expiresAt = checkoutExpiry(res.check_out_date);
+  const now = nowIso();
+  const imgPurge = addYears(laterIso(res.created_at, res.check_out_date + "T00:00:00Z"), parseInt(env.DATA_RETENTION_YEARS || "5", 10));
+
+  const out: { guestId: string; slotNo: number; role: string; token: string }[] = [];
+  const stmts: D1PreparedStatement[] = [];
+  for (let i = 0; i < addCount; i++) {
+    const slot = startSlot + i;
+    const guestId = newId("g_");
+    stmts.push(
+      env.DB.prepare(
+        `INSERT INTO guests (id, reservation_id, member_role, slot_no, img_purge_at, submit_status, filled_by, created_at, updated_at)
+         VALUES (?,?,'companion',?,?, 'draft','self',?,?)`
+      ).bind(guestId, res.id, slot, imgPurge, now, now)
+    );
+    const token = generateToken();
+    const th = await hashToken(token);
+    stmts.push(
+      env.DB.prepare(
+        "INSERT INTO guest_tokens (id, guest_id, token_hash, expires_at, created_at) VALUES (?,?,?,?,?)"
+      ).bind(newId("pt_"), guestId, th, expiresAt, now)
+    );
+    out.push({ guestId, slotNo: slot, role: "companion", token });
+  }
+
+  // 人数が増えた分、完了済み判定をリセットする（既に全員完了通知が送られていても、増えた人数を含めて
+  // 再度全員完了したタイミングで改めて通知が飛ぶように）。
+  stmts.push(
+    env.DB.prepare(
+      "UPDATE reservations SET declared_guests=?, expected_guests=?, completion_notified_at=NULL, updated_at=? WHERE id=?"
+    ).bind(newTotal, newTotal, now, res.id)
+  );
+
+  // 全INSERT/UPDATEを1トランザクションにまとめる。同時リクエストでslot_noが衝突した場合は
+  // UNIQUE制約違反でbatch全体が失敗し、中途半端な行が残らないようにする（呼び出し元でcatchする）。
+  await env.DB.batch(stmts);
+
+  return out;
+}
+
 export function computeProgress(guests: Guest[], expected: number): { done: number; total: number } {
   const done = guests.filter((g) => g.submit_status === "submitted").length;
   return { done, total: expected || guests.length };

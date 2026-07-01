@@ -4,6 +4,7 @@ import type { Lang } from "../types";
 import type { HE } from "./layout";
 import { t, OCCUPATIONS, NATIONALITIES, GENDERS, CHOOSE_REASONS, STAY_PURPOSES, optLabel } from "../lib/i18n";
 import type { Guest, Reservation } from "../lib/db";
+import { MAX_GUESTS } from "../lib/db";
 import type { FieldErrors } from "../lib/validation";
 
 const esc = (s: string) =>
@@ -126,41 +127,84 @@ export function declarePage(lang: Lang, opts: { token: string; max?: number; err
   </div>`;
 }
 
-// 進捗ダッシュボード（氏名＋済/未のみ。機微情報は出さない）
-export function progressPage(
+// 宿泊情報入力ページ（進捗確認＋各参加者への個人リンク共有を1画面に統合）。
+// 未提出者には都度新しい個人トークンを発行して表示する（提出済みには発行しない＝他人PII再オープン防止、
+// 生トークンはハッシュ化保存で復元不可なため毎回新規発行。旧リンクも失効はさせず並行して有効）。
+export function guestInfoPage(
   lang: Lang,
   opts: {
     groupToken: string;
-    guests: { slot_no: number; full_name: string | null; submit_status: string; guestId: string }[];
+    base: string;
+    guests: { slotNo: number; role: string; fullName: string | null; submitStatus: string; token: string | null }[];
     done: number;
     total: number;
+    addGuestsError?: boolean;
   }
 ): HE {
   const pct = opts.total > 0 ? Math.round((opts.done / opts.total) * 100) : 0;
+  const allDone = opts.done >= opts.total && opts.total > 0;
   const rows = opts.guests
-    .map((g) => {
-      const name = g.full_name ? esc(g.full_name) : `#${g.slot_no}`;
-      const done = g.submit_status === "submitted";
+    .map((g, i) => {
+      const label = g.fullName
+        ? esc(g.fullName)
+        : g.role === "representative"
+          ? `👑 ${t(lang, "representative_label")}`
+          : `#${g.slotNo}`;
+      const done = g.submitStatus === "submitted";
       const badge = done
         ? `<span class="badge ok">${t(lang, "status_done")}</span>`
         : `<span class="badge pending">${t(lang, "status_pending")}</span>`;
-      // 提出済みは編集リンクを出さない（第三者による他人PIIの再オープンを防ぐ、reveal と同じ安全策）
-      const link = done
-        ? ""
-        : `<a class="muted" href="/g/${opts.groupToken}/edit/${g.guestId}?lang=${lang}">${t(lang, "edit_link")}</a>`;
-      return `<li><span>${name}</span><span style="display:flex;gap:10px;align-items:center">${link} ${badge}</span></li>`;
+      if (done || !g.token) {
+        return `<li><span>${label}</span><span style="display:flex;gap:10px;align-items:center">${badge}</span></li>`;
+      }
+      const url = `${opts.base}/p/${g.token}?lang=${lang}`;
+      const id = `plink${i}`;
+      return `<li><span>${label}</span><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <a id="${id}" class="muted" href="${url}">${t(lang, "edit_link")}</a>
+        <button type="button" class="btn secondary" style="width:auto;padding:4px 10px" onclick="hzCopyGuestLink('${id}',this)">${t(lang, "copy_link")}</button>
+        ${badge}
+      </span></li>`;
     })
     .join("");
-  const allDone = opts.done >= opts.total && opts.total > 0;
+  const copiedLiteral = JSON.stringify(t(lang, "copied")).replace(/</g, "\\u003c");
   return html`
   <div class="card">
-    <h1>${t(lang, "progress_title")}</h1>
+    <h1>${t(lang, "guest_info_title")}</h1>
+    <div class="notice warn">${t(lang, "guest_info_intro")}</div>
+    <p class="muted">${t(lang, "guest_info_share_note")}</p>
     <p>${t(lang, "progress_count", { done: opts.done, total: opts.total })}</p>
     <div class="bar"><span style="width:${pct}%"></span></div>
     ${allDone ? html`<div class="notice ok">${t(lang, "all_done")}</div>` : ""}
     <ul class="list">${raw(rows)}</ul>
-    <p class="muted">${t(lang, "share_links")}</p>
-  </div>`;
+  </div>
+  ${(() => {
+    const remaining = Math.max(0, MAX_GUESTS - opts.guests.length);
+    if (remaining === 0) return "";
+    return html`<div class="card">
+      <h2>${t(lang, "add_guests_label")}</h2>
+      ${opts.addGuestsError ? html`<div class="notice err">${t(lang, "add_guests_error")}</div>` : ""}
+      <div class="notice warn">${t(lang, "add_guests_note")}</div>
+      <form method="post" action="/g/${opts.groupToken}/add-guests?lang=${lang}" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap">
+        <div>
+          <label>${t(lang, "add_guests_count_label")}</label>
+          <input type="number" name="add_count" min="1" max="${remaining}" required style="width:100px">
+        </div>
+        <button class="btn secondary" type="submit">${t(lang, "add_guests_button")}</button>
+      </form>
+    </div>`;
+  })()}
+  ${raw(`<script>
+function hzCopyGuestLink(id, btn){
+  var el = document.getElementById(id);
+  if (!el || !navigator.clipboard || !navigator.clipboard.writeText) return;
+  var text = el.tagName === 'A' ? el.href : el.textContent;
+  navigator.clipboard.writeText(text).then(function(){
+    var orig = btn.textContent;
+    btn.textContent = ${copiedLiteral};
+    setTimeout(function(){ btn.textContent = orig; }, 1500);
+  }).catch(function(){});
+}
+</script>`)}`;
 }
 
 function optionTags(opts: { code: string; label: Record<Lang, string> }[], lang: Lang, selected: string): string {
